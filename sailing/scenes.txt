@@ -31,7 +31,7 @@ zoom fire      | 연료탱크/가득/!start ignition
 cam            | 모든 게/준비 완료/!파도를/헤쳐
 spiral         | 긴장을 높여/눈 앞에/펼쳐지는/!어드벤처
 zoom speed     | 위험을 넘어/끝없이/질주하자/!오션라이너
-stamp          | Get on the Deck!/!Get on the Deck!
+stamp          | !Get on the Deck!
 wheel          | 너의 손에/!키를/붙잡아
 stamp          | Get on the Deck!/!Get on the Deck!
 zoom sun       | 붉은 태양의/저 바다로/!출발하자
