@@ -39,3 +39,13 @@ Flags: `inv` (yellow pop-art background), `fire` (fire gradient + embers), `dawn
 Emphasis chunks trigger screen shake, flash, shockwave ring, confetti and RGB split. Instrumental breaks and the outro show a bouncing SURGES title.
 
 Note: the singer repeats 「流れ続く空と日々の狭間に」 at 1:02, which the lyric sheet omits; `align.py` inserts it (`EXTRA`).
+
+## Sailing My Sea (sailing/)
+
+Second song, Korean lyrics only. `sailing/lines.json` timings come from `sailing/tools/`: UVR vocal separation, Whisper large-v3 + Korean zipformer (sherpa-onnx models from GitHub releases), phrase VAD (`groups.txt`), syllables placed on vocal onsets.
+Extra styles: `type` (hangul composes like typing), `wave`, `wheel` (ship wheel), `hoist` (sail rising), `stamp`. Background is a sea/sky that changes with time of day per section.
+
+```
+python3 sailing/build.py
+node work/render.mjs sailing.mp4 --page sailing/kinetic.html --audio sailing/song.mp3
+```
