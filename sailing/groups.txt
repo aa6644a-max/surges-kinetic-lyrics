@@ -13,7 +13,7 @@
 67.48-71.60 | 모두가 파란 세상 파란 하늘 바다를 봐봐 // 알고도 싶고 보고도 싶은 것도 너무나 많아
 71.69-73.70 | Go Let's Go 모두 같이 출발
 73.75-82.85 | 연료탱크 가득 start ignition // 모든 게 준비 완료 파도를 헤쳐 // 긴장을 높여 눈 앞에 펼쳐지는 어드벤처 // 위험을 넘어 끝없이 질주하자 오션라이너
-83.11-95.86 | Get on the Deck! // 너의 손에 키를 붙잡아 // Get on the Deck! Get on the Deck! // 붉은 태양의 저 바다로 출발하자 // Yeah~ Oh Yeah~
+82.10-95.86 | Get on the Deck! Get on the Deck! // 너의 손에 키를 붙잡아 // Get on the Deck! Get on the Deck! // 붉은 태양의 저 바다로 출발하자 // Yeah~ Oh Yeah~
 100.86-105.57 | Yeah~ Never Say Die Gotta Go!
 106.08-108.76 | Go!! Go!!!
 109.18-113.15 | 저 파란 하늘 아래로
