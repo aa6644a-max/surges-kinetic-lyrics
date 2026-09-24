@@ -33,6 +33,8 @@ ffmpeg comes from `pip install imageio-ffmpeg` (or set `FFMPEG`). Set `CHROME` t
 | `tate` | vertical writing, columns slide down | columns shutter up/down |
 | `shout` | giant emphasis word slams in and shakes | letters explode |
 
+Fonts: Noto Sans JP Black (lyrics, title), Noto Sans KR Bold (Korean subtitles).
+
 Flags: `inv` (yellow pop-art background), `fire` (fire gradient + embers), `dawn` (sunrise background).
 Emphasis chunks trigger screen shake, flash, shockwave ring, confetti and RGB split. Instrumental breaks and the outro show a bouncing SURGES title.
 
