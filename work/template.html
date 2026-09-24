@@ -5,74 +5,146 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Surges Kinetic Lyrics</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@500;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@700&family=Gothic+A1:wght@500;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0b0a12;--fg:#f4f1ff;--dim:#5b5670;--a1:#ff3d7f;--a2:#3de0ff;--a3:#ffd23d}
 *{box-sizing:border-box;margin:0}
-html,body{height:100%;background:var(--bg);color:var(--fg);overflow:hidden;font-family:"Zen Kaku Gothic New",sans-serif}
-#stage{position:fixed;inset:0;display:grid;place-items:center;perspective:900px}
-#ring{position:absolute;width:60vmin;height:60vmin;border-radius:50%;border:2px solid var(--a1);opacity:0;pointer-events:none}
-#ring.hit{animation:ring .5s ease-out}
-@keyframes ring{from{transform:scale(.6);opacity:.55}to{transform:scale(1.6);opacity:0}}
-#flash{position:absolute;inset:0;background:radial-gradient(circle,rgba(255,61,127,.18),transparent 60%);opacity:0;transition:opacity .25s}
-#line{position:relative;max-width:88vw;text-align:center;line-height:1.25;font-family:"Dela Gothic One",sans-serif;font-size:clamp(28px,7vw,92px);transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,.9,.2,1)}
-#line.out{animation:out .45s forwards cubic-bezier(.6,0,.8,.4)}
-@keyframes out{to{opacity:0;filter:blur(12px);transform:translateY(-40px) scale(1.1)}}
-.w{display:inline-block;opacity:0;transform:translateY(.6em) scale(.4) rotate(var(--r,0deg));filter:blur(8px);transition:opacity .12s,transform .38s cubic-bezier(.2,1.6,.4,1),filter .2s,color .3s}
-.w.on{opacity:1;transform:none;filter:none}
-.w.now{color:var(--a3);text-shadow:0 0 24px rgba(255,210,61,.6)}
-.w.key{color:var(--a1);font-size:1.35em}
-.v1 .w{--r:-18deg}.v2 .w{transform:translateX(-1.2em) skewX(-20deg);}
-.v3 .w{transform:translateZ(300px) scale(2.2)}
-.v1 .w.on,.v2 .w.on,.v3 .w.on{transform:none}
-#gap{position:absolute;font-family:"Dela Gothic One";font-size:clamp(40px,14vw,200px);color:transparent;-webkit-text-stroke:1.5px var(--dim);opacity:0;transition:opacity .8s;letter-spacing:.1em}
-#gap.show{opacity:1}
-#ui{position:fixed;left:16px;right:16px;bottom:16px;display:flex;gap:12px;align-items:center;font:13px/1 system-ui;color:var(--dim)}
+html,body{height:100%;background:#000;overflow:hidden}
+/* fixed 1080x1920 canvas, scaled to fit the window in preview */
+#cv{position:absolute;left:50%;top:50%;width:1080px;height:1920px;transform-origin:0 0;overflow:hidden;background:var(--bg);color:var(--fg);font-family:"Dela Gothic One",sans-serif}
+#bg{position:absolute;inset:-10%;}
+.ring{position:absolute;left:50%;top:44%;border-radius:50%;border:3px solid var(--a1);translate:-50% -50%}
+#r1{width:760px;height:760px}#r2{width:1100px;height:1100px;border-color:var(--a2);border-width:2px}
+.dot{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--fg)}
+#flash{position:absolute;inset:0;background:radial-gradient(circle at 50% 44%,rgba(255,61,127,.35),transparent 60%)}
+#bars{position:absolute;left:0;right:0;bottom:0;height:260px;display:flex;align-items:flex-end;gap:6px;padding:0 40px;opacity:.28}
+#bars i{flex:1;background:linear-gradient(var(--a2),var(--a1));border-radius:4px 4px 0 0}
+.ln{position:absolute;left:90px;right:90px;top:44%;translate:0 -50%;line-height:1.22;will-change:transform}
+.jp{white-space:normal;word-break:break-all}
+.w{display:inline-block;will-change:transform,opacity}
+.w.key{color:var(--a1)}
+.ko{margin-top:48px;font:800 46px/1.35 "Gothic A1",sans-serif;color:#cfc9e8;letter-spacing:-.01em}
+.bk{position:absolute;left:0;right:0;font:700 40px/1.3 "Zen Kaku Gothic New",sans-serif;color:var(--a2)}
+.bk small{display:block;font:500 30px "Gothic A1";color:#8fdcef;margin-top:6px}
+#title{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+#title b{display:block;font-size:168px;letter-spacing:.04em;color:transparent;-webkit-text-stroke:3px var(--fg);line-height:1}
+#title span{display:block;margin-top:40px;font:700 44px "Zen Kaku Gothic New";color:var(--a3);letter-spacing:.2em}
+#prog{position:absolute;left:0;top:0;height:8px;background:linear-gradient(90deg,var(--a2),var(--a1))}
+#ui{position:fixed;left:16px;right:16px;bottom:16px;display:flex;gap:12px;align-items:center;font:13px/1 system-ui;color:#aaa;z-index:2}
 #ui button{background:var(--a1);color:#fff;border:0;border-radius:999px;width:44px;height:44px;font-size:18px;cursor:pointer;flex:none}
 #bar{flex:1;height:6px;background:#221f30;border-radius:3px;position:relative;cursor:pointer}
 #fill{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,var(--a2),var(--a1));border-radius:3px}
-#pick{position:fixed;top:16px;right:16px;font:12px system-ui;color:var(--dim)}
-#pick input{display:none}#pick label{cursor:pointer;text-decoration:underline}
+.render #ui{display:none}
 </style>
 </head>
 <body>
-<div id="stage"><div id="flash"></div><div id="ring"></div><div id="gap">SURGES</div><div id="line"></div></div>
-<div id="pick"><label>음원 다시 선택<input type="file" accept="audio/*" id="file"></label></div>
+<div id="cv">
+  <div id="bg"><div class="ring" id="r2"></div><div class="ring" id="r1"></div></div>
+  <div id="flash"></div>
+  <div id="bars"></div>
+  <div id="title"><b>SURGES</b><span>おとなりモンスター 歌ってみた</span></div>
+  <div id="stage"></div>
+  <div id="prog"></div>
+</div>
 <div id="ui"><button id="pp">▶</button><div id="bar"><div id="fill"></div></div><span id="time">0:00</span></div>
 <audio id="au" src="song.m4a" preload="auto"></audio>
 <script>
 const D=/*DATA*/null;
-const KEY=/最高|未来|燃え|心|空|明日|日常|上等|夜明け/;
-const au=document.getElementById('au'),lineEl=document.getElementById('line'),gap=document.getElementById('gap'),
-ring=document.getElementById('ring'),flash=document.getElementById('flash'),fill=document.getElementById('fill'),tm=document.getElementById('time');
-let cur=-1,spans=[],bi=0;
-function build(i){
-  const L=D.lines[i];lineEl.className='v'+(i%4);lineEl.innerHTML='';
-  lineEl.style.transform=`rotate(${[0,-3,2,-1][i%4]}deg) translateY(${[0,-4,3,-2][i%4]}vh)`;
-  spans=L.w.map(([t])=>{const s=document.createElement('span');s.className='w'+(KEY.test(t)?' key':'');s.textContent=t;lineEl.appendChild(s);return s});
-  // mark multi-token keywords
-  const txt=L.w.map(w=>w[0]).join('');let m,re=new RegExp(KEY.source,'g');
-  while((m=re.exec(txt))){let p=0;L.w.forEach((w,k)=>{const a=p,b=p+w[0].length;if(b>m.index&&a<m.index+m[0].length)spans[k].classList.add('key');p=b})}
-}
-function lineAt(t){for(let i=D.lines.length-1;i>=0;i--){const L=D.lines[i];if(t>=L.s-0.05)return t<L.e+0.8?i:-1}return -1}
-function tick(){
-  const t=au.currentTime,i=lineAt(t);
-  if(i!==cur){
-    if(i<0){lineEl.classList.add('out')}else{build(i)}
-    cur=i;gap.classList.toggle('show',i<0);
+const KEY=/最高|未来|燃え|心|空|明日|日常|上等|夜明け|熱情|光/;
+const $=id=>document.getElementById(id);
+const cv=$('cv'),stage=$('stage'),bg=$('bg'),flash=$('flash'),title=$('title'),prog=$('prog'),bars=$('bars');
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+const easeOut=x=>1-Math.pow(1-x,3);
+const back=x=>{const c=1.9;x-=1;return 1+(c+1)*x*x*x+c*x*x};
+function fit(){const s=Math.min(innerWidth/1080,innerHeight/1920);cv.style.transform=`scale(${s}) translate(-50%,-50%)`}
+addEventListener('resize',fit);fit();
+
+// deterministic pseudo-random
+const rnd=i=>{const x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x)};
+const dots=[...Array(46)].map((_,i)=>{const d=document.createElement('div');d.className='dot';bg.appendChild(d);return d});
+const barEls=[...Array(24)].map(()=>{const b=document.createElement('i');bars.appendChild(b);return b});
+
+// per-line layout variants: [text-align, rotate(deg), font scale]
+const VAR=[['center',0],['left',-4],['right',3],['left',2],['center',-2],['right',-3]];
+function fontSize(n){return n<=7?170:n<=10?140:n<=13?118:n<=16?100:n<=19?90:84}
+
+const lines=D.lines.map((L,i)=>{
+  const el=document.createElement('div');el.className='ln';
+  const [al,rot]=VAR[i%VAR.length];el.style.textAlign=al;
+  const n=L.w.length;
+  const jp=document.createElement('div');jp.className='jp';jp.style.fontSize=fontSize(n)+'px';
+  const txt=L.w.map(w=>w[0]).join('');const hit=new Array(n).fill(false);
+  let m,re=new RegExp(KEY.source,'g');
+  while((m=re.exec(txt))){let p=0;L.w.forEach((w,k)=>{const a=p,b=p+w[0].length;if(b>m.index&&a<m.index+m[0].length)hit[k]=true;p=b})}
+  const spans=L.w.map(([t],k)=>{const s=document.createElement('span');s.className='w'+(hit[k]?' key':'');s.textContent=t;jp.appendChild(s);return s});
+  el.appendChild(jp);
+  const ko=document.createElement('div');ko.className='ko';ko.textContent=L.ko.replace(/[「」]/g,"").trim();el.appendChild(ko);
+  let bk=null;
+  if(L.bk){bk=document.createElement('div');bk.className='bk';bk.style.textAlign=al;bk.innerHTML=`(${L.bk})<small>(${L.bko})</small>`;bk.style.bottom='calc(100% + 60px)';el.appendChild(bk)}
+  el.style.display='none';stage.appendChild(el);
+  // visible window: from start until the next line starts (or a short hold)
+  const next=D.lines[i+1];const hold=next&&next.s-L.e<3?next.s:L.e+1.2;
+  return {L,el,jp,ko,bk,spans,rot,dir:i%2?1:-1,in:L.s-.15,out:hold}
+});
+
+function beatPulse(t){let lo=0,hi=D.beats.length-1,b=-1;while(lo<=hi){const m=(lo+hi)>>1;if(D.beats[m]<=t){b=m;lo=m+1}else hi=m-1}
+  return b<0?0:Math.exp(-(t-D.beats[b])*7)}
+function energy(t){const E=D.energy;if(!E)return .5;const i=clamp(Math.floor(t*2),0,E.length-1);return E[i]}
+
+function render(t){
+  const p=beatPulse(t),en=energy(t);
+  // background
+  const hue=(t*6)%360;
+  cv.style.background=`radial-gradient(ellipse at 50% ${40+10*Math.sin(t*.3)}%,hsl(${260+40*Math.sin(t*.1)} 45% ${10+6*en}%),#07060c 70%)`;
+  $('r1').style.transform=`scale(${.85+.25*p}) rotate(${t*20}deg)`;$('r1').style.opacity=.15+.5*p;
+  $('r2').style.transform=`scale(${1+.08*p})`;$('r2').style.opacity=.08+.2*p;
+  flash.style.opacity=(.25+.75*en)*p;
+  dots.forEach((d,i)=>{const sp=20+60*rnd(i),y=((rnd(i+50)*2200-t*sp)%2200+2200)%2200-100;
+    d.style.transform=`translate(${rnd(i+9)*1300}px,${y}px) scale(${.5+rnd(i+3)*1.5+p})`;d.style.opacity=.15+.5*rnd(i+7)});
+  barEls.forEach((b,i)=>{b.style.height=(20+230*en*(.35+.65*Math.abs(Math.sin(i*1.7+t*3.1+rnd(i)*6)))*(.6+.4*p))+'px'});
+  prog.style.width=(t/D.dur*100)+'%';
+
+  // lyrics
+  let any=false;
+  for(const o of lines){
+    const vis=t>=o.in&&t<o.out+.4;
+    if(!vis){if(o.el.style.display!=='none')o.el.style.display='none';continue}
+    any=true;o.el.style.display='';
+    const ex=clamp((t-o.out)/.4);           // exit progress
+    const ent=easeOut(clamp((t-o.in)/.4));  // entry progress
+    const sc=1+.035*p;
+    o.el.style.transform=`rotate(${o.rot*(1-.3*ex)}deg) translateY(${(1-ent)*60-ex*140}px) scale(${sc*(1+ex*.15)})`;
+    o.el.style.opacity=1-ex;o.el.style.filter=ex>0?`blur(${ex*14}px)`:'';
+    o.L.w.forEach(([,s,e],k)=>{
+      const sp=o.spans[k],a=clamp((t-s)/.32);
+      if(a<=0){sp.style.opacity=0;sp.style.transform=`translate(${o.dir*40}px,70px) scale(.3) rotate(${o.dir*25}deg)`;sp.style.filter='blur(10px)';sp.style.color='';sp.style.textShadow='';return}
+      const b=back(a);
+      sp.style.opacity=clamp(a*2.5);
+      sp.style.transform=`translate(${o.dir*40*(1-b)}px,${70*(1-b)}px) scale(${.3+.7*b}) rotate(${o.dir*25*(1-b)}deg)`;
+      sp.style.filter=a<1?`blur(${10*(1-a)}px)`:'';
+      const now=t>=s&&t<e+.08;
+      sp.style.color=now?'var(--a3)':'';
+      sp.style.textShadow=now?'0 0 30px rgba(255,210,61,.7)':sp.classList.contains('key')?'0 0 24px rgba(255,61,127,.5)':'';
+    });
+    const ka=clamp((t-o.L.s-.2)/.5);o.ko.style.opacity=ka;o.ko.style.transform=`translateY(${(1-easeOut(ka))*20}px)`;
+    if(o.bk){const ba=clamp((t-o.L.s-.3)/.5);o.bk.style.opacity=ba*.9;o.bk.style.transform=`translateX(${(1-easeOut(ba))*-30}px)`}
   }
-  if(i>=0){const W=D.lines[i].w;W.forEach(([,s,e],k)=>{spans[k].classList.toggle('on',t>=s);spans[k].classList.toggle('now',t>=s&&t<e+.05)})}
-  while(bi<D.beats.length&&D.beats[bi]<t){if(t-D.beats[bi]<.1&&!au.paused){ring.classList.remove('hit');void ring.offsetWidth;ring.classList.add('hit');flash.style.opacity=1;setTimeout(()=>flash.style.opacity=0,90)}bi++}
-  fill.style.width=(t/(au.duration||1)*100)+'%';tm.textContent=Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0');
-  requestAnimationFrame(tick);
+  // title card in instrumental gaps
+  const tt=any?0:1;title.style.opacity=tt;
+  title.style.transform=`scale(${1+.04*p+.01*Math.sin(t)})`;
 }
-au.addEventListener('seeked',()=>{bi=D.beats.findIndex(b=>b>=au.currentTime);if(bi<0)bi=D.beats.length;cur=-2});
-document.getElementById('pp').onclick=()=>{au.paused?au.play():au.pause()};
-au.onplay=()=>pp.textContent='❚❚';au.onpause=()=>pp.textContent='▶';
-document.getElementById('bar').onclick=e=>{const r=e.currentTarget.getBoundingClientRect();au.currentTime=(e.clientX-r.left)/r.width*au.duration};
-document.addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();pp.click()}if(e.code==='ArrowRight')au.currentTime+=5;if(e.code==='ArrowLeft')au.currentTime-=5});
-document.getElementById('file').onchange=e=>{const f=e.target.files[0];if(f){au.src=URL.createObjectURL(f);au.play()}};
-requestAnimationFrame(tick);
+window.renderAt=render;window.DUR=D.dur;
+
+if(new URLSearchParams(location.search).has('render')){document.body.classList.add('render');render(0)}
+else{
+  const au=$('au'),pp=$('pp');
+  const loop=()=>{render(au.currentTime);$('fill').style.width=(au.currentTime/D.dur*100)+'%';
+    $('time').textContent=Math.floor(au.currentTime/60)+':'+String(Math.floor(au.currentTime%60)).padStart(2,'0');requestAnimationFrame(loop)};
+  pp.onclick=()=>{au.paused?au.play():au.pause()};au.onplay=()=>pp.textContent='❚❚';au.onpause=()=>pp.textContent='▶';
+  $('bar').onclick=e=>{const r=e.currentTarget.getBoundingClientRect();au.currentTime=(e.clientX-r.left)/r.width*D.dur};
+  document.addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();pp.click()}if(e.code==='ArrowRight')au.currentTime+=5;if(e.code==='ArrowLeft')au.currentTime-=5});
+  requestAnimationFrame(loop);
+}
 </script>
 </body>
 </html>
