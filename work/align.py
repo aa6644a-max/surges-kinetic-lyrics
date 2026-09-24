@@ -71,13 +71,15 @@ out = []
 for li, p in enumerate(parsed):
     ct = {k: times[n] for n, (l, k, _) in enumerate(lc) if l == li}
     # units: every character, punctuation glued to its neighbour
-    units, last = [], None
+    units, last, quoted = [], None, False
     for k, c in enumerate(p["main"]):
         if c in " 　":
-            if units: units[-1][0] += " "
             continue
         if c in PUNCT:
-            if units and c not in "「“”\"" : units[-1][0] += c
+            opening = c in "「“" or (c in "”\"" and not quoted)  # ”…” is used as a pair
+            if c in "”\"":
+                quoted = not quoted
+            if units and not opening: units[-1][0] += c
             else: last = c  # opening mark: prefix next unit
             continue
         s, e = ct[k]

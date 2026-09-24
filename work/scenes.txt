@@ -1,0 +1,47 @@
+# One row per lyric line (same order as work/lines.json).
+# style [flags] | chunks separated by "/" ; "!" marks an emphasis chunk.
+# styles: cam spiral stack zoom scatter bounce tate shout
+# flags:  wind rise fire inv dawn
+cam            | 流れ続く/!空と/日々の/狭間に
+stack          | 形のない/!今日を/それでも/!進む
+scatter wind   | 何も/知らぬ朝と/清かな/!風に
+tate           | 息を繋ぐ/僕らの声は/何を/!望む？
+zoom           | 迷っていた/!君に/届かない
+bounce         | 言葉は/いつだって/!単純で
+spiral         | 目指していた/!明日に/届かない
+stack          | 心が/僕らには/!最高で
+zoom           | わかっていたって/!諦め切れない
+scatter fire   | 心の奥が/まだ/!燃えていて
+bounce         | 何もないなんて/謂えない/!僕ら
+stack          | 大人になる前の/!延長戦
+cam            | 足を/踏み出した/その先の/!空を
+scatter rise   | !駆け上がる/僕らの/日常が
+spiral         | 願った/!未来を/越える/!未来まで
+stack          | 止まらぬ/僕たちの/!最高を/目指して征く
+zoom           | 君に/届かない/言葉は/いつだって/!単純で
+tate           | 目指していた/!明日に/届かない
+scatter fire   | 心が/いつまでも/!燃えていて
+cam            | 描いた/!未来が/昨日に/なるまで
+stack          | 止まらぬ/僕たちの/!熱情が
+zoom           | 「踠いていたって/何も/掴めない/!光が
+shout inv      | 僕らには/!上等！」
+bounce         | なんて/歌っている
+cam            | 流れ続く/!空と/日々の/狭間に
+tate           | 形のない/!今日を/それでも/!進む
+scatter wind   | 行方のない/朝の/穏やかな/!風に
+stack          | !涙滲む/僕らの声は/何を/!望む？
+zoom           | 迷っていた/!君に/届かない
+bounce         | 言葉は/いつだって/!単純で
+spiral         | 願っていた/!明日に/届かない/心は
+stack          | いつだって/その先を/!目指している
+zoom           | わかっていたって/!諦め切れない
+scatter fire   | 心の奥が/まだ/!燃えていて
+cam            | 望まぬ/未来が/そこに/あったって/!進む
+stack          | 僕たちは/!最高を/目指して征ける
+zoom fire      | 言葉にならない/心の全部を/!燃やしてゆけ
+spiral         | 踠いていたって/何も/掴めない/!光が
+shout inv      | 僕らには/!上等だ！/って
+bounce         | 目指していた/誰も/知り得ない
+stack dawn     | !夜明けを/僕達は/越えてゆけ
+spiral         | 描いた未来の/その先の/空を/!貫く
+shout inv      | 僕たちの/!”最高”を/目指して征け
