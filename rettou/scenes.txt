@@ -1,0 +1,54 @@
+# One row per line of lyrics.txt. style [flags] | chunks separated by "/" ; "!" = emphasis
+# styles: cam spiral stack zoom scatter bounce tate shout   flags: inv fire dawn wind rise
+cam            | 誰か/夢が/!破れた
+spiral         | 誰かの/席が/!空いた
+stack          | 君の/夢を/!笑った
+zoom           | この/!劣等感が
+shout inv      | !弱虫
+tate           | 僕を/!不安定に/させる
+scatter        | 甘い/蜜の/美味は/!安定だ/なのに
+scatter wind   | 空きっ腹に/!風
+spiral         | 満たされてない/ないの/!循環系
+zoom           | 涙/枯れる/花咲く/!吹雪く
+bounce         | ゆらりと/!落ちる
+stack          | 踏まれ/帰り/また/!芽吹いて
+cam            | この/!原動力を/笑えるか？
+tate           | 君が/去って/!握った
+zoom           | 錆びる/朽ちる/!栄光
+stack          | この/!劣等感/喪失感
+zoom           | 達成感は/!虚無/かんからの
+stack          | 存在感/!充実感
+shout          | 優越感が/!僕のじゃ/ないって
+spiral         | 誰か/夢が/!破れた
+cam            | 誰かの/席が/!空いた
+scatter        | 君の/夢を/!笑った
+shout inv      | この劣等感が/!弱虫/だろ
+zoom           | 劣等/喪失/達成/!存在
+zoom           | 充実/優越/!虚無/からの
+zoom           | 青春/葛藤/恋愛/!夢
+zoom           | 社会/挫折/!幸福
+cam            | されど/道は/!続いて
+stack          | 人は/!懸命に/生きている
+tate           | 恥を/忍び/!食い縛って
+spiral         | そんな/現状も/!奪うのか？
+bounce         | 落とし物を/!拾った
+zoom           | 光る/映る/!影
+stack          | この/!劣等感/喪失感
+zoom           | 達成感は/!虚無
+scatter        | 揺らぐ/存在感/!充実感
+cam            | 優越感が/!僕のじゃない
+spiral         | 劣等感/!喪失感
+zoom           | 達成感は/!虚無/かんからの
+stack          | 存在感/!充実感
+shout          | 優越感が/!僕のじゃ/ないって
+stack inv      | この/劣等感を/!浄化
+scatter        | その/存在感は/!幻影
+zoom           | 劣等感/!喪失感
+zoom           | 達成感が/!虚無
+stack          | だから/存在感/!充実感
+stack dawn     | 優越感は/!君と/じゃなきゃ/駄目
+cam            | 誰か/夢が/!破れた
+spiral         | 誰かの/席が/!空いた
+stack          | 君の/夢を/!笑った
+zoom           | この/!劣等感が
+shout inv      | !弱虫
