@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Ashita Storyboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@100;300;600&family=Noto+Sans+JP:wght@300;700;900&family=Noto+Sans+KR:wght@300;700&display=swap" rel="stylesheet">
+<style>html,body{margin:0;background:#000}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="cv" width="1080" height="1920"></canvas>
+<script src="../shared/cine.js"></script>
+<script src="../shared/figures.js"></script>
+<script>
+// Storyboard stills: frame k = renderAt(k). Original silhouette characters (the boy, and "you").
+CINE.init(document.getElementById('cv'),{lines:[]});cv.style.transform='none';
+ACC='#8FE3FF';const ORG='#FFB547';
+function sky(a,b,c){const gr=g.createLinearGradient(0,0,0,H);gr.addColorStop(0,a);gr.addColorStop(.6,b);gr.addColorStop(1,c);g.fillStyle=gr;g.fillRect(0,0,W,H)}
+function moon(x,y,r,a=1){g.save();g.globalAlpha=a;const gl=g.createRadialGradient(x,y,r*.8,x,y,r*3);gl.addColorStop(0,'rgba(220,235,255,.35)');gl.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gl;g.fillRect(x-r*3,y-r*3,r*6,r*6);g.fillStyle='#EAF2FF';g.beginPath();g.arc(x,y,r,0,7);g.fill();g.restore()}
+function skyline(y,col,seed=1,lit=1){g.fillStyle=col;g.beginPath();g.moveTo(-50,H+50);g.lineTo(-50,y);let x=-50;while(x<W+60){const w=40+80*R(x,seed),h=60+260*R(x,seed+1)**2;g.lineTo(x,y-h);g.lineTo(x+w,y-h);x+=w}g.lineTo(W+60,H+50);g.fill();
+  for(let k=0;k<140;k++){if(R(k,seed+5)>.55*lit)continue;g.fillStyle=`rgba(255,${200+40*R(k,9)|0},140,${.35+.4*R(k,8)})`;g.fillRect(R(k,seed+6)*W,y-20-R(k,seed+7)*240,4,5)}}
+function roof(y){g.fillStyle='#02030B';g.fillRect(0,y,W,H-y);g.fillStyle='#070916';g.fillRect(0,y,W,10);for(let k=0;k<6;k++){g.fillRect(40+k*190,y-60,8,60);g.fillRect(40+k*190,y-64,190,6)}}
+function ko(txt,y=1760,a=.85){g.save();g.globalAlpha=a;g.font=KR(300,36);g.textAlign='center';g.fillStyle='#E6EEFF';g.fillText(txt,CX,y);g.restore()}
+function jp(txt,x,y,f,w=700,col='#fff',glow=24,gcol=ACC){g.save();g.font=JP(w,f);g.textAlign='center';g.textBaseline='middle';g.fillStyle=col;g.shadowColor=gcol;g.shadowBlur=glow;g.fillText(txt,x,y);g.restore()}
+function label(k,txt){g.save();g.font=EN(300,24);g.fillStyle='rgba(255,255,255,.6)';g.textAlign='left';g.fillText(`SCENE ${k}  —  ${txt}`,60,110);g.restore()}
+const F=[
+// 1 rooftop: the boy on the edge, legs over the drop
+t=>{sky('#050820','#0E1646','#1F2A66');stars(t,.1,200,1,.8);moon(820,380,80);skyline(1500,'#04061A',3);roof(1180);
+  g.fillStyle='#02030B';g.fillRect(0,1180,W,20);figure(420,1190,1.05,'sit',{who:'boy',col:'#010208'});jp('気分次第です',CX,700,86,300,'#E6EEFF',12);ko('제멋대로인 소년, 밤 옥상 끝',1760);label(1,'ROOFTOP')},
+// 2 the clock in the sky turns backward
+t=>{sky('#060A24','#101A55','#1A2150');stars(t,.1,160,5,.7);const cx=CX,cy=720,r=380;g.strokeStyle='rgba(200,230,255,.8)';g.lineWidth=6;g.beginPath();g.arc(cx,cy,r,0,7);g.stroke();
+  for(let k=0;k<60;k++){const a=k*Math.PI/30,l=k%5?14:40;g.lineWidth=k%5?2:5;g.beginPath();g.moveTo(cx+Math.sin(a)*(r-l),cy-Math.cos(a)*(r-l));g.lineTo(cx+Math.sin(a)*(r-6),cy-Math.cos(a)*(r-6));g.stroke()}
+  for(let k=0;k<14;k++){const a=-.8-k*.09;g.strokeStyle=`rgba(143,227,255,${.5*(1-k/14)})`;g.lineWidth=10;g.beginPath();g.moveTo(cx,cy);g.lineTo(cx+Math.sin(a)*r*.85,cy-Math.cos(a)*r*.85);g.stroke()}
+  g.strokeStyle='#fff';g.lineWidth=12;g.beginPath();g.moveTo(cx,cy);g.lineTo(cx+Math.sin(-.8)*r*.85,cy-Math.cos(-.8)*r*.85);g.stroke();g.lineWidth=16;g.beginPath();g.moveTo(cx,cy);g.lineTo(cx+Math.sin(2.2)*r*.55,cy-Math.cos(2.2)*r*.55);g.stroke();
+  jp('↺',cx+r+40,cy-r+40,90,300,ACC,20);for(let k=0;k<9;k++){g.save();g.translate(200+k*90,1250-k*40);g.rotate(-.3+k*.1);g.fillStyle=`rgba(230,238,255,${.25+.05*k})`;g.fillRect(-50,-60,100,120);g.fillStyle='#10163F';g.font=EN(600,40);g.textAlign='center';g.fillText(String(31-k),0,15);g.restore()}
+  skyline(1640,'#04061A',7);roof(1640);figure(760,1640,.55,'lookup',{who:'boy',col:'#010208'});ko('미래가 무서워 과거에 빈다 — 시계가 거꾸로',1760);label(2,'THE CLOCK TURNS BACK')},
+// 3 time-lapse: days and nights rush past, only the boy stays still
+t=>{sky('#2A3B7A','#6C6FA8','#F0A870');for(let k=0;k<6;k++){g.strokeStyle=k%2?'rgba(255,220,160,.7)':'rgba(220,235,255,.6)';g.lineWidth=k%2?14:8;g.beginPath();g.arc(CX,1500,600+k*90,-Math.PI*.95,-Math.PI*.05);g.stroke()}
+  for(let k=0;k<30;k++){g.fillStyle=`rgba(255,255,255,${.15})`;g.fillRect(0,300+k*30,W,8)}skyline(1520,'#0A0C22',11,.5);roof(1520);figure(540,1520,.62,'stand',{who:'boy',col:'#010208'});ko('달이 지고 해가 뜬다 — 세상은 빨리 감기, 소년만 정지',1760);label(3,'TIME-LAPSE')},
+// 4 the hands
+t=>{sky('#070C2A','#141C50','#22295E');stars(t,.1,140,9,.6);g.save();g.fillStyle='#02030B';g.strokeStyle='#02030B';
+  g.lineCap='round';g.lineWidth=90;g.beginPath();g.moveTo(-100,1180);g.lineTo(430,960);g.stroke();g.lineWidth=40;for(let k=0;k<4;k++){g.beginPath();g.moveTo(430,960);g.lineTo(490+k*6,890+k*30);g.stroke()}
+  g.lineWidth=90;g.beginPath();g.moveTo(1180,700);g.lineTo(660,880);g.stroke();g.lineWidth=40;for(let k=0;k<4;k++){g.beginPath();g.moveTo(660,880);g.lineTo(600-k*6,950-k*30+60);g.stroke()}g.restore();
+  g.fillStyle=ORG;g.fillRect(1000,720,80,90);flare(545,925,14,'rgba(255,255,255,.95)',1,1.6);jp('君は僕の手を',CX,1400,90,700,'#fff',24,ORG);ko('그 밤, 너는 내 손을',1760);label(4,'HANDS')},
+// 5 rain in the city: alone under a streetlight
+t=>{sky('#0B0F24','#141A38','#1B2140');skyline(1400,'#070918',15,.8);g.fillStyle='#05060F';g.fillRect(0,1400,W,520);
+  const cone=g.createRadialGradient(700,760,10,700,1500,760);cone.addColorStop(0,'rgba(255,220,160,.55)');cone.addColorStop(1,'rgba(255,220,160,0)');g.fillStyle=cone;g.beginPath();g.moveTo(700,760);g.lineTo(420,1560);g.lineTo(980,1560);g.closePath();g.fill();
+  g.fillStyle='#0A0B16';g.fillRect(694,760,12,800);g.fillRect(640,750,80,14);g.strokeStyle='rgba(180,200,240,.35)';g.lineWidth=2;for(let k=0;k<220;k++){const x=R(k,1)*W,y=R(k,2)*H;g.beginPath();g.moveTo(x,y);g.lineTo(x-8,y+40);g.stroke()}
+  g.fillStyle='rgba(255,220,160,.12)';g.beginPath();g.ellipse(700,1560,300,30,0,0,7);g.fill();figure(720,1560,.8,'hold',{who:'boy',col:'#010208'});jp('未来は残酷で',CX,560,96,700,'#DCE5FF',16);ko('잔혹한 미래 — 빗속 가로등 아래 혼자',1760);label(5,'RAIN')},
+// 6 flashback: the night becomes a photograph, kept like a star
+t=>{sky('#2A1E1A','#4A3326','#6A4A32');g.save();g.translate(CX,860);g.rotate(-.06);g.fillStyle='#F4ECDD';g.fillRect(-340,-420,680,800);const ph=g.createLinearGradient(0,-380,0,260);ph.addColorStop(0,'#1A2150');ph.addColorStop(1,'#6A4F88');g.fillStyle=ph;g.fillRect(-300,-380,600,640);
+  for(let k=0;k<50;k++){g.fillStyle='rgba(255,255,255,.7)';g.fillRect(-300+R(k,3)*600,-380+R(k,4)*560,2,2)}g.strokeStyle=ACC;g.lineWidth=4;g.beginPath();g.moveTo(-260,200);g.quadraticCurveTo(0,-100,240,-300);g.stroke();g.strokeStyle=ORG;g.beginPath();g.moveTo(-230,230);g.quadraticCurveTo(30,-60,260,-270);g.stroke();
+  g.font=KR(300,34);g.fillStyle='#5A4A3A';g.textAlign='center';g.fillText('그날 밤',0,340);g.restore();g.fillStyle='rgba(255,220,170,.08)';g.fillRect(0,0,W,H);
+  jp('忘れてないさ',CX,1450,96,700,'#FFF4E0',20,ORG);ko('회상 — 아름다웠던 그날 밤을 사진처럼 간직',1760);label(6,'FLASHBACK')},
+// 7 the glass sky shatters
+t=>{sky('#0A0F33','#1B2560','#2E3A7A');stars(t,.1,160,13,.7);g.strokeStyle='rgba(200,230,255,.8)';g.lineWidth=3;g.beginPath();g.arc(CX,1500,900,-Math.PI,0);g.stroke();
+  for(let k=0;k<22;k++){let x=CX+(R(k,1)-.5)*300,y=700+(R(k,2)-.5)*200;g.beginPath();g.moveTo(CX,720);for(let s2=0;s2<4;s2++){x+=(R(k,s2+3)-.5)*260;y+=(R(k,s2+9)-.3)*180;g.lineTo(x,y)}g.stroke()}
+  for(let k=0;k<40;k++){g.save();g.translate(CX+(R(k,21)-.5)*900,500+R(k,22)*500);g.rotate(R(k,23)*6);g.fillStyle='rgba(200,230,255,.5)';g.beginPath();g.moveTo(-20,-6);g.lineTo(18,-10);g.lineTo(4,16);g.closePath();g.fill();g.restore()}
+  ring(CX,720,.4,700,16,ORG);flare(CX,720,12,'rgba(255,181,71,.9)',1,1.4);jp('叶えてしまえや',CX,1060,110,900,'#FFE2B0',30,ORG);figure(CX,1560,.7,'shout',{who:'boy',col:'#010208'});ko('바란다면 이뤄버려 — 유리 하늘이 깨진다',1760);label(7,'THE GLASS SKY')},
+// 8 dawn: the two of them on the rooftop, the arrow of light
+t=>{sky('#1B1F5C','#7A4F8C','#F29A7A');const sun=g.createRadialGradient(CX,1480,20,CX,1480,800);sun.addColorStop(0,'rgba(255,236,214,.9)');sun.addColorStop(.3,'rgba(255,160,90,.6)');sun.addColorStop(1,'rgba(255,160,90,0)');g.fillStyle=sun;g.fillRect(0,700,W,1220);
+  skyline(1480,'#2A1C3A',17,.2);roof(1480);g.save();g.globalCompositeOperation='lighter';const lg=g.createLinearGradient(-100,1300,1180,200);lg.addColorStop(0,'rgba(255,255,255,0)');lg.addColorStop(.85,'rgba(255,255,255,.95)');lg.addColorStop(1,'rgba(255,255,255,0)');g.strokeStyle=lg;g.lineWidth=12;g.beginPath();g.moveTo(-100,1300);g.lineTo(1000,380);g.stroke();g.restore();flare(1000,380,12,'rgba(255,220,160,.9)',1,1.4);
+  figure(470,1480,.75,'lookup',{who:'boy',col:'#140A1E'});figure(610,1480,.72,'lookup',{who:'girl',col:'#140A1E',t:2});g.save();g.font=EN(100,150);g.textAlign='center';g.fillStyle='#fff';g.shadowColor=ORG;g.shadowBlur=30;g.letterSpacing='12px';g.fillText('Sky Arrow',CX,700);g.restore();ko('새벽 옥상, 나란히 선 두 사람과 빛의 화살',1760);label(8,'DAWN')}
+];
+function renderAt(t){CINE.begin();const k=Math.max(0,Math.min(F.length-1,Math.floor(t)));F[k](t);post(t)}
+window.DUR=8;
+window.READY=(async()=>{try{await Promise.all([document.fonts.load(JP(300,100),'気分次第です'),document.fonts.load(JP(700,100),'君は僕の手を未来は残酷で忘れてないさ'),document.fonts.load(JP(900,100),'叶えてしまえや↺'),document.fonts.load(KR(300,40),'제멋대로인소년밤옥상끝미래가무서워과거에빈다시계가거꾸로달이지고해가뜬다세상은빨리감기만정그너는내손을잔혹한빗속가로등아래혼자회상아름다웠던날사진처럼간직바란다면이뤄버려유리하늘깨진새벽나란히선두사람과빛의화살'),document.fonts.load(EN(100,100),'Sky Arrow'),document.fonts.load(EN(300,40),'SCENE ROOFTOP CLOCK TURNS BACK TIME-LAPSE HANDS RAIN FLASHBACK GLASS DAWN —0123456789'),document.fonts.load(EN(600,40),'0123456789')])}catch(e){}window.renderAt=renderAt;renderAt(0)})();
+</script>
+</body>
+</html>
