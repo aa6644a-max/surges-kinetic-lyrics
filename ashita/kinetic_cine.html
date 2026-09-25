@@ -43,12 +43,15 @@ const K=[
  [115,19400,-3100,1.0,-.12],
  [118.8,21000,-3800,1.06,.08],
  [123.8,22200,-4400,1.0,0],            // "you said it" — climbing back above the clouds
- [132,23600,-4800,1.02,-.03],
- [138.8,24600,-5100,1.04,.03],
- [143.8,25600,-6200,1.02,-.05,eInC],   // Sky Arrow: the steep climb into the dawn
- [152.5,26400,-7600,1.08,.02],
- [165,26800,-7900,.86,0],              // the vocalise: pull back over the dawn
- [180,27000,-8000,.8,0]];
+ [128.8,23000,-4600,1.0,0],
+ [132,25200,-4900,1.04,-.08,eInC],     // climax: the flight accelerates
+ [135,27600,-5300,1.0,.1],
+ [138.8,30400,-5600,1.06,-.08],
+ [143.8,33400,-6600,1.02,.08],         // Sky Arrow: the steep climb into the dawn
+ [147.4,36000,-7200,1.06,-.06],
+ [152.5,38600,-7900,1.1,.02],
+ [165,39400,-8200,.86,0],              // the vocalise: pull back over the dawn
+ [180,39800,-8300,.8,0]];
 function cam(t){const c=camAt(K,t);return {x:c[1],y:c[2],z:c[3],r:c[4]}}
 function camVel(t){const a=cam(t-.04),b=cam(t+.04);return {x:(b.x-a.x)/.08,y:(b.y-a.y)/.08}}
 // ---------- world ----------
@@ -72,15 +75,16 @@ function windLines(t,v){const sp=Math.hypot(v.x,v.y);const a=clamp((sp-300)/2200
 // the two lights: mine (cyan) and yours (orange). Before the touch they approach; afterwards they fly
 // like a pair of fighters — helixes, crossings, loops, chases — sampled as trails from the same function.
 const SEG=[ // [t0, mode] ; modes blend over 1.2 s
- [0,'helix'],[37.1,'weave'],[58,'dogfight'],[77.5,'hover'],[85.2,'weave'],[105.3,'chase'],[123.8,'weave'],[136.5,'merge'],[138.8,'arrow'],[143.8,'helix'],[152.5,'dogfight'],[165,'hover']];
+ [0,'helix'],[37.1,'weave'],[58,'dogfight'],[64.2,'write'],[70.8,'dogfight'],[77.5,'hover'],[85.2,'weave'],[105.3,'chase'],[123.8,'weave'],[136.5,'merge'],[138.8,'arrow'],[143.8,'helix'],[152.5,'dogfight'],[165,'hover']];
 function modePos(m,t,who){const s=who?1:-1,ph=who?Math.PI:0;
   switch(m){
-    case 'helix':{const w=3.2;return {x:Math.cos(w*t+ph)*260,y:-420+Math.sin(w*2*t)*40,z:Math.sin(w*t+ph)}}
+    case 'helix':{const w=3.2*(1+1.2*BOOST(t));return {x:Math.cos(w*t+ph)*260,y:-420+Math.sin(w*2*t)*40,z:Math.sin(w*t+ph)}}
     case 'weave':{const w=1.6;return {x:Math.sin(w*t+ph*.6)*380,y:-380+Math.sin(2*w*t+who)*220,z:Math.cos(w*t+ph*.6)}}
     case 'dogfight':{const w=2.1,a={x:Math.sin(w*t)*420+Math.sin(3.7*t)*160,y:-300+Math.sin(1.3*w*t)*380+Math.cos(2.9*t)*120};
       if(!who)return {...a,z:Math.sin(2.3*t)};const d=.38,b={x:Math.sin(w*(t-d))*420+Math.sin(3.7*(t-d))*160,y:-300+Math.sin(1.3*w*(t-d))*380+Math.cos(2.9*(t-d))*120};
       return {x:b.x+Math.cos(6*t)*90,y:b.y+Math.sin(6*t)*90,z:Math.cos(2.3*t)}}
     case 'chase':{const w=2.8;return {x:Math.sin(w*t+who*.9)*360+s*60,y:-200+Math.sin(w*1.7*t+who)*320,z:Math.sin(w*t)}}
+    case 'write':{const p=clamp((t-64.4)/5.8);return {x:lerp(-360,360,p)+(who?18:-18),y:-520+Math.sin(t*11+who*2)*120+(who?30:-30),z:0}}
     case 'hover':{return {x:s*140+Math.sin(t*.7+who)*50,y:-420+Math.cos(t*.9+who)*40,z:0}}
     case 'merge':{return {x:s*18+Math.sin(t*4)*6,y:-420,z:0}}
     case 'arrow':{const p=clamp((t-138.8)/2.5);return {x:lerp(-360,420,eIOs(p))+s*14,y:lerp(300,-760,eIOs(p))+s*10,z:0}}
@@ -103,7 +107,7 @@ function lights(t){const a=t-T(11,0),touch=T(11,4);if(a<-.3)return;
 function leadStar(t){const a=t-T(13,4)+.6;if(a<0)return;layer(1,()=>{const c=cam(t);const x=c.x+320*Math.sin(t*.23+1)+Math.sin(t*.8)*80,y=c.y-560+220*Math.cos(t*.19)+Math.cos(t*.6)*40;
   for(let k=0;k<40;k++){const q=k/40;g.fillStyle=rgba(ORG,.45*(1-q)*clamp(a/.8)*(1-DK));g.beginPath();g.arc(x-q*700,y+q*260,14*(1-q)+2,0,7);g.fill()}flare(x,y,12+3*pulse(t),rgba(ORG,.95),clamp(a/.6)*(1-DK),1.4)})}
 // ---------- lyric placement: each line hangs in the world where the camera will be ----------
-function at(t,i,dx=0,dy=0){const c=cam((L(i).s+L(i).e)/2);if(i>=14){const n=cam(t);return [lerp(n.x,c.x,.1)+dx,lerp(n.y,c.y,.5)+dy]}return [c.x+dx,c.y+dy]}
+function at(t,i,dx=0,dy=0){const c=cam((L(i).s+L(i).e)/2);if(i>=14){const n=cam(t),k=i>=33?0:.1;return [lerp(n.x,c.x,k)+dx*(i>=33?.3:1),lerp(n.y,c.y,i>=33?0:.5)+dy]}return [c.x+dx,c.y+dy]}
 function row(t,i,ks,x,y,f,style,o={}){return words(t,i,ks,x,y,JP(o.w||700,f),style,o)}
 const outOf=i=>Ln[i+1]?Math.min(Ln[i+1].s-.4,L(i).e+2.2):L(i).e+1.5;
 function subOf(t,i,x,y,o={}){sub(t,L(i).ko,L(i).s,o.out??outOf(i),x,y,o)}
@@ -166,18 +170,46 @@ const SPEC=[
  [38,[[[0, 1, 2, 3, 4, 5, 6],-60,-110,110,700,'rise'],[[7, 8, 9, 10, 11, 12, 13],60,20,110,700,'rise'],[[14, 15, 16],0,190,210,900,'stamp',{hotGlow:70}]],330],
  [39,[[[0, 1, 2, 3, 4],0,-230,130,900,'pop',{hot:'#FFE2B0',gcol:ORG,maxW:880}],[[5, 6, 7, 8, 9, 10, 11],0,-60,120,900,'pop',{hot:'#FFE2B0',gcol:ORG,maxW:880}],[[12, 13, 14, 15, 16],0,130,170,900,'stamp',{hot:'#FFF4D6',gcol:ORG,hotGlow:80,maxW:880}]],300]];
 function lyrics2(t){for(const [i,rows,sy] of SPEC){if(!Ln[i])continue;const o0=outOf(i);if(t<L(i).s-.5||t>o0+.6)continue;layer(1,()=>{const [x,y]=at(t,i,0,-60);
-  for(const [ks,dx,dy,f,w,st,op] of rows)row(t,i,ks,x+dx,y+dy,f,st,{w,out:o0,maxW:900,...(op||{})});subOf(t,i,x,y+sy);
+  for(const [ks,dx,dy,f,w,st,op] of rows)row(t,i,ks,x+dx*(i>=33?.3:1),y+dy,f,st,{w,out:o0,maxW:i>=33?820:900,...(op||{})});subOf(t,i,x,y+sy);
   if(i===22||i===30||i===38){const a=t-T(i,rows[rows.length-1][0][0]);ring(x,y+rows[rows.length-1][2],clamp(a/.8),900,18)}
   if(i===39){const a=t-T(i,12);ring(x,y+130,clamp(a/1),1300,24,'#FFF4D6');ring(x,y+130,clamp((a-.2)/1.2),1300,14,ORG)}})}}
 function outro(t){const a=t-156;if(a<0)return;const q=clamp(a/2)*(1-P(t,176,2));g.save();g.globalAlpha=q;g.font=JP(900,110);g.textAlign='center';g.textBaseline='middle';g.fillStyle='#fff';g.shadowColor=ORG;g.shadowBlur=40;g.letterSpacing='12px';g.fillText('明日の夜空哨戒班',CX,CY-120);
   g.shadowBlur=0;g.font=EN(300,34);g.letterSpacing='14px';g.fillStyle=rgba('#FFFFFF',.8);g.fillText('ASHITA NO YOZORA SHOUKAIHAN',CX,CY-10);g.font=KR(300,40);g.letterSpacing='8px';g.fillText('내일의 밤하늘 초계반',CX,CY+60);g.restore()}
+
+// ---------- instrumental (1:01–1:17): skywriting, echo words rushing past, guitar-hit flashes ----------
+const SW=document.createElement('canvas');SW.width=1080;SW.height=560;{const c=SW.getContext('2d');c.font=JP(900,300);c.textAlign='center';c.textBaseline='middle';c.lineJoin='round';
+  c.strokeStyle='rgba(255,255,255,.95)';c.lineWidth=16;c.shadowColor='#8FE3FF';c.shadowBlur=40;c.strokeText('明日へ',540,290);c.lineWidth=6;c.strokeStyle='#FFE2B0';c.shadowBlur=0;c.strokeText('明日へ',540,290)}
+const ECHO=['空','夜','星','明日','翔'];
+function instrumental(t){if(t<61||t>77.6)return;
+  // skywriting: revealed left-to-right behind the two lights, then it drifts away and dissolves
+  const p=clamp((t-64.4)/5.8),fade=1-P(t,72.5,2.2);if(p>0&&fade>0){const drift=Math.max(0,t-70.3)*120;g.save();g.globalAlpha=fade;g.beginPath();g.rect(0,0,p*W+40,H);g.clip();
+    g.globalCompositeOperation='lighter';g.drawImage(SW,-drift,CY-520-280);g.restore()}
+  // beat-synced echo words fly at the camera from the vanishing point
+  for(let k=0;k<ECHO.length;k++){const t0=71+k*1.276,a=t-t0;if(a<0||a>1.2)continue;const q=a/1.2,sc=.15+5*eInC(q),al=Math.sin(q*Math.PI)*.35;
+    g.save();g.translate(CX+(k%2?1:-1)*80*q,CY-200+80*q);g.scale(sc,sc);g.globalAlpha=al;g.font=JP(900,260);g.textAlign='center';g.textBaseline='middle';g.lineWidth=4;g.strokeStyle=k%2?ORG:ACC;g.strokeText(ECHO[k],0,0);g.restore()}
+  // guitar hits
+  const fl=pulse(t)*.12*(1-P(t,76,1.5));if(fl>0){g.fillStyle=`rgba(200,235,255,${fl})`;g.fillRect(0,0,W,H)}
+  for(const b of [61,64.2,67.3,70.8,74]){ring(CX,CY-300,clamp((t-b)/.9),900,14,b%2?ORG:'#FFFFFF')}}
+// ---------- climax (2:09–2:33): speed, punches, bursts ----------
+const BOOST=t=>eIOs(P(t,128.4,2.2))*(1-eIOs(P(t,152.6,2.5)));
+function warp(t,B){if(B<=0)return;g.save();g.globalCompositeOperation='lighter';for(let k=0;k<90;k++){const an=R(k,90)*6.28,ph=(t*(1.2+1.8*B)+R(k,91))%1,r0=120+ph*1400,r1=r0+(100+700*B)*ph;
+  g.strokeStyle=`rgba(${k%4?'200,235,255':'255,210,150'},${B*ph*.7})`;g.lineWidth=1+3*ph*B;g.beginPath();g.moveTo(CX+Math.cos(an)*r0,CY+Math.sin(an)*r0*1.2);g.lineTo(CX+Math.cos(an)*r1,CY+Math.sin(an)*r1*1.2);g.stroke()}g.restore()}
+function burst(t,t0,big=1,col='#FFFFFF'){const a=t-t0;if(a<0||a>2.2)return;g.save();g.globalCompositeOperation='lighter';
+  for(let k=0;k<20;k++){const an=k*Math.PI/10+R(k,5)*.25,len=(700+900*R(k,6))*eOutX(clamp(a/.5))*big,w=(4+9*R(k,7))*(1-clamp(a/1.6))*big;if(w<=0)continue;const lg=g.createLinearGradient(CX,CY,CX+Math.cos(an)*len,CY+Math.sin(an)*len);lg.addColorStop(0,'rgba(255,255,255,.9)');lg.addColorStop(.3,rgba(k%3?ACC:ORG,.55));lg.addColorStop(1,'rgba(0,0,0,0)');g.strokeStyle=lg;g.lineWidth=w;g.beginPath();g.moveTo(CX,CY);g.lineTo(CX+Math.cos(an)*len,CY+Math.sin(an)*len);g.stroke()}
+  g.restore();for(let r=0;r<3;r++)ring(CX,CY,clamp((a-r*.12)/1.1),1300*big,16-r*4,r===1?ORG:col);
+  for(let k=0;k<50*big;k++){const an=R(k,11)*6.28,v=400+1200*R(k,12),q=clamp(a/1.6),x=CX+Math.cos(an)*v*eOutC(q),y=CY+Math.sin(an)*v*eOutC(q)+260*q*q,sz=(6+20*R(k,13))*(1+q);g.save();g.translate(x,y);g.rotate(q*7*(R(k,14)-.5));g.globalAlpha=1-q;g.fillStyle=k%3?rgba(ACC,.9):rgba(ORG,.9);g.beginPath();g.moveTo(-sz,-sz*.3);g.lineTo(sz*.6,-sz*.5);g.lineTo(sz*.2,sz*.6);g.closePath();g.fill();g.restore()}
+  if(a<.25){g.fillStyle=`rgba(255,255,255,${.45*Math.min(1,big)*(1-a/.25)})`;g.fillRect(0,0,W,H)}}
+function climax(t){const B=BOOST(t);warp(t,B);if(B>0){const fl=pulse(t)*.1*B;if(fl>0){g.fillStyle=`rgba(255,240,220,${fl})`;g.fillRect(0,0,W,H)}}
+  if(Ln[39]){burst(t,T(36,11),.8,ACC);burst(t,T(37,3),1,'#FFFFFF');burst(t,T(38,14),1.1,ORG);burst(t,T(39,0),.9,'#FFFFFF');burst(t,T(39,12),1.4,'#FFF4D6')}
+  // Sky Arrow: a bolt of light cuts the frame diagonally
+  if(Ln[37]){const a=t-T(37,3);if(a>0&&a<1.4){const p=eOutX(clamp(a/.35));g.save();g.globalCompositeOperation='lighter';const lg=g.createLinearGradient(-200,H+100,W+200,-100);lg.addColorStop(0,'rgba(255,255,255,0)');lg.addColorStop(.85,`rgba(255,255,255,${1-a/1.4})`);lg.addColorStop(1,'rgba(255,255,255,0)');g.strokeStyle=lg;g.lineWidth=18*(1-a/1.4)+2;g.beginPath();g.moveTo(-200,H+100);g.lineTo(lerp(-200,W+200,p),lerp(H+100,-100,p));g.stroke();g.restore()}}}
 // ---------- frame ----------
-function render(t){CINE.begin();const c=cam(t);CAM={x:c.x,y:c.y,z:c.z*(1+.012*pulse(t)),r:c.r};
+function render(t){CINE.begin();const c=cam(t),B=BOOST(t),IB=(t>61&&t<77)?.6:0;CAM={x:c.x,y:c.y,z:c.z*(1+(.012+.035*B+.02*IB)*pulse(t)),r:c.r+(B*.03+IB*.04)*Math.sin(t*2.1)};
   // handheld on the ground, a big hit for the shout, steady once airborne
-  const hand=t<T(11,4)?5:1.5;shake(t,hand,8);if(t>=T(7,0)-.05&&t<outOf(7)){for(const k of [0,3,6]){const a=t-T(7,k);if(a>0&&a<.4)shake(t,40*(1-a/.4))}}
+  const hand=t<T(11,4)?5:1.5;shake(t,hand,8);shake(t,(7*B+4*IB)*pulse(t));if(t>=T(7,0)-.05&&t<outOf(7)){for(const k of [0,3,6]){const a=t-T(7,k);if(a>0&&a<.4)shake(t,40*(1-a/.4))}}
   skyAt(t);stars(t,.08,220,1,(.6+.4*clamp(-CAM.y/3000))*(1-.8*DK));moonLayer(t);stars(t,.25,90,2,.8);
   city(t);clouds(t,.7,-2500,.35,mix('#9FB4E8','#FFC99A',DK),11,1.3);clouds(t,.9,-3000,.55,mix('#8EA3DC','#FFB78A',DK),21,1.6);
-  lights(t);leadStar(t);lyrics(t);lyrics2(t);outro(t);
+  instrumental(t);climax(t);lights(t);leadStar(t);lyrics(t);lyrics2(t);outro(t);
   clouds(t,1.25,-3400,.55,mix('#B8C8F0','#FFD9B0',DK),31,2.0);clouds(t,1.5,-4100,.4,mix('#5C6EB8','#E69A86',DK),41,2.6);
   windLines(t,camVel(t));layer(1.6,()=>dust(t,1));post(t);
   const fi=clamp(t/.6);if(fi<1){g.fillStyle=`rgba(0,0,0,${1-fi})`;g.fillRect(0,0,W,H)}const fo=P(t,176.5,3);if(fo>0){g.fillStyle=`rgba(0,0,0,${fo})`;g.fillRect(0,0,W,H)}}
