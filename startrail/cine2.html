@@ -115,15 +115,15 @@ shot(19.0,29.6,[[19,0,-100,1.0,-.12],[29.6,0,300,1.12,-.02]],t=>{stars(t,.12,200
   layer(1,()=>{trails(t,.9,0,-600,.03,1,1900);horizon(800,.35+.15*Math.sin(t))});
   layer(.35,()=>{big(t,'STAR TRAIL',20.2,0,-120,EN(100,140),{sp:16,track:80,glow:18,out:28.3,dur:1.6});big(t,'STELLIVE',21.0,0,40,EN(300,40),{sp:18,track:40,col:ACC,out:28.3,dur:1.4})})});
 // 2: darkness comes down, the stars go out one by one
-shot(29.6,33.9,[[29.6,0,-260,1.08,0],[33.9,0,220,1.12,.02]],t=>{const i=2;
+shot(29.6,34.5,[[29.6,0,-260,1.08,0],[34.5,0,220,1.12,.02]],t=>{const i=2;
   stars(t,.12,160,31,.8*(1-.7*P(t,T(i,8),3)));
   layer(1,()=>{const dk=P(t,T(i,0),2.5);const gr=g.createLinearGradient(0,-1400,0,-1400+2200*dk);gr.addColorStop(0,'rgba(0,0,5,.95)');gr.addColorStop(1,'rgba(0,0,5,0)');g.fillStyle=gr;g.fillRect(-1200,-1400,2400,2200*dk);
-    words(t,i,[0,1,2,3,4],-60,-420,KR(900,120),'drop',{dist:320,out:34.2});words(t,i,[5,6,7],120,-240,KR(300,86),'drop',{dist:200,out:34.2});
+    words(t,i,[0,1,2,3,4],-60,-420,KR(900,120),'drop',{dist:320,out:34.35});words(t,i,[5,6,7],120,-240,KR(300,86),'drop',{dist:200,out:34.35});
     // eight bright stars that go dark on 별조차 빛을 잃은 밤
     for(let k=0;k<8;k++){const x=-380+k*110,y=60+Math.sin(k*1.7)*80,off=T(i,8+k);const on=1-P(t,off,.35);flare(x,y,3,rgba(ACC,.8),on*(t>30?1:0),.6)}
-    words(t,i,[8,9,10,11,12,13,14,15],0,280,KR(300,80),'rise',{out:34.2,col:'#B8C4E8'})})});
+    words(t,i,[8,9,10,11,12,13,14,15],0,280,KR(300,80),'rise',{out:34.4,col:'#B8C4E8'})})});
 // 3: a tear falls from 눈물, the camera follows it down to the water
-shot(33.9,39.7,[[33.9,0,-120,1.1,0],[T(3,6)+.3,0,-80,1.14,0],[39.7,0,560,1.0,.02]],t=>{const i=3;stars(t,.12,160,41,.5);
+shot(34.5,39.7,[[34.5,0,-120,1.1,0],[T(3,6)+.3,0,-80,1.14,0],[39.7,0,560,1.0,.02]],t=>{const i=3;stars(t,.12,160,41,.5);
   layer(1,()=>{words(t,i,[0,1,2,3,4],0,-420,KR(300,84),'twinkle',{});
     words(t,i,[5,6,7,8,9,10],0,-230,KR(900,130),'rise',{});
     const td=T(i,7)+.1,a=t-td;if(a>0){const y=lerp(-160,880,eInC(clamp(a/1.3)));if(a<1.3){g.save();g.fillStyle=rgba(ACC,.95);g.shadowColor=ACC;g.shadowBlur=30;g.beginPath();g.moveTo(40,y-40);g.quadraticCurveTo(64,y+10,40,y+26);g.quadraticCurveTo(16,y+10,40,y-40);g.fill();g.restore()}
@@ -279,11 +279,25 @@ shot(186.3,191.6,[[186.3,0,0,1.0,-.15],[191.6,0,-40,1.12,.15]],t=>{const i=32;st
   layer(1,()=>{const a=t-T(i,0),b=t-T(i,2);if(a>-.1)big(t,'너랑',T(i,0),lerp(-620,-170,eOutC(clamp((a+.1)/.5))),-200,KR(900,140),{sp:6,track:0,dy:0});if(b>-.1)big(t,'나',T(i,2),lerp(620,190,eOutC(clamp((b+.1)/.5))),-200,KR(900,140),{sp:6,track:0,dy:0});
     words(t,i,[3,4,5,6],0,-20,KR(300,100),'rise',{});const c=t-T(i,9);if(c>-.2){ring(0,-200,clamp(c/1),900);flare(0,-200,10,rgba(ACC,.9),clamp((c+.2)/.3)*(1-clamp((c-1.2)/1)))}
     words(t,i,[7,8,9,10,11,12,13],0,200,KR(900,120),'pop',{hotGlow:40})})});
-// 33: break the limit — the frame around the words shatters, the camera punches through
-shot(191.6,197.2,[[191.6,0,0,1.0,0],[T(33,12),0,0,1.08,0],[T(33,12)+.3,0,0,1.5,0,eOutC],[197.2,0,-40,1.4,.03]],t=>{const i=33;stars(t,.12,220,331,.8);
-  layer(1,()=>{words(t,i,[0,1,2],0,-560,KR(900,130),'stamp',{});words(t,i,[3,4,5,6,7,8],0,-340,EN(300,82),'rise',{split:true,stagger:.02,maxW:960});
-    const br=t-T(i,12);if(br<0){g.strokeStyle=rgba(ACC,.9);g.lineWidth=5;g.strokeRect(-360,-10,720,260)}else{for(let k=0;k<24;k++){const x=(R(k,1)-.5)*720,y=-10+R(k,2)*260,q=clamp(br/1.2);g.save();g.translate(x+(x)*q*2,y+(y-120)*q*2+300*q*q);g.rotate(q*6*(R(k,3)-.5));g.globalAlpha=1-q;g.fillStyle=rgba(ACC,.9);g.fillRect(-18,-3,36,6);g.restore()}ring(0,120,clamp(br/.8),900)}
-    words(t,i,[9,10,11,12,13],0,120,KR(900,170),'pop',{hotGlow:44})})});
+// 33: break the limit — pressure builds (cracks, tremor), then the frame explodes: white flash, shock rings, light burst, shards, camera punch
+shot(191.6,197.2,[[191.6,0,0,1.0,0],[T(33,9),0,0,1.04,0],[T(33,12),0,0,1.14,0,eInC],[T(33,12)+.35,0,-30,1.32,.05,eOutX],[197.2,0,-60,1.22,.03]],t=>{const i=33,br=t-T(i,12),pre=P(t,T(i,9),T(i,12)-T(i,9));
+  // tremor that grows as the limit is reached, then a big kick
+  const amp=br<0?pre*pre*16:40*Math.exp(-br*5);CAM.x+=(R(1,Math.floor(t*30))-.5)*amp;CAM.y+=(R(2,Math.floor(t*30))-.5)*amp;
+  stars(t,.12,240,331,.8);if(br>0)stars(t,.6,160,332,clamp(br/.3),1.6);
+  layer(1,()=>{words(t,i,[0,1,2],0,-600,KR(900,130),'stamp',{out:T(i,12)-.05,exit:'scatter'});words(t,i,[3,4,5,6,7,8],0,-420,EN(300,82),'rise',{split:true,stagger:.02,maxW:960,out:T(i,12)-.05,exit:'scatter'});
+    if(br<0){ // the frame under pressure: glowing edges, cracks spreading from the corners
+      g.strokeStyle=rgba(ACC,.6+.4*pre);g.lineWidth=5+6*pre;g.shadowColor=ACC;g.shadowBlur=20+40*pre;g.strokeRect(-380,-40,760,300);g.shadowBlur=0;
+      const n=Math.floor(pre*18);for(let k=0;k<n;k++){let x=(R(k,1)>.5?1:-1)*380,y=-40+R(k,2)*300;g.strokeStyle=`rgba(255,255,255,${.8})`;g.lineWidth=2;g.beginPath();g.moveTo(x,y);for(let s2=0;s2<4;s2++){x+=(-Math.sign(x))*(20+50*R(k,s2+3));y+=(R(k,s2+9)-.5)*60;g.lineTo(x,y)}g.stroke()}
+      words(t,i,[9,10,11],0,110,KR(900,170),'jitter',{hotGlow:50})}
+    else{ // explosion
+      g.save();g.globalCompositeOperation='lighter';
+      for(let k=0;k<24;k++){const an=k*Math.PI/12+R(k,5)*.2,len=(900+900*R(k,6))*eOutX(clamp(br/.5)),w=(8+18*R(k,7))*(1-clamp(br/2.5));if(w<=0)continue;const lg=g.createLinearGradient(0,110,Math.cos(an)*len,110+Math.sin(an)*len);lg.addColorStop(0,'rgba(255,255,255,.95)');lg.addColorStop(.3,rgba(k%3?ACC:GOLD,.6));lg.addColorStop(1,'rgba(0,0,0,0)');g.strokeStyle=lg;g.lineWidth=w;g.beginPath();g.moveTo(0,110);g.lineTo(Math.cos(an)*len,110+Math.sin(an)*len);g.stroke()}
+      g.restore();
+      for(let r2=0;r2<3;r2++)ring(0,110,clamp((br-r2*.12)/1.1),1400,18-r2*4,r2===1?GOLD:'#FFFFFF');
+      for(let k=0;k<70;k++){const an=R(k,11)*6.28,v=500+1400*R(k,12),q=clamp(br/1.6),x=Math.cos(an)*v*eOutC(q),y=110+Math.sin(an)*v*eOutC(q)+300*q*q,sz=(10+40*R(k,13))*(1+q);g.save();g.translate(x,y);g.rotate(q*8*(R(k,14)-.5));g.globalAlpha=1-q;g.fillStyle=k%4?rgba(ACC,.9):'rgba(255,255,255,.95)';g.beginPath();g.moveTo(-sz,-sz*.3);g.lineTo(sz*.6,-sz*.5);g.lineTo(sz*.2,sz*.6);g.closePath();g.fill();g.restore()}
+      flare(0,110,24*(1-clamp(br/1.2))+8,rgba(ACC,.95),1,2);
+      const p=eOutC(clamp(br/.35));g.save();g.translate(0,110);g.scale(1+.8*(1-p),1+.8*(1-p));g.font=KR(900,140);g.textAlign='center';g.textBaseline='middle';g.fillStyle='#fff';g.shadowColor=ACC;g.shadowBlur=80;g.fillText('한계를 넘어',0,0);g.shadowBlur=20;g.fillText('한계를 넘어',0,0);g.restore()}});
+  if(br>0&&br<.45){g.fillStyle=`rgba(255,255,255,${1-br/.45})`;g.fillRect(0,0,W,H)}});
 // 34: follow me — the camera flies along a trail road toward the dawn; the words line the way
 shot(197.2,205.4,[[197.2,0,0,1.0,0],[205.4,0,-80,1.3,.04]],t=>{const i=34;stars(t,.12,220,341,.6);
   layer(1,()=>{horizon(360,.9,'#1A0E30');for(let k=0;k<14;k++){const z=((k/14+(t-197.2)*.35)%1),y=360+z*z*1400,w=40+z*z*900;g.fillStyle=rgba(ACC,.12+.3*z);g.fillRect(-w/2,y,w,6+10*z)}
