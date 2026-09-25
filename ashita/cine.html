@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ashita Night Flight</title>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@100;300;600&family=Noto+Sans+JP:wght@300;700;900&family=Noto+Sans+KR:wght@300;700&display=swap" rel="stylesheet">
+<style>*{margin:0}html,body{height:100%;background:#000;overflow:hidden}#cv{position:absolute;left:50%;top:50%;width:1080px;height:1920px;transform-origin:0 0}</style>
+</head>
+<body>
+<canvas id="cv" width="1080" height="1920"></canvas>
+<script src="../shared/cine.js"></script>
+<script>
+/* 明日の夜空哨戒班 — one continuous night flight (single camera path, no cuts) */
+const D=/*DATA*/null;
+CINE.init(document.getElementById('cv'),D);
+ACC='#8FE3FF';const ORG='#FFB547';B0=1.24%BEAT;
+const L=i=>Ln[i];
+// ---------- the one camera path (absolute time, world coords; up = negative y) ----------
+const K=[
+ [0,   -80,-260,1.18,.0],
+ [T(0,0),0,-280,1.15,.0],
+ [T(4,0),520,-360,1.12,.02],          // drifting along the rooftop through the verse
+ [T(7,0)-.3,640,-980,1.2,.0,eIOs],     // pre-chorus: tilt up toward the moon
+ [T(8,0),640,-1000,1.28,-.03],         // the shout
+ [T(9,0),600,-820,.95,.0],             // the world leaves me behind (pull back)
+ [T(10,0),600,-760,.98,.0],
+ [T(11,4)-.1,600,-880,1.1,.0],         // "that night was different": slow push, stillness
+ [T(11,4)+.2,600,-1000,1.12,.0,eInC],  // the hands touch -> lift-off
+ [T(13,0),900,-3300,1.0,-.06,eIO],     // through the clouds
+ [T(14,0),1500,-4300,1.02,.0],         // above the clouds, the leading star ahead
+ [T(18,0),3600,-4700,1.04,.04],
+ [60,4200,-4800,1.0,-.02],
+];
+function cam(t){const c=camAt(K,t);return {x:c[1],y:c[2],z:c[3],r:c[4]}}
+function camVel(t){const a=cam(t-.04),b=cam(t+.04);return {x:(b.x-a.x)/.08,y:(b.y-a.y)/.08}}
+// ---------- world ----------
+function skyAt(){const alt=clamp(-CAM.y/4600);const gr=g.createLinearGradient(0,0,0,H);gr.addColorStop(0,mix('#070B26','#03051A',alt));gr.addColorStop(.6,mix('#101A55','#0A0F33',alt));gr.addColorStop(1,mix('#26306E','#1B2560',alt));g.fillStyle=gr;g.fillRect(0,0,W,H)}
+function moonLayer(t){ // far layer; the moon sinks during "月は沈み", the sky warms at "陽は昇る"
+  const s0=T(9,1),set=eIO(P(t,s0,1.8)),rise=eIO(P(t,T(9,4),2.2))*(1-P(t,T(11,4)+1,3));
+  layer(.08,()=>{const mx=780,my=lerp(-1900,-400,set);const gl=g.createRadialGradient(mx,my,80,mx,my,420);gl.addColorStop(0,`rgba(220,235,255,${.35*(1-set)})`);gl.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gl;g.fillRect(mx-420,my-420,840,840);g.globalAlpha=1-clamp((set-.85)/.15);g.fillStyle='#EAF2FF';g.beginPath();g.arc(mx,my,110,0,7);g.fill();g.globalAlpha=1;
+    if(rise>0){const gl2=g.createRadialGradient(200,-150,20,200,-150,1100);gl2.addColorStop(0,rgba(ORG,.45*rise));gl2.addColorStop(1,rgba(ORG,0));g.fillStyle=gl2;g.fillRect(-900,-1250,2200,2200)}});
+}
+function city(t){ // skyline far and near; the rooftop the camera starts on
+  for(const [pf,col,seed,base] of [[.45,'#070A26',3,200],[.75,'#04061A',7,120]])layer(pf,()=>{g.fillStyle=col;g.beginPath();g.moveTo(-2600,base+3000);g.lineTo(-2600,base);let x=-2600;while(x<5200){const w=50+100*R(Math.floor(x),seed),h=80+320*R(Math.floor(x),seed+1)**2;g.lineTo(x,base-h);g.lineTo(x+w,base-h);x+=w}g.lineTo(5200,base+3000);g.fill();
+    for(let k=0;k<260;k++){if(R(k,seed+5)>.5)continue;g.fillStyle=`rgba(255,${200+40*R(k,9)|0},140,${.3+.4*R(k,8)*(.7+.3*Math.sin(t*.7+k))})`;g.fillRect(-2600+R(k,seed+6)*7800,base-20-R(k,seed+7)*300,5,6)}});
+  layer(1,()=>{g.fillStyle='#02030E';g.fillRect(-1200,0,4000,1600);g.strokeStyle=rgba(ACC,.3);g.lineWidth=3;g.beginPath();g.moveTo(-1200,0);g.lineTo(2800,0);g.stroke();
+    for(let k=0;k<8;k++){const x=-600+k*380;g.fillStyle='#050716';g.fillRect(x,-70,10,70);g.fillRect(x-60,-74,130,8)}});
+}
+function clouds(t,pf,y0,a,col,seed,scale){if(a<=0)return;layer(pf,()=>{for(let k=0;k<26;k++){const x=-800+R(k,seed)*6800,y=y0+(R(k,seed+2)-.5)*420,rx=(260+360*R(k,seed+3))*scale,ry=rx*.26;const gl=g.createRadialGradient(x,y,0,x,y,rx);gl.addColorStop(0,rgba(col,a*(.45+.45*R(k,seed+4))));gl.addColorStop(1,rgba(col,0));g.save();g.translate(x,y);g.scale(1,ry/rx);g.fillStyle=gl;g.beginPath();g.arc(0,0,rx,0,7);g.fill();g.restore()}})}
+function windLines(t,v){const sp=Math.hypot(v.x,v.y);const a=clamp((sp-300)/2200);if(a<=0)return;const ang=Math.atan2(-v.y,-v.x);g.save();g.globalCompositeOperation='lighter';
+  for(let k=0;k<70;k++){const ph=(t*1.8+R(k,40))%1,x=R(k,41)*W,y=R(k,42)*H,l=(120+500*R(k,43))*a;const px=x+Math.cos(ang)*ph*900,py=y+Math.sin(ang)*ph*900;g.strokeStyle=rgba(ACC,a*(.15+.45*R(k,44))*Math.sin(ph*Math.PI));g.lineWidth=1+2.5*R(k,45);g.beginPath();g.moveTo(px,py);g.lineTo(px+Math.cos(ang)*l,py+Math.sin(ang)*l);g.stroke()}g.restore()}
+// the two lights: mine (cyan) and yours (orange); after the hands touch they fly together ahead of the camera
+function lights(t){const a=t-T(11,0),touch=T(11,4);if(a<-.3)return;
+  if(t<touch){const p=eIO(clamp((t-T(11,0))/(touch-T(11,0))));layer(1,()=>{const y=-880;flare(lerp(170,560,p),y,6+2*pulse(t),rgba(ACC,.9),clamp((a+.3)/.4));flare(lerp(1030,640,p),y,6+2*pulse(t),rgba(ORG,.9),clamp((a+.3)/.4));
+    g.strokeStyle=rgba('#FFFFFF',.35*p);g.lineWidth=2;g.beginPath();g.moveTo(lerp(170,560,p),y);g.quadraticCurveTo(600,y-120*p,lerp(1030,640,p),y);g.stroke()});return}
+  const b=t-touch;if(b<.5){g.fillStyle=`rgba(255,255,255,${.8*(1-b/.5)})`;g.fillRect(0,0,W,H)}
+  // the pair rides just ahead of the camera (screen-anchored with a gentle drift)
+  const x=CX+Math.sin(t*1.3)*60,y=CY-520+Math.cos(t*1.1)*40;flare(x-26,y,5,rgba(ACC,.9),1,.8);flare(x+26,y+6,5,rgba(ORG,.9),1,.8);
+  g.save();g.globalCompositeOperation='lighter';for(let k=0;k<24;k++){const q=k/24;g.fillStyle=rgba(ACC,.25*(1-q));g.beginPath();g.arc(x-26,y+q*420,6*(1-q)+1,0,7);g.fill();g.fillStyle=rgba(ORG,.25*(1-q));g.beginPath();g.arc(x+26,y+6+q*420,6*(1-q)+1,0,7);g.fill()}g.restore()}
+// the leading star (魁星) waits above the clouds and then leads the way
+function leadStar(t){const a=t-T(13,4)+.6;if(a<0)return;layer(1,()=>{const c=cam(t);const x=c.x+300+Math.sin(t*.8)*80,y=c.y-560+Math.cos(t*.6)*40;
+  for(let k=0;k<40;k++){const q=k/40;g.fillStyle=rgba(ORG,.45*(1-q)*clamp(a/.8));g.beginPath();g.arc(x-q*700,y+q*260,14*(1-q)+2,0,7);g.fill()}flare(x,y,12+3*pulse(t),rgba(ORG,.95),clamp(a/.6),1.4)})}
+// ---------- lyric placement: each line hangs in the world where the camera will be ----------
+function at(t,i,dx=0,dy=0){const c=cam((L(i).s+L(i).e)/2);if(i>=14){const n=cam(t);return [lerp(n.x,c.x,.25)+dx,c.y+dy]}return [c.x+dx,c.y+dy]}
+function row(t,i,ks,x,y,f,style,o={}){return words(t,i,ks,x,y,JP(o.w||700,f),style,o)}
+const outOf=i=>Ln[i+1]?Ln[i+1].s-.4:L(i).e+1.5;
+function subOf(t,i,x,y,o={}){sub(t,L(i).ko,L(i).s,o.out??outOf(i),x,y,o)}
+function lyrics(t){
+  // verse on the rooftop — small, cool, handheld
+  layer(1,()=>{let [x,y]=at(t,0,-60,-140);row(t,0,[0,1,2,3,4,5],x-60,y,86,'focus',{w:300,out:outOf(0)});row(t,0,[6,7],x+180,y+120,120,'rise',{out:outOf(0)});subOf(t,0,x,y+230);
+    [x,y]=at(t,1,0,-120);row(t,1,[0,1,2,3,4],x-70,y,96,'rise',{w:300,out:outOf(1)});row(t,1,[5,6,7,8],x+70,y+130,120,'rise',{out:outOf(1)});subOf(t,1,x,y+240);
+    [x,y]=at(t,2,0,-120);row(t,2,[0,1,2,3],x-80,y,110,'rise',{out:outOf(2)});row(t,2,[4,5,6,7,8,9],x+100,y+130,90,'focus',{w:300,out:outOf(2)});subOf(t,2,x,y+240);
+    [x,y]=at(t,3,0,-120);row(t,3,[0,1,2,3,4,5],x-80,y,100,'rise',{w:300,out:outOf(3)});row(t,3,[6,7,8,9,10,11],x+70,y+130,110,'drop',{dist:120,out:outOf(3)});subOf(t,3,x,y+240);
+    // pre-chorus: the words climb with the camera, tension builds
+    [x,y]=at(t,4,0,-60);row(t,4,[0,1,2,3],x-80,y,90,'rise',{w:300,out:outOf(4)});row(t,4,[4,5,6,7,8,9],x+110,y+120,120,'jitter',{out:outOf(4)});subOf(t,4,x,y+230);
+    [x,y]=at(t,5,0,-160);row(t,5,[0,1,2,3,4,5],x-70,y,110,'rise',{out:outOf(5)});row(t,5,[6,7,8,9,10,11],x+70,y+130,110,'rise',{out:outOf(5)});subOf(t,5,x,y+240);
+    [x,y]=at(t,6,0,-220);row(t,6,[0,1,2,3,4,5,6,7],x,y-60,84,'rise',{w:300,out:outOf(6)});row(t,6,[8,9,10,11,12],x-60,y+70,96,'rise',{w:300,out:outOf(6)});row(t,6,[13,14,15,16],x+140,y+210,150,'stamp',{hotGlow:50,out:outOf(6)});subOf(t,6,x,y+330)});
+  // the shout — screen space, huge, one phrase per hit
+  {const i=7;[[0,1,2],[3,4,5],[6,7,8,9,10,11,12,13,14]].forEach((ks,n)=>{const t0=T(i,ks[0]),t1=n<2?T(i,ks[0]+3)-.45:outOf(i);const a=t-t0;if(a<-.1||t>t1+.3)return;ring(CX,CY,clamp(a/.7),1000,22);
+      g.save();g.translate(CX,CY-80);g.rotate(n===1?.05:n===0?-.06:0);words(t,i,ks,0,0,JP(900,n<2?200:112),'pop',{hotGlow:70,maxW:960,out:t1});g.restore()});
+    sub(t,L(i).ko,L(i).s,outOf(i),CX,CY+180,{f:44,a:.9})}
+  layer(1,()=>{let [x,y]=at(t,8,0,0);row(t,8,[0,1,2],x-70,y-60,90,'rise',{w:300,out:outOf(8)});row(t,8,[3,4,5,6,7],x+80,y+70,120,'rise',{out:outOf(8),exit:'down'});subOf(t,8,x,y+190);
+    // the moon sets, the sun rises — words follow the motion
+    [x,y]=at(t,9,0,-60);row(t,9,[0,1,2,3],x-80,y,110,'drop',{dist:160,out:outOf(9)});row(t,9,[4,5,6,7],x+80,y+140,110,'rise',{dist:160,out:outOf(9),hot:'#FFE2B0',gcol:ORG});subOf(t,9,x,y+260);
+    // stillness — "but that night was different"
+    [x,y]=at(t,10,0,-80);row(t,10,[0,1],x-230,y-80,80,'focus',{w:300,out:outOf(10)});row(t,10,[2,3,4,5],x,y+30,130,'focus',{out:outOf(10)});row(t,10,[6,7,8,9,10],x+70,y+170,110,'rise',{out:outOf(10)});subOf(t,10,x,y+290)});
+  // you took my hand — the words meet like the two lights
+  {const i=11,[x0,y0]=[600,-760];layer(1,()=>{row(t,i,[0,1],x0-220,y0+80,110,'rise',{hot:'#FFE2B0',gcol:ORG,out:T(i,4)+.6});row(t,i,[2,3],x0+220,y0+80,110,'rise',{out:T(i,4)+.6});row(t,i,[4,5],x0,y0+230,170,'pop',{hotGlow:60,out:outOf(i)})});sub(t,L(i).ko,L(i).s,outOf(i),CX,CY+560,{})}
+  // lift-off: the words ride the wind as we rise through the clouds
+  layer(1,()=>{let i=12,[x,y]=at(t,i,0,0);row(t,i,[0,1,2,3],x-70,y-120,170,'wind',{dir:1,out:outOf(i),exit:'wind'});row(t,i,[4,5,6,7,8],x+80,y+90,100,'wind',{dir:-1,w:300,out:outOf(i),exit:'wind'});subOf(t,i,x,y+220);
+    i=13;[x,y]=at(t,i,-60,40);row(t,i,[0,1,2,3,4],x-40,y-260,86,'rise',{w:300,out:outOf(i)});row(t,i,[5,6],x,y-40,300,'pop',{hot:'#FFE2B0',gcol:ORG,hotGlow:80,glow:30,out:outOf(i)});subOf(t,i,x,y+170)});
+  // above the clouds, following the leading star
+  layer(1,()=>{let i=14,[x,y]=at(t,i,0,-40);row(t,i,[0,1,2,3,4],x-60,y-80,100,'rise',{w:300,out:outOf(i)});row(t,i,[5,6,7,8,9,10,11,12,13,14,15,16],x,y+60,96,'rise',{out:outOf(i)});subOf(t,i,x,y+190);
+    i=15;[x,y]=at(t,i,0,-40);row(t,i,[0,1,2,3,4],x-70,y-60,110,'rise',{out:outOf(i)});row(t,i,[5,6,7,8,9,10,11],x+80,y+80,96,'rise',{w:300,out:outOf(i)});subOf(t,i,x,y+200);
+    // "let me change yesterday" — the words rewind, then dissolve (we will not ask for it)
+    i=16;[x,y]=at(t,i,0,-20);{const rw=P(t,T(i,7)-.1,.8),gone=P(t,T(i,7)+.5,.7);g.save();g.translate(x,y);g.scale(1-.15*rw,1);row(t,i,[0,1,2,3,4,5,6,7],0,0,108,'rise',{maxW:940,a:1-gone});g.restore();
+      if(rw>0&&rw<1){g.strokeStyle=rgba(ACC,.6*(1-rw));g.lineWidth=3;for(let k=0;k<3;k++){g.beginPath();g.arc(x,y,160+k*60,-Math.PI/2,-Math.PI/2-rw*Math.PI*1.6,true);g.stroke()}}}
+    subOf(t,i,x,y+140);
+    i=17;[x,y]=at(t,i,0,-20);row(t,i,[0,1,2],x-70,y,110,'rise',{out:outOf(i)});row(t,i,[3,4,5,6,7,8],x+100,y+130,110,'rise',{out:outOf(i)});subOf(t,i,x,y+250);
+    i=18;[x,y]=at(t,i,0,-60);row(t,i,[0,1,2,3,4],x-70,y-60,110,'rise',{out:outOf(i)});row(t,i,[5,6],x+160,y+60,120,'pop',{hot:'#FFE2B0',gcol:ORG,out:outOf(i)});row(t,i,[7,8,9,10,11,12,13,14,15],x,y+190,96,'rise',{w:300,out:outOf(i)});subOf(t,i,x,y+310)});
+}
+// ---------- frame ----------
+function render(t){CINE.begin();const c=cam(t);CAM={x:c.x,y:c.y,z:c.z*(1+.012*pulse(t)),r:c.r};
+  // handheld on the ground, a big hit for the shout, steady once airborne
+  const hand=t<T(11,4)?5:1.5;shake(t,hand,8);if(t>=T(7,0)-.05&&t<outOf(7)){for(const k of [0,3,6]){const a=t-T(7,k);if(a>0&&a<.4)shake(t,40*(1-a/.4))}}
+  skyAt();stars(t,.08,220,1,.6+.4*clamp(-CAM.y/3000));moonLayer(t);stars(t,.25,90,2,.8);
+  city(t);clouds(t,.7,-2500,.35,'#9FB4E8',11,1.3);clouds(t,.9,-3000,.55,'#8EA3DC',21,1.6);
+  lights(t);leadStar(t);lyrics(t);
+  clouds(t,1.25,-3400,.55,'#B8C8F0',31,2.0);clouds(t,1.5,-4100,.4,'#5C6EB8',41,2.6);
+  windLines(t,camVel(t));layer(1.6,()=>dust(t,1));post(t);
+  const fi=clamp(t/.6);if(fi<1){g.fillStyle=`rgba(0,0,0,${1-fi})`;g.fillRect(0,0,W,H)}}
+window.DUR=D.dur;
+window.READY=(async()=>{const jp=Ln.map(l=>l.u.map(u=>u[0]).join('')).join(''),ko=Ln.map(l=>l.ko).join('');try{await Promise.all([document.fonts.load(JP(300,100),jp),document.fonts.load(JP(700,100),jp),document.fonts.load(JP(900,100),jp),document.fonts.load(KR(300,40),ko)])}catch(e){}window.renderAt=render;render(0)})();
+</script>
+</body>
+</html>
