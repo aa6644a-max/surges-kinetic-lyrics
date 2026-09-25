@@ -1,5 +1,7 @@
 import sherpa_onnx as s, numpy as np, soundfile as sf, json
-M="/tmp/claude-0/models/sherpa-onnx-zipformer-korean-2024-06-24/"
+import os
+MD=os.environ.get("CINE_MODELS") or next(p for p in ("models","../models","../../models") if os.path.isdir(p))   # model dir: $CINE_MODELS or the repo-level models/ folder
+M=MD+"/sherpa-onnx-zipformer-korean-2024-06-24/"
 d0,sr=sf.read("stem0.wav"); d1,_=sf.read("stem1.wav")
 def env(d): m=d.mean(1); h=sr//20; return np.sqrt(np.add.reduceat(m*m,np.arange(0,len(m),h))/h)
 e0,e1=env(d0),env(d1)
@@ -30,4 +32,4 @@ for a,b in m:
     r=st.result; toks=[(tk,round(t0+ts,2)) for tk,ts in zip(r.tokens,r.timestamps)]
     out.append({"s":round(t0,2),"e":round(t1,2),"text":r.text,"toks":toks})
     print(f"{t0:6.2f}-{t1:6.2f} {r.text}")
-json.dump(out,open("asr.json","w"),ensure_ascii=False)
+json.dump(out,open("asr.json","w",encoding="utf-8"),ensure_ascii=False)

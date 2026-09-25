@@ -1,6 +1,8 @@
 """Forced alignment of known Korean lyrics with the zipformer transducer (Viterbi, one symbol per frame)."""
 import numpy as np, soundfile as sf, onnxruntime as ort, sentencepiece as spm, kaldi_native_fbank as knf, json, re
-M="../models/sherpa-onnx-zipformer-korean-2024-06-24/"
+import os
+MD=os.environ.get("CINE_MODELS") or next(p for p in ("models","../models","../../models") if os.path.isdir(p))   # model dir: $CINE_MODELS or the repo-level models/ folder
+M=MD+"/sherpa-onnx-zipformer-korean-2024-06-24/"
 enc=ort.InferenceSession(M+"encoder-epoch-99-avg-1.onnx");dec=ort.InferenceSession(M+"decoder-epoch-99-avg-1.onnx");joi=ort.InferenceSession(M+"joiner-epoch-99-avg-1.onnx")
 sp=spm.SentencePieceProcessor(model_file=M+"bpe.model")
 v,sr=sf.read("vocals16k.wav",dtype="float32")

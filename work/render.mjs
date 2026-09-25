@@ -11,7 +11,11 @@ const opt = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] :
 const out = args[0] && !args[0].startsWith('--') ? args[0] : 'surges_reels.mp4';
 const FPS = 30;
 const PAGE = opt('--page', 'kinetic.html'), AUDIO = opt('--audio', 'song.m4a');
-const ffmpeg = process.env.FFMPEG || execSync('python3 -c "import imageio_ffmpeg as f;print(f.get_ffmpeg_exe())"').toString().trim();
+const which = cmd => { try { return execSync(cmd, { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim().split(/\r?\n/)[0]; } catch { return ''; } };
+// $FFMPEG, else ffmpeg on PATH, else the imageio-ffmpeg binary (python3 on Windows can exit non-zero, so try python too)
+const ffmpeg = process.env.FFMPEG || which(process.platform === 'win32' ? 'where ffmpeg' : 'command -v ffmpeg') ||
+  which('python3 -c "import imageio_ffmpeg as f;print(f.get_ffmpeg_exe())"') || which('python -c "import imageio_ffmpeg as f;print(f.get_ffmpeg_exe())"');
+if (!ffmpeg) { console.error('ffmpeg not found: install it, pip install imageio-ffmpeg, or set FFMPEG'); process.exit(1); }
 const root = resolve('.');
 const fontCache = new Map();
 

@@ -53,4 +53,4 @@ for row in open("groups.txt",encoding="utf-8").read().strip().splitlines():
             ws.append([U[k][0],round(t[k],2),round(min(e,t[k]+.9),2),U[k][2],U[k][1]])
         res.append({"t":l,"s":ws[0][1],"e":ws[-1][2],"w":ws})
 for r in res: print(f'{r["s"]:6.2f}-{r["e"]:6.2f} {r["t"]}   ', " ".join(f"{u[0]}@{u[1]:.2f}" for u in r["w"][:6]))
-json.dump(res,open("lines.json","w"),ensure_ascii=False,indent=1)
+json.dump(res,open("lines.json","w",encoding="utf-8"),ensure_ascii=False,indent=1)

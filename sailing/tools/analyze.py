@@ -45,4 +45,4 @@ print(" t    energy  bright  low  vocal")
 for s in np.arange(0,dur,4):
     e=float(rms[int(s*fps):int((s+4)*fps)].mean())
     print(f"{s:5.0f}  {'#'*int(e*40):40s} {e:.2f} {seg(cent,s):6.0f} {seg(low,s):.2f} {seg(voc,s):.2f}")
-json.dump({"bpm":round(bpm,1),"beats":beats,"energy_0p5s":energy},open("beats.json","w"))
+json.dump({"bpm":round(bpm,1),"beats":beats,"energy_0p5s":energy},open("beats.json","w",encoding="utf-8"))

@@ -52,4 +52,4 @@ for a,b,lines in groups:
         n=len(l["w"]);ws=U[k:k+n];k+=n
         res.append({"t":l["t"],"s":ws[0][1],"e":ws[-1][2],"w":ws})
 for r,o in zip(res,old): print(f'{r["s"]:6.2f} (was {o["s"]:6.2f}) {r["t"]}')
-json.dump(res,open("lines.json","w"),ensure_ascii=False,indent=1)
+json.dump(res,open("lines.json","w",encoding="utf-8"),ensure_ascii=False,indent=1)

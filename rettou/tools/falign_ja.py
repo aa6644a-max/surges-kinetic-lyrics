@@ -3,7 +3,9 @@ transducer (character vocab, Viterbi with one symbol per frame) -> lines.json.
 Needs: tools/vocals16k.wav (UVR vocals, 16 kHz) and the sherpa-onnx model dir in $JA_MODEL."""
 import numpy as np, soundfile as sf, onnxruntime as ort, kaldi_native_fbank as knf, json, os, re
 os.chdir(os.path.dirname(os.path.abspath(__file__)) + "/..")
-M = os.environ.get("JA_MODEL", "/tmp/claude-0/models/sherpa-onnx-zipformer-ja-reazonspeech-2024-08-01") + "/"
+import os
+MD=os.environ.get("CINE_MODELS") or next(p for p in ("models","../models","../../models") if os.path.isdir(p))   # model dir: $CINE_MODELS or the repo-level models/ folder
+M = os.environ.get("JA_MODEL", MD + "/sherpa-onnx-zipformer-ja-reazonspeech-2024-08-01") + "/"
 enc = ort.InferenceSession(M + "encoder-epoch-99-avg-1.onnx")
 dec = ort.InferenceSession(M + "decoder-epoch-99-avg-1.onnx")
 joi = ort.InferenceSession(M + "joiner-epoch-99-avg-1.onnx")
