@@ -40,7 +40,10 @@ def main():
     only = set(a.only.split(",")) if a.only else None
     todo = [p for p in M["plates"] if (only is None or p["id"] in only) and (a.force or not os.path.exists(os.path.join(RAW, p["id"] + ".png")))]
     codex = os.environ.get("CODEX_BIN", "codex")
-    if not a.dry and not shutil.which(codex): sys.exit(f"codex CLI not found ({codex}); install it or set CODEX_BIN")
+    if not a.dry:
+        found = shutil.which(codex)   # resolves codex.cmd on Windows, which subprocess cannot find by bare name
+        if not found: sys.exit(f"codex CLI not found ({codex}); install it or set CODEX_BIN")
+        codex = found
     failed = []
     for p in todo:
         out = os.path.join(RAW, p["id"] + ".png")
@@ -49,12 +52,12 @@ def main():
         if ref and os.path.exists(ref): cmd += ["-i", ref]          # before the other flags: --image takes several values
         elif ref: print(f"  ! {p['id']}: reference {p['ref']} not generated yet, going without it")
         text = instruction(M, p, out, "-i" in cmd)
-        cmd += ["--full-auto", "--skip-git-repo-check", "-C", RAW] + shlex.split(os.environ.get("CODEX_ARGS", ""))
+        cmd += ["-s", "workspace-write", "--skip-git-repo-check", "-C", RAW]   # --full-auto was removed from newer codex + shlex.split(os.environ.get("CODEX_ARGS", ""))
         if a.dry:
             print(f"==== {p['id']}  ({' '.join(shlex.quote(c) for c in cmd)} -)\n{text}\n"); continue
         print(f"-> {p['id']} ...", flush=True); t0 = time.time()
         if os.path.exists(out): os.remove(out)
-        r = subprocess.run(cmd + ["-"], input=text, text=True)
+        r = subprocess.run(cmd + ["-"], input=text, text=True, encoding="utf-8")
         if not os.path.exists(out):
             alt = newest_codex_png(t0)
             if alt: shutil.copy(alt, out); print(f"   copied from {alt}")
