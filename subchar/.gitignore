@@ -1,0 +1,4 @@
+tools/stem*.wav
+tools/*.log
+tools/__pycache__/
+plates/raw/
