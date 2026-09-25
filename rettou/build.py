@@ -5,7 +5,8 @@ PUNCT = set("「」！？!?”“\"、。 　・…")
 core = lambda s: "".join(c for c in s if c not in PUNCT)
 L = json.load(open("lines.json", encoding="utf-8"))
 import sys
-TRAVEL = "--travel" in sys.argv
+ROAD = "--road" in sys.argv
+TRAVEL = "--travel" in sys.argv or ROAD
 rows = [r for r in open("scenes_travel.txt" if TRAVEL else "scenes.txt", encoding="utf-8").read().splitlines() if r.strip() and not r.startswith("#")]
 assert len(rows) == len(L), (len(rows), len(L))
 lines = []
@@ -24,6 +25,6 @@ for i, (x, row) in enumerate(zip(L, rows)):
     lines.append({"s": x["s"], "e": x["e"], "w": units, "ch": chunks, "st": style, "fl": flags, "ko": x["ko"], "bk": "", "bko": ""})
 b = json.load(open("beats.json"))
 data = {"dur": 214.0, "bpm": b["bpm"], "beats": b["beats"], "energy": b.get("energy_0p5s"), "lines": lines}
-html = open("travel.html" if TRAVEL else "template.html", encoding="utf-8").read()
-open("kinetic_travel.html" if TRAVEL else "kinetic.html", "w", encoding="utf-8").write(html.replace("/*DATA*/null", json.dumps(data, ensure_ascii=False, separators=(",", ":"))))
+html = open("road.html" if ROAD else "travel.html" if TRAVEL else "template.html", encoding="utf-8").read()
+open("kinetic_road.html" if ROAD else "kinetic_travel.html" if TRAVEL else "kinetic.html", "w", encoding="utf-8").write(html.replace("/*DATA*/null", json.dumps(data, ensure_ascii=False, separators=(",", ":"))))
 print("built", len(lines), "lines")
