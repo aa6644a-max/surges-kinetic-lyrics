@@ -20,7 +20,7 @@
 <audio id="au" src="song.mp3" preload="auto"></audio>
 <script>
 const D=/*DATA*/null;
-const cv=document.getElementById('cv'),g=cv.getContext('2d'),W=1080,H=1920,CX=540;
+const cv=document.getElementById('cv'),W=1080,H=1920,CX=540;let g=cv.getContext('2d');
 function fit(){const s=Math.min(innerWidth/W,innerHeight/H);cv.style.transform=`scale(${s}) translate(-50%,-50%)`}
 addEventListener('resize',fit);fit();
 
@@ -62,7 +62,7 @@ function spaced(txt,x,y,font,col,sp,a=1,glow=0){if(a<=0)return;g.save();g.font=f
 const isEN=s=>/^[A-Za-z]/.test(s);
 // caption: the whole line, units light up as they are sung
 function caption(t,L,y,col,acc,a=1){if(a<=0)return;
-  const f=44;g.save();g.textBaseline='middle';g.textAlign='left';
+  const f=50;g.save();g.textBaseline='middle';g.textAlign='left';
   const items=L.u.map(u=>{g.font=u[3]?EN(300,f+4):KR(300,f);return {u,w:g.measureText(u[0]).width,f:u[3]?EN(300,f+4):KR(300,f)}});
   const rows=[[]];let rw=0;items.forEach(it=>{const gap=it.u[4]?f*.32:0;if(rw+gap+it.w>920&&rows[rows.length-1].length){rows.push([]);rw=0}const r=rows[rows.length-1];it.gap=r.length?gap:0;r.push(it);rw+=it.gap+it.w});
   rows.forEach((r,ri)=>{const tw=r.reduce((p,it)=>p+it.gap+it.w,0);let x=CX-tw/2;const yy=y+ri*(f*1.5)-(rows.length-1)*f*.75;
@@ -70,7 +70,7 @@ function caption(t,L,y,col,acc,a=1){if(a<=0)return;
       g.globalAlpha=a*(on?1:.28);g.fillStyle=on?(now?acc:col):col;if(now){g.shadowColor=acc;g.shadowBlur=18}g.fillText(it.u[0],x,yy+(on?-4*Math.exp(-s*12):0));g.shadowBlur=0;x+=it.w})});
   g.restore()}
 // keyword (the one big word of the scene): appears at its own sung time with tracking-out
-function keyword(t,L,x,y,o){const k0=L.kt??L.s,a=t-k0+.05;if(a<0)return 0;const p=eOutC(clamp(a/.55));
+function keyword(t,L,x,y,o){const k0=L.kt??L.s,a=t-k0+.05;if(a<0){if(o.ghost!==false){const txt0=L.key,en0=isEN(txt0),f0=o.f||(en0?150:170),fn0=en0?EN(o.w||100,f0):KR(o.w||900,f0),sp0=(o.sp??(en0?10:18));const sc0=Math.min(1,(o.maxW||940)/spacedW(txt0,fn0,sp0));g.save();g.translate(x,y);g.scale(sc0,sc0);spaced(txt0,0,0,fn0,o.col||'#fff',sp0,.09*clamp((t-L.s+.4)/.4));g.restore()}return 0}const p=eOutC(clamp(a/.55));
   const txt=L.key,en=isEN(txt),f=o.f||(en?150:170);const font=en?EN(o.w||100,f):KR(o.w||900,f);let sp=(o.sp??(en?10:18))+(1-p)*40;
   let wd=spacedW(txt,font,sp);const sc=Math.min(1,(o.maxW||940)/wd);
   g.save();g.translate(x,y+(1-p)*30);g.scale(sc,sc);spaced(txt,0,0,font,o.col||'#fff',sp,clamp(a/.2)*(o.a??1),o.glow??24);g.restore();return p}
@@ -88,7 +88,7 @@ SC.CHART=(t,L,P,la)=>{bg(t,P);stars(t,150,20,.5);
   // magnitude scale on the right
   const m=mode==='one'&&a>0?1:6;for(let k=1;k<=6;k++){const y=560+k*90,r=16-k*2.2,on=k===m;g.globalAlpha=on?1:.35;g.fillStyle=on?(m===1?GOLD:P.accH):'#fff';g.beginPath();g.arc(960,y,r,0,7);g.fill();g.font=EN(300,24);g.textAlign='right';g.fillText(String(k),925,y+8)}g.globalAlpha=1;
   g.save();g.translate(CX,840);g.textAlign='center';g.textBaseline='middle';
-  if(mode==='six'){const p=eOutC(clamp((a+.1)/.6));g.globalAlpha=.1*p;g.font=KR(100,900);g.fillStyle=GOLD;g.save();g.translate(70,20);g.rotate(.35);g.fillText('1',0,0);g.restore();
+  if(mode==='six'||(mode==='one'&&a<0)){const p=eOutC(clamp((a+.1)/.6));g.globalAlpha=.1*p;g.font=KR(100,900);g.fillStyle=GOLD;g.save();g.translate(70,20);g.rotate(.35);g.fillText('1',0,0);g.restore();
     g.globalAlpha=.75*p;g.font=EN(100,760);g.fillStyle=rgba(P.accH,.6);g.shadowColor=P.accH;g.shadowBlur=40;g.fillText('6',0,0);g.shadowBlur=0}
   else if(mode==='try'){ // 6 tries to become 1 and falls back (not yet)
     const q=Math.sin(clamp(a/1.6)*Math.PI);g.rotate(q*.35);g.globalAlpha=.75*(1-q*.6);g.font=EN(100,760);g.fillStyle=rgba(P.accH,.6);g.shadowColor=P.accH;g.shadowBlur=40;g.fillText('6',0,0);g.shadowBlur=0;
@@ -107,7 +107,7 @@ SC.CARD=(t,L,P,la,ld)=>{bg(t,P);stars(t,110,40+L.i,.6,4);
   cg.clearRect(0,0,760,900);cg.fillStyle='rgba(255,255,255,.07)';cg.fillRect(0,0,760,900);cg.strokeStyle=rgba(P.accH,.9);cg.lineWidth=4;cg.strokeRect(2,2,756,896);
   cg.strokeStyle='rgba(255,255,255,.1)';cg.lineWidth=1;for(let y=80;y<900;y+=80){cg.beginPath();cg.moveTo(40,y);cg.lineTo(720,y);cg.stroke()}
   cg.font=EN(300,22);cg.fillStyle='rgba(255,255,255,.5)';cg.textAlign='left';cg.fillText(`CARD ${String(L.i+1).padStart(2,'0')} / ${Ln.length}`,40,50);cg.textAlign='right';cg.fillText('◐',720,50);
-  const gg=g;g=cg;keyword(t,L,380,420,{maxW:640,f:isEN(L.key)?140:150,glow:26});g=gg;
+  const gg=g;g=cg;keyword(t,L,380,450,{maxW:640,f:isEN(L.key)?140:150,glow:26});g=gg;
   const inP=eOutC(clamp((la+.15)/.5)),outP=eInC(clamp((t-ld+.3)/.3)),turn=(1-inP)*-.9+outP*.9+Math.sin(t*.8)*.05,dir=L.i%2?1:-1;
   const cw=720*Math.max(.02,Math.cos(turn)),x0=CX-cw/2,y0=300,persp=Math.sin(turn)*dir*.3;
   for(let s=0;s<760;s+=4){const u=s/760,sc=1-persp*(u-.5)*2,hh=900*sc;g.drawImage(CARD,s,0,4,900,x0+u*cw,y0+(900-hh)/2,cw/760*4+1,hh)}
@@ -161,6 +161,10 @@ function render(t){
     const L0={i:-1,key:'',u:[],s:0};bg(t,P);const grow=clamp(t/7);
     for(let k=0;k<240;k++){const r=30+1300*R(k,5)**.8,a0=R(k,6)*6.28+t*.05,len=(.05+.6*R(k,7))*grow;g.strokeStyle=`rgba(190,210,255,${(.1+.35*R(k,8))*grow})`;g.lineWidth=.8+1.8*R(k,10);g.beginPath();g.arc(CX,620,r,a0,a0+len);g.stroke()}
     sparkle(CX,620,6,rgba(P.accH,.9),clamp(t/2));titleCard(t,1.2,P);micro(t,'#fff',.5*clamp(t/2))}
+  else if(Ln[i+1]&&t>Ln[i].e+1.2&&Ln[i+1].s-Ln[i+1].pre-Ln[i].e>4&&t<Ln[i+1].s-Ln[i+1].pre){ // instrumental interlude: star trails keep turning, section label
+    const a=t-(Ln[i].e+1.2),q=clamp(a/.8)*clamp((Ln[i+1].s-Ln[i+1].pre-t)/.5);bg(t,P);stars(t,120,7,.5);
+    for(let k=0;k<240;k++){const r=30+1300*R(k,5)**.8,a0=R(k,6)*6.28+t*.08,len=(.1+.6*R(k,7))*clamp(a/4);g.strokeStyle=`rgba(190,210,255,${(.1+.35*R(k,8))*q})`;g.lineWidth=.8+1.8*R(k,10);g.beginPath();g.arc(CX,620,r,a0,a0+len);g.stroke()}
+    sparkle(CX,620,6+2*pulse(t),rgba(P.accH,.9),q);const lab=i<3?'INTERLUDE':'—';if(i<3)titleCard(t,Ln[i].e+1.6,P);else spaced('STAR TRAIL',CX,1180,EN(100,96),'#fff',14,q*.8);micro(t,'#fff',.5*q)}
   else{const L=Ln[i],nx=Ln[i+1],ld=nx?nx.s-nx.pre:D.dur,la=t-(L.s-L.pre);
     (SC[L.sc]||SC.CARD)(t,L,P,la,ld);
     const light=L.sc==='FLASH';micro(t,light?'#0A0E2A':'#fff',.55,i);

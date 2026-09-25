@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>STAR TRAIL Kinetic</title>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@100;300;600&family=Noto+Sans+KR:wght@100;300;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;box-sizing:border-box}html,body{height:100%;background:#000;overflow:hidden}
+#cv{position:absolute;left:50%;top:50%;width:1080px;height:1920px;transform-origin:0 0}
+#ui{position:fixed;left:16px;right:16px;bottom:16px;display:flex;gap:12px;align-items:center;font:13px/1 system-ui;color:#ccc}
+#ui button{background:#6FA8FF;color:#0A0E2A;border:0;border-radius:999px;width:44px;height:44px;font-size:18px}
+#bar{flex:1;height:6px;background:#333;border-radius:3px;position:relative}#fill{position:absolute;inset:0 auto 0 0;background:#6FA8FF}
+.render #ui{display:none}
+</style>
+</head>
+<body>
+<canvas id="cv" width="1080" height="1920"></canvas>
+<div id="ui"><button id="pp">▶</button><div id="bar"><div id="fill"></div></div><span id="time">0:00</span></div>
+<audio id="au" src="song.mp3" preload="auto"></audio>
+<script>
+const D={"dur":224.0,"b0":0.5370212765957443,"dawn":160.58,"lines":[{"i":0,"t":"Star trail 우리의 꿈이 향하는 길을 따라","u":[["Star",6.92,7.9,1,0],["trail",8.0,9.15,1,1],["우",9.15,9.35,0,1],["리",9.35,9.51,0,0],["의",9.51,10.12,0,0],["꿈",10.12,10.48,0,1],["이",10.48,10.8,0,0],["향",10.8,11.16,0,1],["하",11.16,11.4,0,0],["는",11.4,11.77,0,0],["길",11.77,12.09,0,1],["을",12.09,13.05,0,0],["따",13.05,13.17,0,1],["라",13.17,13.68,0,0]],"s":6.92,"e":13.68,"sc":"TRAIL","key":"STAR TRAIL","kt":6.92,"pre":0.25},{"i":1,"t":"달려갈 거야, we are StelLive","u":[["달",13.73,13.98,0,0],["려",13.98,14.3,0,0],["갈",14.3,14.66,0,0],["거",14.66,15.22,0,1],["야,",15.22,16.27,0,0],["we",16.27,16.59,1,1],["are",16.59,16.71,1,1],["StelLive",16.71,19.0,1,1]],"s":13.73,"e":19.0,"sc":"TRAIL","key":"StelLive","kt":16.71,"pre":0.25},{"i":2,"t":"짙은 어둠이 내려와 별조차 빛을 잃은 밤","u":[["짙",29.92,30.0,0,0],["은",30.0,30.2,0,0],["어",30.2,30.4,0,1],["둠",30.4,30.73,0,0],["이",30.73,31.09,0,0],["내",31.09,31.33,0,1],["려",31.33,31.53,0,0],["와",31.53,32.3,0,0],["별",32.3,32.5,0,1],["조",32.5,32.74,0,0],["차",32.74,32.98,0,0],["빛",32.98,33.3,0,1],["을",33.3,33.62,0,0],["잃",33.62,33.95,0,1],["은",33.95,34.11,0,0],["밤",34.11,34.19,0,1]],"s":29.92,"e":34.19,"sc":"CARD","key":"어둠","kt":30.2,"pre":0.25},{"i":3,"t":"반짝이는 건 내 눈물뿐인걸","u":[["반",34.15,34.91,0,0],["짝",34.91,35.07,0,0],["이",35.07,35.36,0,0],["는",35.36,35.72,0,0],["건",35.72,36.04,0,1],["내",36.04,36.32,0,1],["눈",36.32,36.8,0,1],["물",36.8,37.13,0,0],["뿐",37.13,37.49,0,0],["인",37.49,37.57,0,0],["걸",37.53,39.3,0,0]],"s":34.15,"e":39.3,"sc":"CARD","key":"눈물","kt":36.32,"pre":0.25},{"i":4,"t":"그 눈물을 비춰준 건 지평선 너머의 luminous","u":[["그",40.02,40.1,0,0],["눈",40.1,40.38,0,1],["물",40.38,40.46,0,0],["을",40.42,40.95,0,0],["비",40.95,41.07,0,1],["춰",41.07,41.51,0,0],["준",41.51,41.71,0,0],["건",41.71,42.56,0,1],["지",42.56,42.64,0,1],["평",42.64,43.0,0,0],["선",43.0,43.16,0,0],["너",43.16,43.24,0,1],["머",43.2,43.72,0,0],["의",43.72,43.8,0,0],["luminous",43.8,44.88,1,1]],"s":40.02,"e":44.88,"sc":"RISE","key":"luminous","kt":43.8,"pre":0.25},{"i":5,"t":"비록 지금은 흐린 6등성이라 해도","u":[["비",44.93,45.09,0,0],["록",45.09,45.29,0,0],["지",45.29,45.53,0,1],["금",45.53,45.9,0,0],["은",45.9,46.26,0,0],["흐",46.26,46.54,0,1],["린",46.54,47.02,0,0],["6",47.02,47.22,0,1],["등",47.22,47.43,0,0],["성",47.43,47.75,0,0],["이",47.75,47.99,0,0],["라",47.99,48.07,0,0],["해",48.07,48.47,0,1],["도",48.47,49.59,0,0]],"s":44.93,"e":49.59,"sc":"CHART","key":"6등성","kt":47.02,"pre":0.25,"mode":"six"},{"i":6,"t":"새로운 everys, 새까만 어둠 속 한 발짝 내딛어","u":[["새",49.64,49.84,0,0],["로",49.84,50.08,0,0],["운",50.08,50.33,0,0],["everys,",50.33,51.33,1,1],["새",51.33,51.45,0,1],["까",51.45,51.77,0,0],["만",51.77,52.26,0,0],["어",52.26,52.38,0,1],["둠",52.38,52.62,0,0],["속",52.62,52.86,0,1],["한",52.86,53.1,0,1],["발",53.1,53.42,0,1],["짝",53.42,53.71,0,0],["내",53.71,53.87,0,1],["딛",53.87,54.03,0,0],["어",54.03,55.06,0,0]],"s":49.64,"e":55.06,"sc":"CARD","key":"everys","kt":50.33,"pre":0.25},{"i":7,"t":"반짝인 꿈은 cliche","u":[["반",55.11,55.31,0,0],["짝",55.31,55.52,0,0],["인",55.52,55.76,0,0],["꿈",55.76,56.0,0,1],["은",56.0,56.32,0,0],["cliche",56.32,57.03,1,1]],"s":55.11,"e":57.03,"sc":"FLASH","key":"cliche","kt":56.32,"pre":0.25},{"i":8,"t":"채우자 universe","u":[["채",57.08,57.17,0,0],["우",57.17,57.69,0,0],["자",57.69,58.09,0,0],["universe",58.09,59.7,1,1]],"s":57.08,"e":59.7,"sc":"CONST","key":"UNIVERSE","kt":58.09,"pre":0.25},{"i":9,"t":"노래해, 빛나는 별이 모두의 꿈에 닿도록","u":[["노",59.88,60.0,0,0],["래",60.0,60.2,0,0],["해,",60.2,60.61,0,0],["빛",60.61,60.81,0,1],["나",60.81,61.01,0,0],["는",61.01,61.37,0,0],["별",61.37,61.85,0,1],["이",61.85,62.46,0,0],["모",62.46,62.62,0,1],["두",62.62,62.82,0,0],["의",62.82,63.14,0,0],["꿈",63.14,63.42,0,1],["에",63.42,63.62,0,0],["닿",63.62,63.86,0,1],["도",63.86,64.15,0,0],["록",64.15,65.3,0,0]],"s":59.88,"e":65.3,"sc":"RISE","key":"노래해","kt":59.88,"pre":0.25},{"i":10,"t":"Make each other shine brighter, 우리 함께","u":[["Make",65.35,66.28,1,0],["each",66.28,66.64,1,1],["other",66.64,66.92,1,1],["shine",66.92,67.32,1,1],["brighter,",67.32,67.93,1,1],["우",67.93,68.25,0,1],["리",68.25,68.73,0,0],["함",68.73,68.93,0,1],["께",68.93,70.3,0,0]],"s":65.35,"e":70.3,"sc":"CARD","key":"shine","kt":66.92,"pre":0.25},{"i":11,"t":"조용히 떠오르는 starlight, 내일을 비추고서","u":[["조",70.46,70.58,0,0],["용",70.58,70.66,0,0],["히",70.62,71.75,0,0],["떠",71.75,71.83,0,1],["오",71.83,71.99,0,0],["르",71.99,72.51,0,0],["는",72.51,72.67,0,0],["starlight,",72.67,73.43,1,1],["내",73.43,74.16,0,1],["일",74.16,74.24,0,0],["을",74.2,74.4,0,0],["비",74.4,74.52,0,1],["추",74.52,74.88,0,0],["고",74.88,75.08,0,0],["서",75.08,76.12,0,0]],"s":70.46,"e":76.12,"sc":"FLASH","key":"starlight","kt":72.67,"pre":0.25},{"i":12,"t":"약속했던 그곳 너머로 우릴 데려갈 테니까","u":[["약",76.17,76.53,0,0],["속",76.53,76.69,0,0],["했",76.69,76.85,0,0],["던",76.85,77.21,0,0],["그",77.21,77.93,0,1],["곳",77.93,78.01,0,0],["너",77.97,78.09,0,1],["머",78.09,78.46,0,0],["로",78.46,79.66,0,0],["우",80.02,80.38,0,1],["릴",80.38,80.71,0,0],["데",80.71,81.03,0,1],["려",81.03,81.47,0,0],["갈",81.47,81.83,0,0],["테",81.83,81.95,0,1],["니",81.95,82.19,0,0],["까",82.19,84.0,0,0]],"s":76.17,"e":84.0,"sc":"TUNNEL","key":"너머로","kt":77.97,"pre":0.25,"dir":1},{"i":13,"t":"We are StelLive","u":[["We",84.51,84.87,1,0],["are",84.87,85.48,1,1],["StelLive",85.48,87.98,1,1]],"s":84.51,"e":87.98,"sc":"TRAIL","key":"StelLive","kt":85.48,"pre":0.25},{"i":14,"t":"하늘 위에서 바라본 세상은 너무 바빠서","u":[["하",96.06,96.14,0,0],["늘",96.1,96.18,0,0],["위",96.14,96.42,0,1],["에",96.42,97.03,0,0],["서",97.03,97.47,0,0],["바",97.47,97.67,0,1],["라",97.67,97.88,0,0],["본",97.88,98.28,0,0],["세",98.28,98.96,0,1],["상",98.96,99.17,0,0],["은",99.17,99.37,0,0],["너",99.37,99.53,0,1],["무",99.53,99.97,0,0],["바",99.97,100.25,0,1],["빠",100.25,100.46,0,0],["서",100.46,101.05,0,0]],"s":96.06,"e":101.05,"sc":"TUNNEL","key":"세상","kt":98.28,"pre":0.25,"dir":-1},{"i":15,"t":"모두 길을 잃고 헤매는 것 같아","u":[["모",101.1,101.26,0,0],["두",101.26,101.34,0,0],["길",101.34,101.83,0,1],["을",101.83,102.15,0,0],["잃",102.15,102.39,0,1],["고",102.39,102.75,0,0],["헤",102.75,103.76,0,1],["매",103.76,103.84,0,0],["는",103.8,104.13,0,0],["것",104.13,104.21,0,1],["같",104.17,105.09,0,1],["아",105.09,105.9,0,0]],"s":101.1,"e":105.9,"sc":"CARD","key":"길","kt":101.34,"pre":0.25},{"i":16,"t":"눈부신 everys, 차원을 넘어서 우리를 비추고","u":[["눈",106.02,106.14,0,0],["부",106.14,106.22,0,0],["신",106.18,106.51,0,0],["everys,",106.51,107.43,1,1],["차",107.43,107.63,0,1],["원",107.63,107.95,0,0],["을",107.95,108.44,0,0],["넘",108.44,108.6,0,1],["어",108.6,108.72,0,0],["서",108.72,109.08,0,0],["우",109.08,109.24,0,1],["리",109.24,109.48,0,0],["를",109.48,109.89,0,0],["비",109.89,110.01,0,1],["추",110.01,110.21,0,0],["고",110.21,111.24,0,0]],"s":106.02,"e":111.24,"sc":"CARD","key":"everys","kt":106.51,"pre":0.25},{"i":17,"t":"기적을 닮은 cliche","u":[["기",111.29,111.45,0,0],["적",111.45,111.66,0,0],["을",111.66,112.02,0,0],["닮",112.02,112.14,0,1],["은",112.14,112.46,0,0],["cliche",112.46,113.26,1,1]],"s":111.29,"e":113.26,"sc":"FLASH","key":"cliche","kt":112.46,"pre":0.25},{"i":18,"t":"찬란한 universe","u":[["찬",113.31,113.91,0,0],["란",113.91,114.19,0,0],["한",114.19,114.27,0,0],["universe",114.23,115.8,1,1]],"s":113.31,"e":115.8,"sc":"CONST","key":"UNIVERSE","kt":114.23,"pre":0.25},{"i":19,"t":"노래해, 저 먼 곳에서 우리를 볼 수 없어도","u":[["노",116.02,116.18,0,0],["래",116.18,116.38,0,0],["해,",116.38,116.7,0,0],["저",116.7,117.46,0,1],["먼",117.46,117.54,0,1],["곳",117.5,117.58,0,1],["에",117.54,117.91,0,0],["서",117.91,118.39,0,0],["우",118.39,118.75,0,1],["리",118.75,118.95,0,0],["를",118.95,119.31,0,0],["볼",119.31,119.63,0,1],["수",119.63,119.71,0,1],["없",119.67,120.11,0,1],["어",120.11,120.51,0,0],["도",120.51,121.26,0,0]],"s":116.02,"e":121.26,"sc":"RISE","key":"노래해","kt":116.02,"pre":0.25},{"i":20,"t":"If we just stay here, we will fade away","u":[["If",121.31,122.0,1,0],["we",122.0,122.72,1,1],["just",122.72,123.16,1,1],["stay",123.16,123.8,1,1],["here,",123.8,123.96,1,1],["we",123.96,124.08,1,1],["will",124.08,124.4,1,1],["fade",124.4,124.92,1,1],["away",124.92,126.56,1,1]],"s":121.31,"e":126.56,"sc":"TUNNEL","key":"fade away","kt":124.4,"pre":0.25,"dir":-1},{"i":21,"t":"언젠가 우리의 노래가 1등성처럼","u":[["언",126.61,126.77,0,0],["젠",126.77,126.97,0,0],["가",126.97,127.29,0,0],["우",127.29,128.05,0,1],["리",128.05,128.25,0,0],["의",128.25,128.57,0,0],["노",128.57,128.85,0,1],["래",128.85,129.18,0,0],["가",129.18,129.54,0,0],["1",129.54,129.74,0,1],["등",129.74,130.34,0,0],["성",130.34,130.42,0,0],["처",130.38,130.62,0,0],["럼",130.62,132.09,0,0]],"s":126.61,"e":132.09,"sc":"CHART","key":"1등성","kt":129.54,"pre":0.25,"mode":"try"},{"i":22,"t":"저 먼 우주를 넘어서 너에게 갈 테니까","u":[["저",132.14,132.22,0,0],["먼",132.22,132.34,0,1],["우",132.34,132.58,0,1],["주",132.58,132.7,0,0],["를",132.7,133.39,0,0],["넘",133.39,133.47,0,1],["어",133.47,133.87,0,0],["서",133.87,134.63,0,0],["너",134.63,134.71,0,1],["에",134.71,134.95,0,0],["게",134.95,135.27,0,0],["갈",135.27,135.43,0,1],["테",135.43,135.51,0,1],["니",135.51,135.71,0,0],["까",135.71,138.21,0,0]],"s":132.14,"e":138.21,"sc":"TUNNEL","key":"너에게","kt":134.63,"pre":0.25,"dir":1},{"i":23,"t":"Star trail, la-la-la","u":[["Star",139.68,140.81,1,0],["trail,",140.81,142.01,1,1],["la-",142.3,143.23,1,1],["la-",143.23,143.43,1,1],["la",143.43,145.93,1,1]],"s":139.68,"e":145.93,"sc":"TRAIL","key":"la-la-la","kt":142.3,"pre":0.25},{"i":24,"t":"Star trail, la-la-la","u":[["Star",146.01,146.09,1,0],["trail,",146.09,147.29,1,1],["la-",147.5,148.35,1,1],["la-",148.35,148.59,1,1],["la",148.59,150.2,1,1]],"s":146.01,"e":150.2,"sc":"TRAIL","key":"la-la-la","kt":147.5,"pre":0.25},{"i":25,"t":"너와 나의 별을","u":[["너",151.56,151.85,0,0],["와",151.85,152.13,0,0],["나",152.13,152.57,0,1],["의",152.57,152.77,0,0],["별",152.77,153.02,0,1],["을",153.02,154.13,0,0]],"s":151.56,"e":154.13,"sc":"CONST","key":"별","kt":152.77,"pre":0.25},{"i":26,"t":"우리의 내일을 찾아 떠나볼까","u":[["우",154.18,154.39,0,0],["리",154.39,154.55,0,0],["의",154.55,154.75,0,0],["내",154.75,155.44,0,1],["일",155.44,155.6,0,0],["을",155.6,156.32,0,0],["찾",156.32,157.52,0,1],["아",157.65,157.9,0,0],["떠",157.9,158.1,0,1],["나",158.1,158.62,0,0],["볼",158.62,158.98,0,0],["까",158.98,160.53,0,0]],"s":154.18,"e":160.53,"sc":"CARD","key":"내일","kt":154.75,"pre":0.25},{"i":27,"t":"노래해, 빛나는 별이 모두의 꿈에 닿도록","u":[["노",160.58,160.9,0,0],["래",160.9,161.5,0,0],["해,",161.5,161.58,0,0],["빛",161.54,161.66,0,1],["나",161.66,161.86,0,0],["는",161.86,162.23,0,0],["별",162.23,162.59,0,1],["이",162.59,163.31,0,0],["모",163.31,163.43,0,1],["두",163.43,163.75,0,0],["의",163.75,163.91,0,0],["꿈",163.91,164.27,0,1],["에",164.27,164.47,0,0],["닿",164.47,164.8,0,1],["도",164.8,165.08,0,0],["록",165.08,166.15,0,0]],"s":160.58,"e":166.15,"sc":"RISE","key":"노래해","kt":160.58,"pre":0.25},{"i":28,"t":"Make each other shine brighter, 우리 함께","u":[["Make",166.2,166.64,1,0],["each",166.64,167.49,1,1],["other",167.49,167.81,1,1],["shine",167.81,168.13,1,1],["brighter,",168.13,168.81,1,1],["우",168.81,169.09,0,1],["리",169.09,169.53,0,0],["함",169.53,169.77,0,1],["께",169.77,171.29,0,0]],"s":166.2,"e":171.29,"sc":"CARD","key":"shine","kt":167.81,"pre":0.25},{"i":29,"t":"찬란히 떠오른 starlight, 1등성이 되어","u":[["찬",171.34,171.46,0,0],["란",171.46,171.7,0,0],["히",171.7,172.62,0,0],["떠",172.62,172.7,0,1],["오",172.7,172.91,0,0],["른",172.91,173.31,0,0],["starlight,",173.31,174.51,1,1],["1",174.59,174.67,0,1],["등",174.67,174.75,0,0],["성",174.71,174.87,0,0],["이",174.87,175.07,0,0],["되",175.07,175.23,0,1],["어",175.23,176.75,0,0]],"s":171.34,"e":176.75,"sc":"CHART","key":"1등성","kt":174.59,"pre":0.25,"mode":"one"},{"i":30,"t":"약속보다 더 빛나는 내일을 안겨줄게","u":[["약",176.8,176.96,0,0],["속",176.96,177.16,0,0],["보",177.16,177.32,0,0],["다",177.32,177.57,0,0],["더",177.57,177.65,0,1],["빛",177.61,178.37,0,1],["나",178.37,178.61,0,0],["는",178.61,179.26,0,0],["내",179.26,179.46,0,1],["일",179.46,179.62,0,0],["을",179.62,179.9,0,0],["안",179.9,180.06,0,1],["겨",180.06,180.22,0,0],["줄",180.22,180.42,0,0],["게",180.42,181.14,0,0]],"s":176.8,"e":181.14,"sc":"CARD","key":"내일","kt":179.26,"pre":0.25},{"i":31,"t":"노래해, 꿈같은 무대, 어쩌면 다신 없을 stage","u":[["노",181.19,181.39,0,0],["래",181.39,181.63,0,0],["해,",181.63,181.87,0,0],["꿈",181.87,182.15,0,1],["같",182.15,182.31,0,0],["은",182.31,182.72,0,0],["무",182.72,182.92,0,1],["대,",182.92,183.76,0,0],["어",183.76,183.88,0,1],["쩌",183.88,184.09,0,0],["면",184.09,184.41,0,0],["다",184.41,184.65,0,1],["신",184.65,184.97,0,0],["없",184.97,185.21,0,1],["을",185.21,185.29,0,0],["stage",185.25,186.5,1,1]],"s":181.19,"e":186.5,"sc":"STAGE","key":"stage","kt":185.25,"pre":0.25},{"i":32,"t":"너랑 나 손을 잡고 만든 기적의 빛을","u":[["너",186.58,187.06,0,0],["랑",187.06,187.87,0,0],["나",187.87,187.95,0,1],["손",187.91,188.07,0,1],["을",188.07,188.19,0,0],["잡",188.19,188.51,0,1],["고",188.51,188.91,0,0],["만",188.91,189.15,0,1],["든",189.15,189.99,0,0],["기",189.99,190.27,0,1],["적",190.27,190.43,0,0],["의",190.43,190.67,0,0],["빛",190.67,191.72,0,1],["을",191.72,191.8,0,0]],"s":186.58,"e":191.8,"sc":"CONST","key":"기적","kt":189.99,"pre":0.25},{"i":33,"t":"말해줘, do you wanna come with me? 한계를 넘어","u":[["말",191.76,191.92,0,0],["해",191.92,192.04,0,0],["줘,",192.04,193.0,0,0],["do",193.0,193.16,1,1],["you",193.16,193.36,1,1],["wanna",193.36,193.64,1,1],["come",193.64,194.29,1,1],["with",194.29,194.53,1,1],["me?",194.53,195.25,1,1],["한",195.25,195.89,0,1],["계",195.89,196.09,0,0],["를",196.09,196.21,0,0],["넘",196.21,196.45,0,1],["어",196.45,197.41,0,0]],"s":191.76,"e":197.41,"sc":"RISE","key":"한계","kt":195.25,"pre":0.25},{"i":34,"t":"날 따라와, 내일을 향해 계속 함께할 테니까","u":[["날",197.46,197.82,0,0],["따",197.82,197.98,0,1],["라",197.98,198.14,0,0],["와,",198.14,198.74,0,0],["내",198.74,199.14,0,1],["일",199.14,199.26,0,0],["을",199.26,199.7,0,0],["향",199.7,200.9,0,1],["해",201.39,201.47,0,0],["계",201.43,201.59,0,1],["속",201.59,201.99,0,0],["함",201.99,202.31,0,1],["께",202.31,202.83,0,0],["할",202.83,203.11,0,0],["테",203.11,203.19,0,1],["니",203.19,203.48,0,0],["까",203.48,205.0,0,0]],"s":197.46,"e":205.0,"sc":"TRAIL","key":"함께","kt":201.99,"pre":0.25},{"i":35,"t":"We are StelLive","u":[["We",205.7,206.6,1,0],["are",206.65,207.3,1,1],["StelLive",207.3,210.0,1,1]],"s":205.7,"e":210.0,"sc":"TRAIL","key":"StelLive","kt":207.3,"pre":0.25}],"flashes":[29.67,44.68,59.63,95.81,115.77,139.43,160.33,205.45],"mag":[[0,6],[44.93,6],[59.88,5],[96.06,4.5],[116.02,4],[126.61,3],[160.58,2],[171.34,1.6],[174.99,1.0]]};
+const cv=document.getElementById('cv'),W=1080,H=1920,CX=540;let g=cv.getContext('2d');
+function fit(){const s=Math.min(innerWidth/W,innerHeight/H);cv.style.transform=`scale(${s}) translate(-50%,-50%)`}
+addEventListener('resize',fit);fit();
+
+/* ---------- helpers ---------- */
+const clamp=(x,a=0,b=1)=>x<a?a:x>b?b:x,lerp=(a,b,x)=>a+(b-a)*x;
+const eOutC=x=>1-(1-x)**3,eInC=x=>x*x*x,eIO=x=>x<.5?4*x*x*x:1-(-2*x+2)**3/2,eOutX=x=>x>=1?1:1-2**(-10*x);
+const eBk=(x,c=1.7)=>{x=clamp(x)-1;return 1+(c+1)*x*x*x+c*x*x};
+const R=(i,s=0)=>{const x=Math.sin(i*127.1+s*311.7+.5)*43758.5453;return x-Math.floor(x)};
+const hex=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)),mix=(a,b,x)=>{const p=hex(a),q=hex(b);return `rgb(${p.map((v,i)=>Math.round(lerp(v,q[i],x))).join(',')})`};
+const rgba=(h,a)=>{const c=hex(h);return `rgba(${c[0]},${c[1]},${c[2]},${a})`};
+const EN=(w,f)=>`${w} ${f}px "Josefin Sans"`,KR=(w,f)=>`${w} ${f}px "Noto Sans KR"`;
+const BEAT=60/94,B0=D.b0||0;const pulse=t=>{const b=(t-B0)/BEAT;return b<0?0:Math.exp(-(b-Math.floor(b))*BEAT*6)};
+const Ln=D.lines,DAWN=D.dawn;
+
+/* ---------- palette: night -> dawn at the last chorus, gold only for magnitude 1 ---------- */
+function pal(t){const k=eIO(clamp((t-DAWN+.8)/1.6));return {k,bg0:mix('#0A0E2A','#140F2E',k),bg1:mix('#111845','#3A2466',k),acc:mix('#6FA8FF','#C9A0FF',k),accH:k<.5?'#6FA8FF':'#C9A0FF',low:mix('#111845','#C9A0FF',k)}}
+const GOLD='#FFD36B';
+
+/* ---------- common layers ---------- */
+function bg(t,P,light=0){const gr=g.createLinearGradient(0,0,0,H);gr.addColorStop(0,P.bg0);gr.addColorStop(.72,P.bg1);gr.addColorStop(1,P.k>0?mix('#111845','#E7C9FF',P.k):P.bg1);g.fillStyle=gr;g.fillRect(0,0,W,H)}
+function stars(t,n,seed,a=1,drift=0){for(let i=0;i<n;i++){const tw=.55+.45*Math.sin(t*(1.2+R(i,seed+4)*2)+i);const r=.6+2.2*R(i,seed)**3;g.globalAlpha=a*(.2+.8*R(i,seed+1))*tw;g.fillStyle='#fff';
+  g.beginPath();g.arc((R(i,seed+2)*W+drift*t*(.3+R(i,seed+5)))%W,R(i,seed+3)*H,r,0,7);g.fill()}g.globalAlpha=1}
+function sparkle(x,y,r,col,a=1){if(a<=0)return;g.save();g.globalAlpha=a;const gl=g.createRadialGradient(x,y,0,x,y,r*3.2);gl.addColorStop(0,col);gl.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gl;g.fillRect(x-r*3.2,y-r*3.2,r*6.4,r*6.4);
+  g.fillStyle='#fff';g.beginPath();g.moveTo(x,y-r*2.2);g.quadraticCurveTo(x,y,x+r*2.2,y);g.quadraticCurveTo(x,y,x,y+r*2.2);g.quadraticCurveTo(x,y,x-r*2.2,y);g.quadraticCurveTo(x,y,x,y-r*2.2);g.fill();g.restore()}
+function magAt(t){const k=D.mag;if(t<k[0][0])return k[0][1];for(let i=1;i<k.length;i++)if(t<k[i][0]){const p=(t-k[i-1][0])/(k[i][0]-k[i-1][0]);return lerp(k[i-1][1],k[i][1],eIO(clamp(p)))}return k[k.length-1][1]}
+function micro(t,col,a=.55,li=-1){g.save();g.globalAlpha=a;g.fillStyle=col;g.font=EN(300,22);g.textBaseline='alphabetic';
+  g.textAlign='left';g.fillText('STELLIVE — STAR TRAIL',60,110);g.fillText('KINETIC TYPOGRAPHY / OBSERVATION LOG',60,140);
+  g.textAlign='right';const ra=2+t*.004;g.fillText(`RA ${String(Math.floor(ra)).padStart(2,'0')}h ${String(Math.floor(ra%1*60)).padStart(2,'0')}m ${String(Math.floor(t*7%60)).padStart(2,'0')}s`,W-60,110);g.fillText('DEC +89° 15′ 51″',W-60,140);
+  const m=magAt(t);g.textAlign='left';g.fillText(`MAG ${m.toFixed(1)}`,60,H-140);g.fillText(`${String(Math.floor(t/60))}:${String(Math.floor(t%60)).padStart(2,'0')}  /  188 BPM`,60,H-110);
+  g.textAlign='right';g.fillText(li>=0?`LINE ${String(li+1).padStart(2,'0')} / ${Ln.length}`:'—',W-60,H-140);g.fillText('9 : 16',W-60,H-110);
+  // magnitude bar: six dots, the current magnitude lit
+  for(let k=1;k<=6;k++){const x=W/2-125+(k-1)*50,on=Math.abs(k-m)<.5;g.globalAlpha=a*(on?1:.35);g.beginPath();g.arc(x,H-120,on?6:3,0,7);g.fill()}
+  g.restore()}
+
+/* ---------- text helpers ---------- */
+function spacedW(txt,font,sp){g.font=font;return [...txt].reduce((a,c)=>a+g.measureText(c).width,0)+sp*([...txt].length-1)}
+function spaced(txt,x,y,font,col,sp,a=1,glow=0){if(a<=0)return;g.save();g.font=font;g.fillStyle=col;g.globalAlpha=a;g.textBaseline='middle';g.textAlign='left';if(glow){g.shadowColor=col;g.shadowBlur=glow}
+  let xx=x-spacedW(txt,font,sp)/2;g.font=font;for(const c of txt){g.fillText(c,xx,y);xx+=g.measureText(c).width+sp}g.restore()}
+const isEN=s=>/^[A-Za-z]/.test(s);
+// caption: the whole line, units light up as they are sung
+function caption(t,L,y,col,acc,a=1){if(a<=0)return;
+  const f=50;g.save();g.textBaseline='middle';g.textAlign='left';
+  const items=L.u.map(u=>{g.font=u[3]?EN(300,f+4):KR(300,f);return {u,w:g.measureText(u[0]).width,f:u[3]?EN(300,f+4):KR(300,f)}});
+  const rows=[[]];let rw=0;items.forEach(it=>{const gap=it.u[4]?f*.32:0;if(rw+gap+it.w>920&&rows[rows.length-1].length){rows.push([]);rw=0}const r=rows[rows.length-1];it.gap=r.length?gap:0;r.push(it);rw+=it.gap+it.w});
+  rows.forEach((r,ri)=>{const tw=r.reduce((p,it)=>p+it.gap+it.w,0);let x=CX-tw/2;const yy=y+ri*(f*1.5)-(rows.length-1)*f*.75;
+    r.forEach(it=>{x+=it.gap;const s=t-it.u[1],on=s>=-.03;const now=t>=it.u[1]-.03&&t<it.u[2];g.font=it.f;
+      g.globalAlpha=a*(on?1:.28);g.fillStyle=on?(now?acc:col):col;if(now){g.shadowColor=acc;g.shadowBlur=18}g.fillText(it.u[0],x,yy+(on?-4*Math.exp(-s*12):0));g.shadowBlur=0;x+=it.w})});
+  g.restore()}
+// keyword (the one big word of the scene): appears at its own sung time with tracking-out
+function keyword(t,L,x,y,o){const k0=L.kt??L.s,a=t-k0+.05;if(a<0){if(o.ghost!==false){const txt0=L.key,en0=isEN(txt0),f0=o.f||(en0?150:170),fn0=en0?EN(o.w||100,f0):KR(o.w||900,f0),sp0=(o.sp??(en0?10:18));const sc0=Math.min(1,(o.maxW||940)/spacedW(txt0,fn0,sp0));g.save();g.translate(x,y);g.scale(sc0,sc0);spaced(txt0,0,0,fn0,o.col||'#fff',sp0,.09*clamp((t-L.s+.4)/.4));g.restore()}return 0}const p=eOutC(clamp(a/.55));
+  const txt=L.key,en=isEN(txt),f=o.f||(en?150:170);const font=en?EN(o.w||100,f):KR(o.w||900,f);let sp=(o.sp??(en?10:18))+(1-p)*40;
+  let wd=spacedW(txt,font,sp);const sc=Math.min(1,(o.maxW||940)/wd);
+  g.save();g.translate(x,y+(1-p)*30);g.scale(sc,sc);spaced(txt,0,0,font,o.col||'#fff',sp,clamp(a/.2)*(o.a??1),o.glow??24);g.restore();return p}
+
+/* ---------- scenes ---------- */
+const SC={};
+SC.TRAIL=(t,L,P,la)=>{bg(t,P);const px=CX,py=620,grow=clamp(la/3);
+  for(let i=0;i<240;i++){const r=30+1300*R(i,5)**.8,a0=R(i,6)*6.28+t*.05,len=(.12+.55*R(i,7))*(.35+.65*grow);g.strokeStyle=i%7?`rgba(190,210,255,${.1+.35*R(i,8)})`:rgba(P.accH,.45+.4*R(i,9));g.lineWidth=.8+1.8*R(i,10);g.beginPath();g.arc(px,py,r,a0,a0+len);g.stroke()}
+  sparkle(px,py,7+2*pulse(t),rgba(P.accH,.9));
+  keyword(t,L,CX,1180,{sp:16,glow:18});g.fillStyle=P.acc;g.globalAlpha=clamp(la/.4);g.fillRect(CX-60,1265,120,2);g.globalAlpha=1;
+  caption(t,L,1360,'#fff',P.acc)};
+SC.CHART=(t,L,P,la)=>{bg(t,P);stars(t,150,20,.5);
+  g.strokeStyle=rgba(P.accH,.14);g.lineWidth=1;const rot=t*.02;for(let r=120;r<1400;r+=120){g.beginPath();g.arc(CX,860,r,0,7);g.stroke()}for(let k=0;k<12;k++){const a=k*Math.PI/6+rot;g.beginPath();g.moveTo(CX,860);g.lineTo(CX+Math.cos(a)*1500,860+Math.sin(a)*1500);g.stroke()}
+  const mode=L.mode||'six',k0=L.kt??L.s,a=t-k0;
+  // magnitude scale on the right
+  const m=mode==='one'&&a>0?1:6;for(let k=1;k<=6;k++){const y=560+k*90,r=16-k*2.2,on=k===m;g.globalAlpha=on?1:.35;g.fillStyle=on?(m===1?GOLD:P.accH):'#fff';g.beginPath();g.arc(960,y,r,0,7);g.fill();g.font=EN(300,24);g.textAlign='right';g.fillText(String(k),925,y+8)}g.globalAlpha=1;
+  g.save();g.translate(CX,840);g.textAlign='center';g.textBaseline='middle';
+  if(mode==='six'||(mode==='one'&&a<0)){const p=eOutC(clamp((a+.1)/.6));g.globalAlpha=.1*p;g.font=KR(100,900);g.fillStyle=GOLD;g.save();g.translate(70,20);g.rotate(.35);g.fillText('1',0,0);g.restore();
+    g.globalAlpha=.75*p;g.font=EN(100,760);g.fillStyle=rgba(P.accH,.6);g.shadowColor=P.accH;g.shadowBlur=40;g.fillText('6',0,0);g.shadowBlur=0}
+  else if(mode==='try'){ // 6 tries to become 1 and falls back (not yet)
+    const q=Math.sin(clamp(a/1.6)*Math.PI);g.rotate(q*.35);g.globalAlpha=.75*(1-q*.6);g.font=EN(100,760);g.fillStyle=rgba(P.accH,.6);g.shadowColor=P.accH;g.shadowBlur=40;g.fillText('6',0,0);g.shadowBlur=0;
+    g.rotate(-q*.35);g.globalAlpha=q*.8;g.font=KR(100,760);g.fillStyle=mix('#6FA8FF',GOLD,q);g.shadowColor=GOLD;g.shadowBlur=30*q;g.fillText('1',0,0);g.shadowBlur=0}
+  else{ // magnitude 1 bursts in gold
+    const q=eOutC(clamp((a+.1)/.5));for(let k=0;k<12;k++){const an=k*Math.PI/6+.2+t*.05;g.strokeStyle=rgba(GOLD,(.2+.2*(k%2))*q);g.lineWidth=k%2?2:4;g.beginPath();g.moveTo(0,0);g.lineTo(Math.cos(an)*(600+400*(k%3))*q,Math.sin(an)*(600+400*(k%3))*q);g.stroke()}
+    if(a<.2){g.globalAlpha=.75*(1-a/.2);g.font=EN(100,760);g.fillStyle=P.accH;g.rotate(a*4);g.fillText('6',0,0);g.rotate(-a*4)}
+    g.globalAlpha=q;g.font=KR(300,680);g.fillStyle=GOLD;g.shadowColor=GOLD;g.shadowBlur=90;g.scale(.8+.2*q,.8+.2*q);g.fillText('1',0,0);g.shadowBlur=12;g.fillStyle='#FFF4D6';g.fillText('1',0,0);g.shadowBlur=0}
+  g.restore();
+  g.font=KR(300,64);g.fillStyle='rgba(255,255,255,.8)';g.textAlign='left';g.globalAlpha=clamp((a+.1)/.4);g.fillText('등성',760,1180);g.globalAlpha=1;
+  g.font=EN(300,26);g.fillStyle='rgba(255,255,255,.55)';g.textAlign='center';g.fillText(mode==='one'&&a>0?'MAGNITUDE 1.0  —  THE BRIGHTEST STAR':'MAGNITUDE 6.0  —  THE FAINTEST STAR',CX,1300);
+  caption(t,L,1450,'#fff',mode==='one'?GOLD:P.acc)};
+const CARD=document.createElement('canvas');CARD.width=760;CARD.height=900;const cg=CARD.getContext('2d');
+SC.CARD=(t,L,P,la,ld)=>{bg(t,P);stars(t,110,40+L.i,.6,4);
+  // draw the card face offscreen, then map it with a fake perspective (turning card)
+  cg.clearRect(0,0,760,900);cg.fillStyle='rgba(255,255,255,.07)';cg.fillRect(0,0,760,900);cg.strokeStyle=rgba(P.accH,.9);cg.lineWidth=4;cg.strokeRect(2,2,756,896);
+  cg.strokeStyle='rgba(255,255,255,.1)';cg.lineWidth=1;for(let y=80;y<900;y+=80){cg.beginPath();cg.moveTo(40,y);cg.lineTo(720,y);cg.stroke()}
+  cg.font=EN(300,22);cg.fillStyle='rgba(255,255,255,.5)';cg.textAlign='left';cg.fillText(`CARD ${String(L.i+1).padStart(2,'0')} / ${Ln.length}`,40,50);cg.textAlign='right';cg.fillText('◐',720,50);
+  const gg=g;g=cg;keyword(t,L,380,450,{maxW:640,f:isEN(L.key)?140:150,glow:26});g=gg;
+  const inP=eOutC(clamp((la+.15)/.5)),outP=eInC(clamp((t-ld+.3)/.3)),turn=(1-inP)*-.9+outP*.9+Math.sin(t*.8)*.05,dir=L.i%2?1:-1;
+  const cw=720*Math.max(.02,Math.cos(turn)),x0=CX-cw/2,y0=300,persp=Math.sin(turn)*dir*.3;
+  for(let s=0;s<760;s+=4){const u=s/760,sc=1-persp*(u-.5)*2,hh=900*sc;g.drawImage(CARD,s,0,4,900,x0+u*cw,y0+(900-hh)/2,cw/760*4+1,hh)}
+  g.fillStyle=rgba(P.accH,.22);g.beginPath();g.ellipse(CX,1290,cw*.5,20,0,0,7);g.fill();
+  caption(t,L,1460,'#fff',P.acc)};
+const CONSTC=document.createElement('canvas');CONSTC.width=W;CONSTC.height=420;const cc=CONSTC.getContext('2d');const CPTS={};
+function constPts(txt,en){if(CPTS[txt])return CPTS[txt];cc.clearRect(0,0,W,420);let f=en?220:260;cc.font=en?EN(600,f):KR(900,f);while(cc.measureText(txt).width>960){f-=10;cc.font=en?EN(600,f):KR(900,f)}cc.textAlign='center';cc.textBaseline='middle';cc.fillStyle='#fff';cc.fillText(txt,W/2,210);
+  const d=cc.getImageData(0,0,W,420).data,pts=[];for(let y=0;y<420;y+=9)for(let x=0;x<W;x+=9)if(d[(y*W+x)*4+3]>128&&R(x*7+y,3)>.55)pts.push([x,y]);
+  pts.sort((a,b)=>a[0]-b[0]);const lk=[];pts.forEach((p,i)=>{let n=0;for(let j=i+1;j<pts.length&&n<2;j++){if(Math.hypot(p[0]-pts[j][0],p[1]-pts[j][1])<24){lk.push([i,j]);n++}}});return CPTS[txt]={pts,lk}}
+SC.CONST=(t,L,P,la,ld)=>{bg(t,P);stars(t,200,60,.55);const {pts,lk}=constPts(L.key,isEN(L.key)),k0=L.kt??L.s,p=clamp((t-k0+.1)/Math.max(.8,Math.min(2.2,ld-k0-.3))),y0=620;
+  g.lineWidth=1.2;lk.forEach(([i,j])=>{const q=clamp(p*1.3-pts[i][0]/W);if(q<=0)return;g.strokeStyle=rgba(P.accH,.55*q);g.beginPath();g.moveTo(pts[i][0],pts[i][1]+y0);g.lineTo(lerp(pts[i][0],pts[j][0],q),lerp(pts[i][1],pts[j][1],q)+y0);g.stroke()});
+  pts.forEach((pt,i)=>{const q=clamp((p*1.25-pt[0]/W)*6);if(q<=0)return;const r=(1.5+3.5*R(i,4)**2)*(q<1?1+2*(1-q):1);g.fillStyle='#fff';g.shadowColor=P.accH;g.shadowBlur=10;g.globalAlpha=q;g.beginPath();g.arc(pt[0],pt[1]+y0,r,0,7);g.fill()});g.shadowBlur=0;g.globalAlpha=1;
+  sparkle(CX+380,640,6+2*pulse(t),rgba(P.accH,.9),clamp(p*2-1));
+  g.font=EN(300,24);g.fillStyle='rgba(255,255,255,.5)';g.textAlign='center';g.fillText('CONSTELLATION  ·  '+[...L.key].join(' '),CX,1110);
+  caption(t,L,1300,'#fff',P.acc)};
+SC.FLASH=(t,L,P,la)=>{const f0=clamp(1-la/.25);g.fillStyle='#F7F8FF';g.fillRect(0,0,W,H);
+  const gl=g.createRadialGradient(CX,960,50,CX,960,900);gl.addColorStop(0,rgba(P.accH,.18));gl.addColorStop(1,rgba(P.accH,0));g.fillStyle=gl;g.fillRect(0,0,W,H);
+  const k0=L.kt??L.s,a=t-k0,txt=L.key,en=isEN(txt);const p=eOutC(clamp((a+.05)/.5));
+  if(en&&txt.includes('i')){const shown=txt.replace('i','ı');g.font=EN(100,190);g.textAlign='center';g.textBaseline='alphabetic';g.fillStyle='#0A0E2A';g.globalAlpha=clamp((a+.05)/.2);
+    const sc=Math.min(1,960/g.measureText(shown).width);g.save();g.translate(CX,1030+(1-p)*30);g.scale(sc,sc);g.fillText(shown,0,0);const idx=shown.indexOf('ı'),pre=g.measureText(shown.slice(0,idx)).width,full=g.measureText(shown).width,iw=g.measureText('ı').width;
+    const sy=-170-(1-eBk(clamp((a-.25)/.4),2.5))*120;sparkle(-full/2+pre+iw/2,sy,11,rgba(P.accH,.95),clamp((a-.2)/.1));g.restore();g.globalAlpha=1}
+  else keyword(t,L,CX,960,{col:'#0A0E2A',glow:0});
+  g.strokeStyle=P.accH;g.lineWidth=2;g.beginPath();g.moveTo(CX-340*p,1110);g.lineTo(CX+340*p,1110);g.stroke();
+  caption(t,L,1220,'#0A0E2A','#2F6BD8');
+  if(f0>0){g.fillStyle=`rgba(255,255,255,${f0})`;g.fillRect(0,0,W,H)}};
+SC.TUNNEL=(t,L,P,la)=>{bg(t,P);stars(t,120,90,.5);const dir=L.dir||1,sp=.35;
+  for(let k=0;k<9;k++){let z=((k/9+(dir>0?1:-1)*la*sp)%1+1)%1;const s=.08+2.4*z*z,a=clamp(z*3)*clamp((1-z)*4);const w=620*s,h=900*s;g.strokeStyle=rgba(P.accH,.55*a);g.lineWidth=1+2*z;g.strokeRect(CX-w/2,860-h/2,w,h);
+    g.fillStyle=`rgba(255,255,255,${.35*a})`;g.font=EN(300,Math.max(8,18*s));g.textAlign='left';g.fillText(`FRAME ${String(k+1).padStart(2,'0')}`,CX-w/2+10*s,860-h/2+26*s)}
+  keyword(t,L,CX,860,{glow:30});caption(t,L,1450,'#fff',P.acc)};
+SC.RISE=(t,L,P,la)=>{bg(t,P);stars(t,140,120,.6);const hy=1250,up=eOutC(clamp(la/1.2));
+  const gl=g.createRadialGradient(CX,hy,10,CX,hy,900);gl.addColorStop(0,rgba(P.accH,.55*up));gl.addColorStop(.4,rgba(P.accH,.15*up));gl.addColorStop(1,rgba(P.accH,0));g.fillStyle=gl;g.fillRect(0,hy-900,W,900);
+  g.fillStyle='rgba(255,255,255,.45)';g.fillRect(0,hy,W,2);const rf=g.createLinearGradient(0,hy,0,H);rf.addColorStop(0,rgba(P.accH,.25));rf.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=rf;g.fillRect(0,hy+2,W,H-hy);
+  for(let i=0;i<40;i++){const y=hy-((la*(80+120*R(i,3))+R(i,4)*700)%800),x=R(i,5)*W;g.fillStyle=`rgba(255,255,255,${.6*R(i,6)*clamp((hy-y)/100)})`;g.beginPath();g.arc(x,y,1+2*R(i,7),0,7);g.fill()}
+  g.save();g.beginPath();g.rect(0,0,W,hy);g.clip();keyword(t,L,CX,lerp(hy+120,880,up),{glow:40});g.restore();
+  caption(t,L,1460,'#fff',P.acc)};
+SC.STAGE=(t,L,P,la)=>{bg(t,P);const k0=L.kt??L.s;
+  for(let k=0;k<7;k++){const bx=CX+(k-3)*170,an=Math.sin(t*1.3+k*1.1)*.35;g.save();g.translate(bx,H+40);g.rotate(an);const gr=g.createLinearGradient(0,0,0,-1700);gr.addColorStop(0,rgba(k%2?P.accH:'#FFFFFF',.35));gr.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gr;g.beginPath();g.moveTo(-20,0);g.lineTo(-200,-1700);g.lineTo(200,-1700);g.lineTo(20,0);g.fill();g.restore()}
+  for(let i=0;i<60;i++){const x=R(i,11)*W,y=1500+R(i,12)*380;g.fillStyle=rgba(i%3?P.accH:'#FFFFFF',.5+.5*Math.sin(t*6+i));g.beginPath();g.arc(x,y-Math.abs(Math.sin(t*3+i))*20,3,0,7);g.fill()}
+  keyword(t,L,CX,820,{glow:36,f:190});caption(t,L,1260,'#fff',P.acc)};
+
+/* ---------- title / outro cards ---------- */
+function titleCard(t,a0,P){const a=t-a0;if(a<0)return;const p=eOutC(clamp(a/1.2));spaced('STAR TRAIL',CX,1180,EN(100,132),'#fff',14+(1-p)*30,p,14);g.fillStyle=P.acc;g.globalAlpha=p;g.fillRect(CX-60,1265,120,2);g.globalAlpha=1;spaced('STELLIVE',CX,1320,EN(300,34),P.acc,16,p)}
+
+/* ---------- render ---------- */
+function lineAt(t){let i=-1;for(let k=0;k<Ln.length;k++)if(t>=Ln[k].s-Ln[k].pre)i=k;return i}
+function render(t){
+  g.setTransform(1,0,0,1,0,0);g.globalAlpha=1;g.shadowBlur=0;
+  const P=pal(t),i=lineAt(t);
+  const zoom=1+.012*pulse(t);g.translate(CX,960);g.scale(zoom,zoom);g.translate(-CX,-960);
+  if(i<0){ // intro: star trails forming + title
+    const L0={i:-1,key:'',u:[],s:0};bg(t,P);const grow=clamp(t/7);
+    for(let k=0;k<240;k++){const r=30+1300*R(k,5)**.8,a0=R(k,6)*6.28+t*.05,len=(.05+.6*R(k,7))*grow;g.strokeStyle=`rgba(190,210,255,${(.1+.35*R(k,8))*grow})`;g.lineWidth=.8+1.8*R(k,10);g.beginPath();g.arc(CX,620,r,a0,a0+len);g.stroke()}
+    sparkle(CX,620,6,rgba(P.accH,.9),clamp(t/2));titleCard(t,1.2,P);micro(t,'#fff',.5*clamp(t/2))}
+  else if(Ln[i+1]&&t>Ln[i].e+1.2&&Ln[i+1].s-Ln[i+1].pre-Ln[i].e>4&&t<Ln[i+1].s-Ln[i+1].pre){ // instrumental interlude: star trails keep turning, section label
+    const a=t-(Ln[i].e+1.2),q=clamp(a/.8)*clamp((Ln[i+1].s-Ln[i+1].pre-t)/.5);bg(t,P);stars(t,120,7,.5);
+    for(let k=0;k<240;k++){const r=30+1300*R(k,5)**.8,a0=R(k,6)*6.28+t*.08,len=(.1+.6*R(k,7))*clamp(a/4);g.strokeStyle=`rgba(190,210,255,${(.1+.35*R(k,8))*q})`;g.lineWidth=.8+1.8*R(k,10);g.beginPath();g.arc(CX,620,r,a0,a0+len);g.stroke()}
+    sparkle(CX,620,6+2*pulse(t),rgba(P.accH,.9),q);const lab=i<3?'INTERLUDE':'—';if(i<3)titleCard(t,Ln[i].e+1.6,P);else spaced('STAR TRAIL',CX,1180,EN(100,96),'#fff',14,q*.8);micro(t,'#fff',.5*q)}
+  else{const L=Ln[i],nx=Ln[i+1],ld=nx?nx.s-nx.pre:D.dur,la=t-(L.s-L.pre);
+    (SC[L.sc]||SC.CARD)(t,L,P,la,ld);
+    const light=L.sc==='FLASH';micro(t,light?'#0A0E2A':'#fff',.55,i);
+    // outro title after the last line
+    if(i===Ln.length-1&&t>L.e+.6){const q=clamp((t-L.e-.6)/.8);g.fillStyle=`rgba(0,0,0,${.0})`;titleCard(t,L.e+.6,P)}}
+  // section-boundary flash (colour reversal accent)
+  for(const b of D.flashes){const a=t-b;if(a>=0&&a<.18){g.setTransform(1,0,0,1,0,0);g.fillStyle=`rgba(255,255,255,${.85*(1-a/.18)})`;g.fillRect(0,0,W,H)}}
+  g.setTransform(1,0,0,1,0,0);const fd=clamp((t-(D.dur-2.5))/2.3);if(fd>0){g.fillStyle=`rgba(0,0,0,${fd})`;g.fillRect(0,0,W,H)}
+}
+window.DUR=D.dur;
+window.READY=(async()=>{const ko=Ln.map(l=>l.u.map(u=>u[0]).join('')).join('')+'등성빛나는';
+  try{await Promise.all([document.fonts.load(EN(100,100),'STAR TRAILabcdefghijklmnopqrstuvwxyzıABCDEFGHIJKLMNOPQRSTUVWXYZ6'),document.fonts.load(EN(300,100),'STELLIVE MAGNITUDE0123456789:/—.hms°+′″abcdefghijklmnopqrstuvwxyz◐'),document.fonts.load(EN(600,100),'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'),
+    document.fonts.load(KR(300,40),ko),document.fonts.load(KR(900,100),ko),document.fonts.load(KR(100,100),'1'),document.fonts.load(KR(300,100),'1')])}catch(e){}
+  window.renderAt=render;render(0)})();
+if(new URLSearchParams(location.search).has('render'))document.body.classList.add('render');
+else{const au=document.getElementById('au'),pp=document.getElementById('pp');const loop=()=>{render(au.currentTime);document.getElementById('fill').style.width=(au.currentTime/D.dur*100)+'%';document.getElementById('time').textContent=au.currentTime.toFixed(1);requestAnimationFrame(loop)};
+  pp.onclick=()=>au.paused?au.play():au.pause();READY.then(()=>requestAnimationFrame(loop))}
+</script>
+</body>
+</html>
