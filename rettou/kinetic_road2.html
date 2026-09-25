@@ -229,6 +229,7 @@ function drawRoad(t,P,sh){
     else{const s=FOC/zr,fr=(it.z-S.i*SEG)/SEG,Xc=lerp(S.X1,S.X2,fr),Yc=lerp(S.Y1,S.Y2,fr);drawObj(it.obj,Xc,Yc,s,S.fog*.5,P,t)}
     g.restore();
   }
+  SEGI={};for(const q of seg)SEGI[q.i]=q;
   return {bio,speed:spd(t)};
 }
 function drawWeather(t,info){
@@ -245,17 +246,19 @@ const eOutX=x=>x>=1?1:1-2**(-10*x);
 const eBk=(x,c=1.7)=>{x=clamp(x)-1;return 1+(c+1)*x*x*x+c*x*x};
 const oBounce=x=>{const n=7.5625,d=2.75;if(x<1/d)return n*x*x;if(x<2/d)return n*(x-=1.5/d)*x+.75;if(x<2.5/d)return n*(x-=2.25/d)*x+.9375;return n*(x-=2.625/d)*x+.984375};
 // line index -> motion (drop / stamp / dash / rise / thru / scatter)
-const LS=['drop','drop','drop','stamp','stamp',
-  'dash','rise','dash','rise','stamp','drop','rise','stamp',
-  'thru','stamp',
-  'stamp','dash','stamp','thru',
-  'drop','drop','drop','stamp',
-  'stamp','stamp','stamp','stamp',
-  'thru','rise','stamp','dash','rise','stamp',
-  'stamp','dash','rise','thru','stamp','dash','stamp','thru',
+const LS=['drop','road','drop','stamp','stamp',
+  'side','thru','dash','road','stamp','drop','side','thru',
+  'road','stamp',
+  'thru','dash','side','stamp',
+  'road','side','drop','stamp',
+  'stamp','dash','stamp','dash',
+  'road','side','stamp','dash','thru','stamp',
+  'thru','dash','side','stamp','road','dash','thru','stamp',
   'scatter','scatter',
-  'stamp','stamp','rise','stamp',
-  'drop','drop','drop','stamp','stamp'];
+  'side','dash','thru','stamp',
+  'road','side','drop','stamp','stamp'];
+let SEGI={};
+function worldPt(z,xo,up){const i=Math.floor(z/SEG),q=SEGI[i];if(!q)return null;const fr=(z-i*SEG)/SEG,s=lerp(q.s1,q.s2,fr);return {x:lerp(q.X1,q.X2,fr)+xo*s,y:lerp(q.Y1,q.Y2,fr)-up*s,s}}
 let LINES=[];
 function buildLines(){
   g.font=JF(100);
@@ -277,7 +280,7 @@ function buildLines(){
     const glyphs=[];let tot=rows.reduce((a,r)=>a+f*(r.some(c=>c.emph)?1.4:1)*1.12,0),y=600-tot/2;let k=0;
     rows.forEach((r,ri)=>{const rh=f*(r.some(c=>c.emph)?1.4:1)*1.12,cy=y+rh/2;y+=rh;
       const rw=r.reduce((a,c)=>a+c.us.reduce((x,u)=>x+u.wr,0)*f*(c.emph?1.4:1),0)+(r.length-1)*f*.25;
-      const slack=Math.max(0,MW-rw)/2,shift=st==='thru'||rows.length===1?0:(ri%2?1:-1)*Math.min(150,slack);
+      const slack=Math.max(0,MW-rw)/2,shift=st==='thru'||st==='road'||rows.length===1?0:(ri%2?1:-1)*Math.min(150,slack);
       let x=W/2-rw/2+shift;
       r.forEach((c,ci)=>{if(ci)x+=f*.25;const cf=f*(c.emph?1.4:1);
         c.us.forEach(u=>{const w=u.wr*cf;glyphs.push({c:u.c,s:u.s,e:u.e,x:x+w/2,y:cy+(c.emph?0:cf*.04),f:cf,emph:c.emph,k:k++,r1:H1(li*31+k,5)-.5,r2:H1(li*31+k,6)-.5});x+=w})})});
@@ -307,7 +310,25 @@ let SHK=0;
 function drawLines(t){
   const fx=[];
   for(const Ln of LINES){
-    const {L,st,out,glyphs,dir}=Ln;if(t<L.s-.9||t>out+.8)continue;
+    const {L,st,out,glyphs,dir}=Ln;if(t<L.s-.9||t>out+2.5)continue;
+    if(st==='road'||st==='side'){ // the whole line lives in the world and approaches during the line; the car passes it as the line ends
+      const t0=L.s-.45,pr=clamp((t-t0)/(out-t0)),px=clamp((t-out)/.4),zr=px>0?lerp(st==='road'?750:1000,160,eInC(px)):lerp(st==='road'?1650:2000,st==='road'?750:1000,pr);if(px>=1)continue;
+      const n=glyphs.length,chH=Math.min(240,1500/n);
+      for(const G of glyphs){const a=t-G.s;if(a<-.12)continue;
+        let p;if(st==='road')p=worldPt(camZ+zr-(G.y-600)*3,(G.x-W/2)*2,0);else p=worldPt(camZ+zr,dir*RW*.9,(n-G.k)*chH+250);if(!p)continue;
+        const pop=Math.max(0,eBk(clamp((a+.12)/.3),2.2)),now=t>=G.s&&t<G.e+.05;
+        let al=clamp((a+.12)/.06)*clamp((zr-200)/250);if(st==='road')al*=clamp((1400-p.y)/220);if(al<=0)continue;
+        g.save();g.translate(p.x,p.y);
+        if(st==='road'){const k=2*p.s*pop;g.scale(k,k*.62);g.translate(0,-G.f*.5)}else{const k=chH*.95*p.s/G.f*pop;g.scale(k,k)}
+        glyph(G.c,G.f,now?'#FFD23D':G.emph?'#FF3B3B':'#FFFFFF',al);g.restore()}
+      continue}
+    if(st==='thru'){ // the whole line hangs over the road ahead like a gantry; it grows as we approach and the car drives under it at the line's end
+      const z0=Z(L.s-.5),zr0=Math.max(900,Z(out)-z0+350),zr=z0+zr0-camZ;if(zr<150)continue;
+      const sc=.6*zr0/zr,p=worldPt(z0+zr0,0,850+180*zr0/FOC);if(!p)continue;
+      const ga=clamp((t-L.s+.5)/.3)*clamp((zr-150)/300)*(1-clamp((sc-3.5)/2.5));if(ga<=0)continue;
+      for(const G of glyphs){const a=t-G.s;if(a<-.1)continue;const m=motion('thru',G,a,t,dir),now=t>=G.s&&t<G.e+.05,hop=now?-Math.sin(clamp((t-G.s)/.24)*Math.PI)*16:0;
+        g.save();g.translate(p.x+(G.x-W/2)*sc,p.y+(G.y-600+hop)*sc);g.scale(sc*m.sx,sc*m.sy);glyph(G.c,G.f,now?'#FFD23D':G.emph?'#FF3B3B':'#FFFFFF',m.al*ga);g.restore()}
+      continue}
     // thru: the whole block approaches from the horizon, then the car drives through it
     let gs=1,gy=0,ga=1,gb=0;
     if(st==='thru'){const a=t-(L.s-.5),inP=eOutC(clamp(a/.55));gs=.25+.75*inP+.06*clamp((t-L.s)/Math.max(.5,out-L.s));gy=(1-inP)*(HOR-600);
