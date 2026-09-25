@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>劣等感 Road Kinetic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@900&family=Noto+Sans+KR:wght@700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;box-sizing:border-box}
+html,body{height:100%;background:#000;overflow:hidden}
+#cv{position:absolute;left:50%;top:50%;width:1080px;height:1920px;transform-origin:0 0}
+#ui{position:fixed;left:16px;right:16px;bottom:16px;display:flex;gap:12px;align-items:center;font:13px/1 system-ui;color:#ccc}
+#ui button{background:#ff2a2a;color:#fff;border:0;border-radius:999px;width:44px;height:44px;font-size:18px;cursor:pointer}
+#bar{flex:1;height:6px;background:#333;border-radius:3px;position:relative;cursor:pointer}
+#fill{position:absolute;inset:0 auto 0 0;background:#ff2a2a;border-radius:3px}
+.render #ui{display:none}
+</style>
+</head>
+<body>
+<canvas id="cv" width="1080" height="1920"></canvas>
+<div id="ui"><button id="pp">▶</button><div id="bar"><div id="fill"></div></div><span id="time">0:00</span></div>
+<audio id="au" src="song.mp3" preload="auto"></audio>
+<script>
+const D={"dur":214.0,"bpm":71.8,"beats":[0.302,1.115,1.927,2.786,3.599,4.435,5.271,6.13,6.943,7.802,8.638,9.497,10.31,11.192,11.981,12.817,13.653,14.466,15.325,16.208,17.043,17.879,18.715,19.574,20.41,21.246,22.082,22.918,23.754,24.59,25.426,26.262,27.121,27.957,28.793,29.605,30.465,31.3,32.136,32.972,33.808,34.667,35.48,36.339,37.175,38.011,38.847,39.683,40.519,41.355,42.214,43.05,43.886,44.722,45.558,46.417,47.229,48.112,48.901,49.76,50.596,51.432,52.291,53.127,53.94,54.822,55.589,56.471,57.284,58.143,59.002,59.815,60.651,61.556,62.346,63.181,64.064,64.877,65.689,66.525,67.361,68.151,69.056,69.892,70.728,71.587,72.423,73.259,74.095,74.954,75.79,76.626,77.439,78.274,79.11,79.993,80.805,81.641,82.5,83.336,84.149,85.008,85.844,86.68,87.539,88.375,89.211,90.047,90.86,91.742,92.555,93.414,94.227,95.086,95.922,96.758,97.617,98.453,99.289,100.124,100.96,101.796,102.632,103.491,104.304,105.117,105.883,106.789,107.671,108.507,109.343,110.179,111.015,111.874,112.71,113.569,114.358,115.217,116.053,116.889,117.725,118.561,119.397,120.256,121.092,121.928,122.764,123.6,124.436,125.318,126.131,126.943,127.803,128.639,129.474,130.31,131.146,132.005,132.818,133.654,134.536,135.372,136.162,137.021,137.857,138.693,139.575,140.388,141.224,142.06,142.896,143.755,144.591,145.427,146.262,147.098,147.958,148.793,149.606,150.442,151.278,152.137,152.973,153.809,154.622,155.504,156.34,157.176,158.012,158.848,159.707,160.543,161.379,162.215,163.051,163.91,164.722,165.581,166.417,167.277,168.089,168.925,169.761,170.62,171.456,172.222,173.128,173.964,174.823,175.636,176.472,177.308,178.143,178.979,179.746,180.651,181.464,182.346,183.205,184.041,184.854,185.736,186.572,187.408,188.221,189.057,189.893,190.752,191.588,192.424,193.26,194.119,194.955,195.767,196.603,197.439,198.298,199.134,199.97,200.806,201.642,202.478,203.337,204.173,204.939,205.845,206.704,207.54,208.353,209.165,210.024,210.791,211.557,212.323,213.09,213.856],"energy":[0.0,0.0,0.07,0.345,0.487,0.575,0.459,0.497,0.489,0.439,0.57,0.45,0.467,0.447,0.605,0.534,0.476,0.462,0.499,0.517,0.54,0.454,0.486,0.486,0.473,0.621,0.582,0.544,0.653,0.507,0.522,0.568,0.588,0.565,0.554,0.568,0.571,0.537,0.569,0.564,0.62,0.612,0.56,0.571,0.576,0.553,0.601,0.583,0.544,0.566,0.526,0.602,0.566,0.564,0.487,0.405,0.439,0.516,0.501,0.496,0.413,0.522,0.522,0.45,0.492,0.491,0.442,0.49,0.537,0.537,0.497,0.507,0.55,0.455,0.402,0.438,0.444,0.517,0.579,0.518,0.582,0.52,0.591,0.565,0.643,0.588,0.611,0.624,0.622,0.551,0.568,0.564,0.634,0.698,0.606,0.603,0.351,0.445,0.575,0.632,0.63,0.615,0.581,0.563,0.645,0.589,0.616,0.628,0.655,0.59,0.516,0.637,0.601,0.555,0.525,0.582,0.523,0.6,0.639,0.244,0.522,0.448,0.542,0.164,0.517,0.638,0.669,0.611,0.619,0.637,0.643,0.6,0.605,0.623,0.613,0.684,0.59,0.681,0.644,0.667,0.706,0.587,0.647,0.656,0.584,0.673,0.646,0.695,0.604,0.714,0.724,0.704,0.7,0.685,0.476,0.53,0.532,0.452,0.506,0.551,0.552,0.548,0.556,0.436,0.547,0.537,0.574,0.519,0.535,0.589,0.383,0.626,0.624,0.7,0.583,0.552,0.659,0.647,0.637,0.606,0.628,0.629,0.655,0.626,0.602,0.785,0.743,0.743,0.733,0.719,0.724,0.653,0.645,0.682,0.647,0.646,0.673,0.683,0.725,0.63,0.636,0.626,0.633,0.662,0.71,0.624,0.585,0.682,0.637,0.658,0.625,0.738,0.653,0.676,0.666,0.637,0.638,0.707,0.639,0.652,0.63,0.583,0.689,0.671,0.627,0.66,0.547,0.657,0.568,0.696,0.601,0.546,0.627,0.645,0.601,0.598,0.638,0.643,0.628,0.638,0.636,0.614,0.628,0.622,0.567,0.672,0.626,0.638,0.589,0.673,0.624,0.514,0.665,0.675,0.574,0.579,0.588,0.558,0.633,0.67,0.581,0.549,0.535,0.624,0.238,0.457,0.334,0.417,0.316,0.36,0.429,0.286,0.354,0.372,0.45,0.386,0.433,0.315,0.535,0.536,0.54,0.59,0.409,0.496,0.507,0.435,0.522,0.53,0.566,0.51,0.554,0.67,0.559,0.63,0.681,0.626,0.643,0.696,0.625,0.603,0.629,0.691,0.647,0.664,0.623,0.65,0.651,0.704,0.655,0.614,0.674,0.674,0.635,0.652,0.637,0.667,0.64,0.716,0.704,0.7,0.726,0.696,0.669,0.648,0.654,0.701,0.689,0.743,0.743,0.628,0.604,0.596,0.702,0.74,0.674,0.675,0.571,0.616,0.628,0.613,0.591,0.62,0.652,0.619,0.618,0.61,0.62,0.635,0.66,0.618,0.629,0.662,0.537,0.614,0.685,0.657,0.59,0.574,0.589,0.705,0.678,0.666,0.57,0.652,0.667,0.628,0.665,0.644,0.63,0.655,0.699,0.687,0.715,0.709,0.706,0.695,0.697,0.69,0.68,0.659,0.664,0.666,0.673,0.692,0.691,0.738,0.661,0.581,0.644,0.592,0.653,0.626,0.642,0.547,0.55,0.614,0.679,0.651,0.624,0.624,0.601,0.694,0.595,0.607,0.595,0.701,0.647,0.586,0.662,0.627,0.569,0.638,0.606,0.62,0.658,0.619,0.705,0.712,0.651,0.663,0.25,0.001,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"lines":[{"s":1.59,"e":4.62,"w":[["誰",1.59,1.89],["か",1.89,2.49],["夢",2.49,2.85],["が",2.85,3.29],["破",3.29,3.78],["れ",3.78,4.02],["た",4.02,4.62]],"ch":[[0,2,0],[2,4,0],[4,7,1]],"st":"fly","fl":["fly"],"ko":"누군가의 꿈이 깨지고","bk":"","bko":""},{"s":4.96,"e":8.04,"w":[["誰",4.96,5.26],["か",5.26,5.63],["の",5.63,6.07],["席",6.07,6.71],["が",6.71,7.11],["空",7.11,7.24],["い",7.24,7.44],["た",7.44,8.04]],"ch":[[0,3,0],[3,5,0],[5,8,1]],"st":"fly","fl":["fly"],"ko":"누군가의 자리가 비었어","bk":"","bko":""},{"s":8.16,"e":11.3,"w":[["君",8.16,8.6],["の",8.6,9.33],["夢",9.33,9.61],["を",9.61,10.13],["笑",10.13,10.49],["っ",10.49,10.7],["た",10.7,11.3]],"ch":[[0,2,0],[2,4,0],[4,7,1]],"st":"fly","fl":["fly"],"ko":"네 꿈을 비웃었지","bk":"","bko":""},{"s":11.54,"e":13.71,"w":[["こ",11.54,11.7],["の",11.7,12.14],["劣",12.14,12.39],["等",12.39,12.63],["感",12.63,13.11],["が",13.11,13.71]],"ch":[[0,2,0],[2,6,1]],"st":"fly+bill","fl":["fly+bill"],"ko":"이 열등감이","bk":"","bko":""},{"s":13.67,"e":14.63,"w":[["弱",13.67,14.03],["虫",14.03,14.63]],"ch":[[0,2,1]],"st":"over","fl":["over"],"ko":"겁쟁이","bk":"","bko":""},{"s":28.78,"e":31.55,"w":[["僕",28.78,29.14],["を",29.14,29.54],["不",29.54,29.71],["安",29.71,29.95],["定",29.95,30.27],["に",30.27,30.59],["さ",30.59,30.75],["せ",30.75,30.95],["る",30.95,31.55]],"ch":[[0,2,0],[2,6,1],[6,9,0]],"st":"fly","fl":["fly"],"ko":"나를 불안정하게 만드는","bk":"","bko":""},{"s":31.52,"e":35.74,"w":[["甘",31.52,31.76],["い",31.76,32.04],["蜜",32.04,32.52],["の",32.52,33.05],["美",33.05,33.25],["味",33.25,33.49],["は",33.49,33.85],["安",33.85,34.09],["定",34.09,34.41],["だ",34.41,34.73],["な",34.73,34.98],["の",34.98,35.14],["に",35.14,35.74]],"ch":[[0,4,0],[4,7,0],[7,10,1],[10,13,0]],"st":"fly+bill","fl":["fly+bill"],"ko":"달콤한 꿀맛은 안정적인데, 그런데도","bk":"","bko":""},{"s":35.58,"e":37.47,"w":[["空",35.58,35.82],["き",35.82,35.98],["っ",35.98,36.1],["腹",36.1,36.55],["に",36.55,36.87],["風",36.87,37.47]],"ch":[[0,5,0],[5,6,1]],"st":"fly","fl":["fly"],"ko":"빈속에 부는 바람","bk":"","bko":""},{"s":37.87,"e":41.77,"w":[["満",37.87,38.2],["た",38.2,38.44],["さ",38.44,38.68],["れ",38.68,38.88],["て",38.88,39.24],["な",39.24,39.44],["い",39.44,39.97],["な",39.97,40.05],["い",40.05,40.25],["の",40.25,40.65],["循",40.65,40.73],["環",40.73,41.17],["系",41.17,41.77]],"ch":[[0,7,0],[7,10,0],[10,13,1]],"st":"fly","fl":["fly"],"ko":"채워지지 않는 '없음'의 순환","bk":"","bko":""},{"s":42.72,"e":46.13,"w":[["涙",42.72,42.88],["枯",42.88,43.04],["れ",43.04,43.12],["る",43.12,43.64],["花",43.64,44.09],["咲",44.09,44.33],["く",44.33,45.13],["吹",45.13,45.45],["雪",45.45,45.53],["く",45.53,46.13]],"ch":[[0,1,0],[1,4,0],[4,7,0],[7,10,1]],"st":"fly","fl":["fly"],"ko":"눈물은 마르고, 꽃은 피고, 눈보라는 몰아치고","bk":"","bko":""},{"s":46.14,"e":48.38,"w":[["ゆ",46.14,46.34],["ら",46.34,46.62],["り",46.62,47.14],["と",47.14,47.42],["落",47.42,47.48],["ち",47.46,47.78],["る",47.78,48.38]],"ch":[[0,4,0],[4,7,1]],"st":"fly","fl":["fly"],"ko":"흔들리듯 떨어진다","bk":"","bko":""},{"s":48.47,"e":51.6,"w":[["踏",48.47,48.67],["ま",48.67,48.83],["れ",48.83,49.27],["帰",49.27,49.63],["り",49.63,49.91],["ま",49.91,50.07],["た",50.07,50.32],["芽",50.32,50.52],["吹",50.52,50.8],["い",50.8,51.0],["て",51.0,51.6]],"ch":[[0,3,0],[3,5,0],[5,7,0],[7,11,1]],"st":"fly","fl":["fly"],"ko":"밟히고 돌아와 다시 싹트는","bk":"","bko":""},{"s":51.76,"e":55.22,"w":[["こ",51.76,51.92],["の",51.92,52.4],["原",52.4,52.65],["動",52.65,52.89],["力",52.89,53.53],["を",53.53,53.73],["笑",53.73,54.05],["え",54.05,54.29],["る",54.29,54.62],["か？",54.62,55.22]],"ch":[[0,2,0],[2,6,1],[6,10,0]],"st":"fly+bill","fl":["fly+bill"],"ko":"이 원동력을 비웃을 수 있나?","bk":"","bko":""},{"s":55.64,"e":57.54,"w":[["君",55.64,55.96],["が",55.96,56.09],["去",56.09,56.21],["っ",56.21,56.29],["て",56.29,56.53],["握",56.53,56.86],["っ",56.86,56.94],["た",56.94,57.54]],"ch":[[0,2,0],[2,5,0],[5,8,1]],"st":"fly","fl":["fly"],"ko":"네가 떠나며 움켜쥔","bk":"","bko":""},{"s":58.76,"e":61.51,"w":[["錆",58.76,59.21],["び",59.21,59.29],["る",59.29,59.73],["朽",59.73,59.98],["ち",59.98,60.1],["る",60.1,60.67],["栄",60.67,60.91],["光",60.91,61.51]],"ch":[[0,3,0],[3,6,0],[6,8,1]],"st":"fly","fl":["fly"],"ko":"녹슬고 썩어가는 영광","bk":"","bko":""},{"s":61.9,"e":65.19,"w":[["こ",61.9,62.26],["の",62.26,62.5],["劣",62.5,62.74],["等",62.74,63.06],["感",63.06,63.87],["喪",63.87,64.07],["失",64.07,64.59],["感",64.59,65.19]],"ch":[[0,5,0],[5,8,1]],"st":"fly+gantry","fl":["fly+gantry"],"ko":"이 열등감, 상실감","bk":"","bko":""},{"s":65.79,"e":69.45,"w":[["達",65.79,66.12],["成",66.12,66.36],["感",66.36,66.84],["は",66.84,67.2],["虚",67.2,67.4],["無",67.4,68.08],["か",68.08,68.4],["ん",68.4,68.57],["か",68.57,68.69],["ら",68.69,68.85],["の",68.85,69.45]],"ch":[[0,4,0],[4,6,1],[6,11,0]],"st":"fly+gantry","fl":["fly+gantry"],"ko":"달성감은 공허, 텅 빈 상태에서","bk":"","bko":""},{"s":69.41,"e":72.02,"w":[["存",69.41,69.65],["在",69.65,69.89],["感",69.89,70.77],["充",70.77,71.01],["実",71.01,71.42],["感",71.42,72.02]],"ch":[[0,3,0],[3,6,1]],"st":"fly+gantry","fl":["fly+gantry"],"ko":"존재감도 충족감도","bk":"","bko":""},{"s":72.46,"e":77.72,"w":[["優",72.46,72.74],["越",72.74,73.06],["感",73.06,73.5],["が",73.5,73.95],["僕",73.95,74.43],["の",74.43,74.67],["じ",74.67,74.91],["ゃ",74.91,75.03],["な",75.03,75.27],["い",75.27,76.17],["っ",77.04,77.12],["て",77.12,77.72]],"ch":[[0,4,0],[4,8,1],[8,12,0]],"st":"over","fl":["over"],"ko":"우월감도 내 것이 아니라는 것","bk":"","bko":""},{"s":78.9,"e":81.65,"w":[["誰",78.9,79.2],["か",79.2,79.68],["夢",79.68,80.04],["が",80.04,80.57],["破",80.57,80.89],["れ",80.89,81.05],["た",81.05,81.65]],"ch":[[0,2,0],[2,4,0],[4,7,1]],"st":"fly","fl":["fly"],"ko":"누군가의 꿈이 깨지고","bk":"","bko":""},{"s":82.19,"e":85.18,"w":[["誰",82.19,82.49],["か",82.49,82.85],["の",82.85,83.26],["席",83.26,83.9],["が",83.9,84.3],["空",84.3,84.42],["い",84.42,84.58],["た",84.58,85.18]],"ch":[[0,3,0],[3,5,0],[5,8,1]],"st":"fly","fl":["fly"],"ko":"누군가의 자리가 비었어","bk":"","bko":""},{"s":85.38,"e":88.39,"w":[["君",85.38,85.78],["の",85.78,86.43],["夢",86.43,86.75],["を",86.75,87.19],["笑",87.19,87.63],["っ",87.63,87.79],["た",87.79,88.39]],"ch":[[0,2,0],[2,4,0],[4,7,1]],"st":"fly","fl":["fly"],"ko":"네 꿈을 비웃던","bk":"","bko":""},{"s":88.63,"e":93.13,"w":[["こ",88.63,88.79],["の",88.79,89.36],["劣",89.36,89.6],["等",89.6,89.88],["感",89.88,90.32],["が",90.32,90.8],["弱",90.8,91.24],["虫",91.24,92.0],["だ",92.0,92.53],["ろ",92.53,93.13]],"ch":[[0,6,0],[6,8,1],[8,10,0]],"st":"over","fl":["over"],"ko":"이 열등감은 겁쟁이겠지","bk":"","bko":""},{"s":99.8,"e":102.81,"w":[["劣",99.8,100.0],["等",100.0,100.25],["喪",100.25,100.65],["失",100.65,101.01],["達",101.01,101.33],["成",101.33,101.89],["存",101.89,102.21],["在",102.21,102.81]],"ch":[[0,2,0],[2,4,0],[4,6,0],[6,8,1]],"st":"fly+bill","fl":["fly+bill"],"ko":"열등, 상실, 달성, 존재","bk":"","bko":""},{"s":102.69,"e":106.31,"w":[["充",102.69,102.86],["実",102.86,103.5],["優",103.5,103.82],["越",103.82,104.22],["虚",104.22,104.46],["無",104.46,105.31],["か",105.31,105.43],["ら",105.43,105.71],["の",105.71,106.31]],"ch":[[0,2,0],[2,4,0],[4,6,1],[6,9,0]],"st":"fly+bill","fl":["fly+bill"],"ko":"충족, 우월, 공허, 그리고","bk":"","bko":""},{"s":106.15,"e":109.08,"w":[["青",106.15,106.35],["春",106.35,106.79],["葛",106.79,106.85],["藤",106.83,107.64],["恋",107.64,107.88],["愛",107.88,108.48],["夢",108.48,109.08]],"ch":[[0,2,0],[2,4,0],[4,6,0],[6,7,1]],"st":"fly+bill","fl":["fly+bill"],"ko":"청춘, 갈등, 사랑, 꿈","bk":"","bko":""},{"s":108.88,"e":111.78,"w":[["社",108.88,109.37],["会",109.37,109.93],["挫",109.93,110.13],["折",110.13,110.93],["幸",110.93,111.18],["福",111.18,111.78]],"ch":[[0,2,0],[2,4,0],[4,6,1]],"st":"fly+bill","fl":["fly+bill"],"ko":"사회, 좌절, 행복","bk":"","bko":""},{"s":112.18,"e":115.32,"w":[["さ",112.18,112.5],["れ",112.5,112.7],["ど",112.7,113.31],["道",113.31,113.67],["は",113.67,114.19],["続",114.19,114.55],["い",114.55,114.72],["て",114.72,115.32]],"ch":[[0,3,0],[3,5,0],[5,8,1]],"st":"fly","fl":["fly"],"ko":"그럼에도 길은 이어지고","bk":"","bko":""},{"s":115.48,"e":119.02,"w":[["人",115.48,115.88],["は",115.88,116.53],["懸",116.53,116.77],["命",116.77,117.13],["に",117.13,117.49],["生",117.49,117.65],["き",117.65,117.93],["て",117.93,118.18],["い",118.18,118.42],["る",118.42,119.02]],"ch":[[0,2,0],[2,5,1],[5,10,0]],"st":"fly","fl":["fly"],"ko":"사람은 필사적으로 살아간다","bk":"","bko":""},{"s":119.1,"e":122.03,"w":[["恥",119.1,119.42],["を",119.42,119.87],["忍",119.87,120.19],["び",120.19,120.47],["食",120.47,120.63],["い",120.63,120.87],["縛",120.87,121.23],["っ",121.23,121.43],["て",121.43,122.03]],"ch":[[0,2,0],[2,4,0],[4,9,1]],"st":"fly","fl":["fly"],"ko":"부끄러움을 참고 이를 악물며","bk":"","bko":""},{"s":122.2,"e":125.7,"w":[["そ",122.2,122.4],["ん",122.4,122.52],["な",122.52,123.41],["現",123.41,123.61],["状",123.61,123.93],["も",123.93,124.25],["奪",124.25,124.57],["う",124.57,124.85],["の",124.85,125.1],["か？",125.1,125.7]],"ch":[[0,3,0],[3,6,0],[6,10,1]],"st":"fly+bill","fl":["fly+bill"],"ko":"그런 현실마저 빼앗을 건가?","bk":"","bko":""},{"s":126.44,"e":128.06,"w":[["落",126.44,126.5],["と",126.48,126.54],["し",126.52,126.65],["物",126.65,126.81],["を",126.81,127.09],["拾",127.09,127.38],["っ",127.38,127.46],["た",127.46,128.06]],"ch":[[0,5,0],[5,8,1]],"st":"fly","fl":["fly"],"ko":"잃어버린 것을 주웠다","bk":"","bko":""},{"s":129.36,"e":131.87,"w":[["光",129.36,129.73],["る",129.73,130.29],["映",130.29,130.62],["る",130.62,131.27],["影",131.27,131.87]],"ch":[[0,2,0],[2,4,0],[4,5,1]],"st":"fly","fl":["fly"],"ko":"빛나고, 비치고, 드리운 그림자","bk":"","bko":""},{"s":132.3,"e":135.59,"w":[["こ",132.3,132.66],["の",132.66,133.02],["劣",133.02,133.22],["等",133.22,133.54],["感",133.54,134.38],["喪",134.38,134.54],["失",134.54,134.99],["感",134.99,135.59]],"ch":[[0,5,0],[5,8,1]],"st":"fly+gantry","fl":["fly+gantry"],"ko":"이 열등감, 상실감","bk":"","bko":""},{"s":136.27,"e":138.59,"w":[["達",136.27,136.59],["成",136.59,136.83],["感",136.83,137.23],["は",137.23,137.71],["虚",137.71,137.99],["無",137.99,138.59]],"ch":[[0,4,0],[4,6,1]],"st":"fly+gantry","fl":["fly+gantry"],"ko":"달성감은 공허","bk":"","bko":""},{"s":138.83,"e":142.4,"w":[["揺",138.83,139.03],["ら",139.03,139.19],["ぐ",139.19,139.63],["存",139.63,139.88],["在",139.88,140.28],["感",140.28,141.18],["充",141.2,141.44],["実",141.44,141.8],["感",141.8,142.4]],"ch":[[0,6,0],[6,9,1]],"st":"fly+gantry","fl":["fly+gantry"],"ko":"흔들리는 존재감, 충족감","bk":"","bko":""},{"s":142.96,"e":146.25,"w":[["優",142.96,143.2],["越",143.2,143.64],["感",143.64,144.0],["が",144.0,144.48],["僕",144.48,144.81],["の",144.81,145.21],["じ",145.21,145.33],["ゃ",145.33,145.41],["な",145.41,145.65],["い",145.65,146.25]],"ch":[[0,4,0],[4,10,1]],"st":"over","fl":["over"],"ko":"우월감은 내 것이 아니다","bk":"","bko":""},{"s":146.37,"e":149.05,"w":[["劣",146.37,146.57],["等",146.57,147.01],["感",147.01,147.77],["喪",147.77,148.01],["失",148.01,148.45],["感",148.45,149.05]],"ch":[[0,3,0],[3,6,1]],"st":"fly+gantry","fl":["fly+gantry"],"ko":"열등감, 상실감","bk":"","bko":""},{"s":149.62,"e":153.38,"w":[["達",149.62,150.02],["成",150.02,150.26],["感",150.26,150.66],["は",150.66,151.06],["虚",151.06,151.38],["無",151.38,152.02],["か",152.02,152.3],["ん",152.3,152.5],["か",152.5,152.62],["ら",152.62,152.78],["の",152.78,153.38]],"ch":[[0,4,0],[4,6,1],[6,11,0]],"st":"fly+gantry","fl":["fly+gantry"],"ko":"달성감은 공허, 텅 빈 상태에서","bk":"","bko":""},{"s":153.26,"e":155.87,"w":[["存",153.26,153.5],["在",153.5,153.82],["感",153.82,154.67],["充",154.67,154.91],["実",154.91,155.27],["感",155.27,155.87]],"ch":[[0,3,0],[3,6,1]],"st":"fly+gantry","fl":["fly+gantry"],"ko":"존재감도 충족감도","bk":"","bko":""},{"s":156.39,"e":161.88,"w":[["優",156.39,156.67],["越",156.67,157.07],["感",157.07,157.47],["が",157.47,157.95],["僕",157.95,158.35],["の",158.35,158.79],["じ",158.79,158.87],["ゃ",158.87,158.99],["な",158.99,159.19],["い",159.19,160.09],["っ",161.2,161.28],["て",161.28,161.88]],"ch":[[0,4,0],[4,8,1],[8,12,0]],"st":"over","fl":["over"],"ko":"우월감도 내 것이 아니라는 것","bk":"","bko":""},{"s":162.42,"e":164.7,"w":[["こ",162.42,162.72],["の",162.72,163.01],["劣",163.01,163.21],["等",163.21,163.33],["感",163.33,163.65],["を",163.65,163.89],["浄",163.89,164.1],["化",164.1,164.7]],"ch":[[0,2,0],[2,6,0],[6,8,1]],"st":"over","fl":["over"],"ko":"이 열등감을 정화하면","bk":"","bko":""},{"s":165.59,"e":168.08,"w":[["そ",165.59,165.91],["の",165.91,166.52],["存",166.52,166.68],["在",166.68,166.92],["感",166.92,167.12],["は",167.12,167.32],["幻",167.32,167.48],["影",167.48,168.08]],"ch":[[0,2,0],[2,6,0],[6,8,1]],"st":"fly","fl":["fly"],"ko":"그 존재감은 환영","bk":"","bko":""},{"s":173.2,"e":175.91,"w":[["劣",173.2,173.5],["等",173.5,173.82],["感",173.82,174.58],["喪",174.58,174.79],["失",174.79,175.31],["感",175.31,175.91]],"ch":[[0,3,0],[3,6,1]],"st":"fly","fl":["fly"],"ko":"열등감, 상실감","bk":"","bko":""},{"s":176.59,"e":178.83,"w":[["達",176.59,176.87],["成",176.87,177.11],["感",177.11,177.59],["が",177.59,178.03],["虚",178.03,178.23],["無",178.23,178.83]],"ch":[[0,4,0],[4,6,1]],"st":"fly","fl":["fly"],"ko":"달성감이 공허","bk":"","bko":""},{"s":179.0,"e":182.73,"w":[["だ",179.0,179.24],["か",179.24,179.44],["ら",179.44,180.08],["存",180.08,180.32],["在",180.32,180.64],["感",180.64,181.44],["充",181.44,181.68],["実",181.68,182.13],["感",182.13,182.73]],"ch":[[0,3,0],[3,6,0],[6,9,1]],"st":"fly+bill","fl":["fly+bill"],"ko":"그래서 존재감도 충족감도","bk":"","bko":""},{"s":183.25,"e":187.26,"w":[["優",183.25,183.49],["越",183.49,183.89],["感",183.89,184.33],["は",184.33,184.93],["君",184.93,185.21],["と",185.21,185.54],["じ",185.54,185.66],["ゃ",185.66,185.78],["な",185.78,186.02],["き",186.02,186.18],["ゃ",186.18,186.42],["駄",186.42,186.66],["目",186.66,187.26]],"ch":[[0,4,0],[4,6,1],[6,11,0],[11,13,0]],"st":"over","fl":["over"],"ko":"우월감도, 너와 함께가 아니면 안 돼","bk":"","bko":""},{"s":197.07,"e":200.09,"w":[["誰",197.07,197.37],["か",197.37,198.01],["夢",198.01,198.37],["が",198.37,198.85],["破",198.85,199.25],["れ",199.25,199.49],["た",199.49,200.09]],"ch":[[0,2,0],[2,4,0],[4,7,1]],"st":"fly","fl":["fly"],"ko":"누군가의 꿈이 깨지고","bk":"","bko":""},{"s":200.38,"e":203.55,"w":[["誰",200.38,200.78],["か",200.78,201.18],["の",201.18,201.62],["席",201.62,202.23],["が",202.23,202.67],["空",202.67,202.75],["い",202.75,202.95],["た",202.95,203.55]],"ch":[[0,3,0],[3,5,0],[5,8,1]],"st":"fly","fl":["fly"],"ko":"누군가의 자리가 비었어","bk":"","bko":""},{"s":203.71,"e":206.76,"w":[["君",203.71,204.15],["の",204.15,204.8],["夢",204.8,205.16],["を",205.16,205.6],["笑",205.6,206.0],["っ",206.0,206.16],["た",206.16,206.76]],"ch":[[0,2,0],[2,4,0],[4,7,1]],"st":"fly","fl":["fly"],"ko":"네 꿈을 비웃었지","bk":"","bko":""},{"s":207.09,"e":209.21,"w":[["こ",207.09,207.33],["の",207.33,207.57],["劣",207.57,207.85],["等",207.85,208.13],["感",208.13,208.61],["が",208.61,209.21]],"ch":[[0,2,0],[2,6,1]],"st":"fly+bill","fl":["fly+bill"],"ko":"이 열등감이","bk":"","bko":""},{"s":209.13,"e":210.14,"w":[["弱",209.13,209.54],["虫",209.54,210.14]],"ch":[[0,2,1]],"st":"over","fl":["over"],"ko":"겁쟁이","bk":"","bko":""}]};
+const cv=document.getElementById('cv'),g=cv.getContext('2d');
+const W=1080,H=1920,HOR=800,FOC=900,SEG=200,RW=620,CAMH=850,DRAW=240;
+function fit(){const s=Math.min(innerWidth/W,innerHeight/H);cv.style.transform=`scale(${s}) translate(-50%,-50%)`}
+addEventListener('resize',fit);fit();
+
+/* ---------- helpers ---------- */
+const clamp=(x,a=0,b=1)=>x<a?a:x>b?b:x,lerp=(a,b,x)=>a+(b-a)*x;
+const eOutC=x=>1-(1-x)**3,eInC=x=>x*x*x,eIO=x=>x<.5?4*x*x*x:1-(-2*x+2)**3/2;
+const eBack=(x,c=1.7)=>{x-=1;return 1+(c+1)*x*x*x+c*x*x};
+const H1=(i,s=0)=>{const x=Math.sin(i*127.1+s*311.7+.5)*43758.5453;return x-Math.floor(x)};
+const nz=(x,s=0)=>Math.sin(x+s*1.3)*.6+Math.sin(x*2.31+s*4.1+1.7)*.4;
+const hex=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+const mixc=(a,b,x)=>a.map((v,i)=>lerp(v,b[i],x));
+const css=(c,a=1)=>`rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`;
+const BT=D.beats;
+function beatIdx(t){let lo=0,hi=BT.length-1,b=-1;while(lo<=hi){const m=(lo+hi)>>1;if(BT[m]<=t){b=m;lo=m+1}else hi=m-1}return b}
+function pulse(t){const b=beatIdx(t);return b<0?0:Math.exp(-(t-BT[b])*7)}
+
+/* ---------- journey: speed and distance ---------- */
+const SPD=[[0,1500],[28.5,2000],[42.5,2300],[55.6,3300],[61.8,3900],[78.4,3000],[96.5,2200],[99.5,4600],[112,2600],[126,900],[132.2,4100],[162,3200],[172.7,2400],[196,1700],[208.5,500],[212.5,0]];
+function spd(t){let i=0;for(let j=0;j<SPD.length;j++)if(t>=SPD[j][0])i=j;if(i===0)return SPD[0][1];
+  return lerp(SPD[i-1][1],SPD[i][1],eIO(clamp((t-SPD[i][0])/1.5)))}
+const DT=.01,NZ=Math.ceil((D.dur+2)/DT),ZT=new Float64Array(NZ+1);
+for(let k=0;k<NZ;k++)ZT[k+1]=ZT[k]+spd(k*DT)*DT;
+function Z(t){const k=clamp(t/DT,0,NZ-1),i=Math.floor(k);return lerp(ZT[i],ZT[i+1],k-i)}
+function tOfZ(z){let lo=0,hi=NZ;while(lo<hi){const m=(lo+hi)>>1;if(ZT[m]<z)lo=m+1;else hi=m}return lo*DT}
+
+/* ---------- places along the way ---------- */
+const BIO=[[0,'city'],[28.5,'suburb'],[42.5,'field'],[55.6,'tunnel'],[61.8,'highway'],[78.4,'bridge'],[96.5,'highway'],[99.5,'neon'],[112,'mountain'],[126,'fog'],[132.2,'highway'],[162,'tunnel'],[168.1,'light'],[172.7,'coast'],[196,'town']];
+function bioIdxT(t){let i=0;for(let j=0;j<BIO.length;j++)if(t>=BIO[j][0])i=j;return i}
+const SKY={ // top, horizon, ground a/b, road, rumble a/b, lane, fog, sun [x,y,r,color] , stars, lights(night)
+  city:    {top:'#2b1b4f',hor:'#ff8a5c',ga:'#2a2a33',gb:'#25252d',road:'#3a3a44',ra:'#d9d9d9',rb:'#b0303a',lane:'#f2f2f2',fog:'#a86a78',sun:[540,760,120,'#ffb36b'],stars:.2,night:.6,curve:.5,hill:.3},
+  suburb:  {top:'#5a3b8f',hor:'#ffb07a',ga:'#51603a',gb:'#4a5835',road:'#4a4a52',ra:'#eeeeee',rb:'#c23b3b',lane:'#ffffff',fog:'#d99a7a',sun:[760,700,150,'#ffcf8a'],stars:0,night:.3,curve:1,hill:.7},
+  field:   {top:'#6fb7e8',hor:'#ffe0a8',ga:'#6f9a3a',gb:'#648c34',road:'#555560',ra:'#ffffff',rb:'#c23b3b',lane:'#ffffff',fog:'#e8d6b0',sun:[300,560,110,'#fff2c0'],stars:0,night:0,curve:1.2,hill:1},
+  tunnel:  {top:'#0b0906',hor:'#1a140c',ga:'#2b2419',gb:'#241e15',road:'#2f2a24',ra:'#d0a040',rb:'#3a3025',lane:'#ffd27a',fog:'#140f08',sun:null,stars:0,night:1,curve:.3,hill:0},
+  highway: {top:'#050a1f',hor:'#1d2a5c',ga:'#0d1226',gb:'#0b0f20',road:'#1c1f2b',ra:'#cfd6ff',rb:'#8a1f2a',lane:'#e8ecff',fog:'#1a2248',sun:null,stars:.9,night:1,curve:.5,hill:.2},
+  bridge:  {top:'#060b24',hor:'#233a78',ga:'#0a1a3d',gb:'#0c1d44',road:'#20232e',ra:'#dfe4ff',rb:'#dfe4ff',lane:'#e8ecff',fog:'#1b2c60',sun:[760,520,70,'#f4f1d8'],stars:1,night:1,curve:.2,hill:0,water:1},
+  neon:    {top:'#12001f',hor:'#5a0d5e',ga:'#140820',gb:'#10061a',road:'#1d1426',ra:'#ff2bd6',rb:'#1de9ff',lane:'#ff5ad9',fog:'#3a0a45',sun:null,stars:0,night:1,curve:.8,hill:.2},
+  mountain:{top:'#0b1433',hor:'#3b4f8a',ga:'#16241f',gb:'#132019',road:'#262a33',ra:'#e6e6e6',rb:'#b0303a',lane:'#f2f2f2',fog:'#2f3f6a',sun:null,stars:.7,night:.8,curve:1.6,hill:1.3},
+  fog:     {top:'#c9ccd2',hor:'#e9eaed',ga:'#8b9096',gb:'#858a90',road:'#6d7178',ra:'#f5f5f5',rb:'#c0c0c0',lane:'#fafafa',fog:'#e4e6ea',sun:null,stars:0,night:0,curve:.5,hill:.3,rain:1},
+  light:   {top:'#ffffff',hor:'#fff6e0',ga:'#e8e2d0',gb:'#e2dccb',road:'#c9c4b8',ra:'#ffffff',rb:'#f0c0c0',lane:'#ffffff',fog:'#fffaf0',sun:null,stars:0,night:0,curve:.3,hill:0},
+  coast:   {top:'#3b5ba8',hor:'#ffb36b',ga:'#d9b87a',gb:'#cfae70',road:'#5a5a64',ra:'#ffffff',rb:'#d13b3b',lane:'#ffffff',fog:'#f3b38a',sun:[540,780,190,'#ffd07a'],stars:0,night:0,curve:1,hill:.4,water:.5},
+  town:    {top:'#8fd0ff',hor:'#fff1d6',ga:'#7aa04a',gb:'#709545',road:'#5c5c66',ra:'#ffffff',rb:'#d13b3b',lane:'#ffffff',fog:'#f2ecd8',sun:[820,420,120,'#fff6d0'],stars:0,night:0,curve:.6,hill:.4}};
+for(const k in SKY){const o=SKY[k];for(const f of ['top','hor','ga','gb','road','ra','rb','lane','fog'])o[f]=hex(o[f])}
+function skyAt(t){const i=bioIdxT(t),P=SKY[BIO[i][1]],a=clamp((t-BIO[i][0])/1.2);if(i===0||a>=1)return P;
+  const Q=SKY[BIO[i-1][1]],o={...P};for(const f of ['top','hor','ga','gb','road','ra','rb','lane','fog'])o[f]=mixc(Q[f],P[f],a);
+  for(const f of ['stars','night','curve','hill'])o[f]=lerp(Q[f]||0,P[f]||0,a);return o}
+
+/* ---------- track ---------- */
+const NSEG=Math.ceil(ZT[NZ]/SEG)+DRAW+5;
+const SB=new Array(NSEG),CURV=new Float32Array(NSEG),HILL=new Float32Array(NSEG);
+for(let i=0;i<NSEG;i++){const t=tOfZ(i*SEG);SB[i]=BIO[bioIdxT(t)][1]}
+{let hsm=0,csm=0;for(let i=0;i<NSEG;i++){const P=SKY[SB[i]];csm=lerp(csm,P.curve,.02);hsm=lerp(hsm,P.hill,.02);
+  CURV[i]=csm*(2.2*Math.sin(i/61)+1.3*Math.sin(i/23+1.3));HILL[i]=hsm*(700*Math.sin(i/130)+260*Math.sin(i/41+2))}}
+const CUM=new Float32Array(NSEG);for(let i=1;i<NSEG;i++)CUM[i]=CUM[i-1]+CURV[i];
+
+/* ---------- lyrics objects in the world ---------- */
+let OBJ=[];
+/* ---------- plain road signs as scenery (no lyrics) ---------- */
+const LABELS=['↑ 12 km','EXIT 7','→ 3 km','↑ 45 km','EXIT 21','↑ 128 km','← 8 km','↑ 64 km'];
+function buildSigns(){
+  let side=1,k=0;
+  for(let i=40;i<NSEG-DRAW;i+=1){const b=SB[i];
+    const every=b==='highway'||b==='bridge'?90:b==='tunnel'||b==='light'||b==='fog'?0:150;
+    if(!every||i%every)continue;
+    const mode=(b==='highway'||b==='bridge')?'gantry':'sign';side=-side;
+    OBJ.push({mode,z:i*SEG,side,label:LABELS[k++%LABELS.length],col:b==='highway'||b==='bridge'?'#0e6b3a':'#1f4fa3'});
+  }
+  OBJ.sort((a,b)=>a.z-b.z);
+}
+
+/* ---------- drawing ---------- */
+function poly(c,pts){g.fillStyle=c;g.beginPath();g.moveTo(pts[0],pts[1]);for(let i=2;i<pts.length;i+=2)g.lineTo(pts[i],pts[i+1]);g.closePath();g.fill()}
+function fogc(c,f,P){return css(mixc(c,P.fog,f))}
+function drawSky(t,P,bgOff){
+  const gr=g.createLinearGradient(0,0,0,HOR+40);gr.addColorStop(0,css(P.top));gr.addColorStop(1,css(P.hor));
+  g.fillStyle=gr;g.fillRect(0,0,W,HOR+400);
+  if(P.stars>0){g.fillStyle=`rgba(255,255,255,${.8*P.stars})`;for(let j=0;j<90;j++){const x=((H1(j,1)*1400+bgOff*.05)%1400+1400)%1400-160,y=H1(j,2)*HOR*.9,r=.8+H1(j,3)*2.2;
+    g.globalAlpha=P.stars*(.4+.6*Math.abs(Math.sin(t*(1+H1(j,4)*2)+j)));g.fillRect(x,y,r,r)}g.globalAlpha=1}
+  if(P.sun){const [sx,sy,r,c]=P.sun,x=sx+bgOff*.08;const rg=g.createRadialGradient(x,sy,0,x,sy,r*3);
+    rg.addColorStop(0,c);rg.addColorStop(.3,c+'aa');rg.addColorStop(1,c+'00');g.fillStyle=rg;g.fillRect(x-r*3,sy-r*3,r*6,r*6);
+    g.fillStyle=c;g.beginPath();g.arc(x,sy,r*.55,0,7);g.fill()}
+}
+function drawFar(P,bgOff,bio){ // silhouettes on the horizon, parallax with road curvature
+  const col=css(mixc(P.hor,[0,0,0],bio==='fog'||bio==='light'?.12:.45));
+  g.fillStyle=col;g.beginPath();g.moveTo(0,HOR+30);
+  const off=bgOff*.25;
+  for(let x=0;x<=W;x+=12){const u=(x-off)/1;let y;
+    if(bio==='city'||bio==='neon'||bio==='town'){const b=Math.floor(u/70);y=HOR+20-(60+H1(b,7)*(bio==='town'?70:220))}
+    else if(bio==='mountain'||bio==='suburb'||bio==='field'){y=HOR+10-(90+80*Math.sin(u/140)+60*Math.sin(u/57+1)+30*Math.sin(u/23))*(bio==='field'?.5:1)}
+    else y=HOR+10-(18+8*Math.sin(u/90));
+    g.lineTo(x,y)}
+  g.lineTo(W,HOR+30);g.closePath();g.fill();
+  if(bio==='neon'||bio==='city'){for(let j=0;j<60;j++){const b=j*3,x=((b*70+off)%1400+1400)%1400-160,h=H1(b,7);if(h<.35)continue;
+    g.fillStyle=bio==='neon'?(j%2?'#ff2bd6':'#1de9ff'):'#ffd89a';g.globalAlpha=.6;g.fillRect(x+10,HOR-30-h*150,6,6);g.globalAlpha=1}}
+}
+function roundRect(x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
+
+// scenery sprite for segment i (world x on a side), drawn at projection (X ground, Y ground, s scale)
+function scenery(i,bio,push){
+  const r=q=>H1(i,q);
+  const S=(x,kind,extra)=>push({x,kind,i,extra});
+  switch(bio){
+    case 'city': if(i%2===0){S(-(RW+500+r(1)*500),'bld',r(2));S(RW+500+r(3)*500,'bld',r(4))} if(i%5===0){S(-(RW+120),'lamp');S(RW+120,'lamp')} break;
+    case 'suburb': if(i%6===0)S((r(1)<.5?-1:1)*(RW+220),'pole'); if(i%3===1&&r(2)<.6)S((r(3)<.5?-1:1)*(RW+400+r(4)*900),'tree',r(5)); if(i%9===4)S((r(6)<.5?-1:1)*(RW+700+r(7)*500),'house',r(8)); break;
+    case 'field': if(i%2===0&&r(1)<.5)S((r(2)<.5?-1:1)*(RW+300+r(3)*1500),'tree',r(4)); if(i%1===0){S(-(RW+200+r(5)*1800),'flower',r(6));S(RW+200+r(7)*1800,'flower',r(8))} if(i%4===0){S(-(RW+90),'post');S(RW+90,'post')} break;
+    case 'tunnel': case 'light': if(i%4===0)S(0,'tlight'); break;
+    case 'highway': if(i%6===0){S(-(RW+80),'hlamp');S(RW+80,'hlamp')} if(i%2===0){S(-(RW+40),'rail');S(RW+40,'rail')} break;
+    case 'bridge': if(i%2===0){S(-(RW+60),'brail');S(RW+60,'brail')} if(i%45===0){S(-(RW+160),'tower');S(RW+160,'tower')} break;
+    case 'neon': if(i%2===0){S(-(RW+450+r(1)*400),'nbld',r(2));S(RW+450+r(3)*400,'nbld',r(4))} if(i%4===0){S(-(RW+100),'nlamp');S(RW+100,'nlamp')} break;
+    case 'mountain': if(r(1)<.8)S(-(RW+250+r(2)*1200),'pine',r(3)); if(r(4)<.8)S(RW+250+r(5)*1200,'pine',r(6)); if(i%3===0){S(-(RW+60),'rail');S(RW+60,'rail')} break;
+    case 'fog': if(i%7===0){S(-(RW+150),'post');S(RW+150,'post')} if(i%11===0)S((r(1)<.5?-1:1)*(RW+500),'tree',r(2)); break;
+    case 'coast': if(i%5===0&&r(1)<.8)S(-(RW+300+r(2)*600),'palm',r(3)); if(i%3===0)S(RW+80,'rail'); break;
+    case 'town': if(i%3===0){S(-(RW+500+r(1)*400),'house',r(2));S(RW+500+r(3)*400,'house',r(4))} if(i%3===1&&r(5)<.7)S((r(6)<.5?-1:1)*(RW+250),'tree',r(7)); break;
+  }
+}
+function drawScenery(o,X,Y,s,fog,P,t){
+  const x=X+o.x*s,night=P.night;g.globalAlpha=1;
+  const F=(c)=>fogc(hex(c),fog,P);
+  switch(o.kind){
+    case 'bld':{const w=(500+o.extra*500)*s,h=(1400+o.extra*3000)*s,xx=o.x<0?x-w:x;g.fillStyle=F('#1d1b2a');g.fillRect(xx,Y-h,w,h);
+      if(night>.2&&s>.05){g.fillStyle=`rgba(255,214,140,${(.8-fog)*night})`;const cw=Math.max(2,70*s),ch=Math.max(2,90*s);for(let yy=Y-h+cw;yy<Y-ch*2;yy+=ch*1.8)for(let xw=xx+cw;xw<xx+w-cw;xw+=cw*2)if(H1(o.i*7+Math.floor(xw)+Math.floor(yy),9)<.55)g.fillRect(xw,yy,cw,ch)}break}
+    case 'nbld':{const w=(420+o.extra*400)*s,h=(1600+o.extra*2600)*s,xx=o.x<0?x-w:x;g.fillStyle=F('#150a22');g.fillRect(xx,Y-h,w,h);
+      const cols=['#ff2bd6','#1de9ff','#ffe14d'];g.fillStyle=cols[o.i%3];g.globalAlpha=(1-fog);g.fillRect(xx+w*.1,Y-h*.7,w*.8,Math.max(2,70*s));g.fillRect(xx+w*.1,Y-h*.45,w*.5,Math.max(2,50*s));g.globalAlpha=1;break}
+    case 'lamp': case 'hlamp': case 'nlamp':{const h=(o.kind==='hlamp'?1500:1100)*s,dir=o.x<0?1:-1;g.strokeStyle=F('#555a66');g.lineWidth=Math.max(1,22*s);g.beginPath();g.moveTo(x,Y);g.lineTo(x,Y-h);g.lineTo(x+dir*260*s,Y-h);g.stroke();
+      if(night>.2){const c=o.kind==='nlamp'?(o.i%8<4?'255,43,214':'29,233,255'):'255,214,140';const rg=g.createRadialGradient(x+dir*260*s,Y-h,0,x+dir*260*s,Y-h,170*s);rg.addColorStop(0,`rgba(${c},${.55*night*(1-fog)})`);rg.addColorStop(1,`rgba(${c},0)`);g.fillStyle=rg;g.fillRect(x+dir*260*s-170*s,Y-h-170*s,340*s,340*s)}break}
+    case 'pole':{g.strokeStyle=F('#3b2f25');g.lineWidth=Math.max(1,26*s);g.beginPath();g.moveTo(x,Y);g.lineTo(x,Y-1500*s);g.moveTo(x-200*s,Y-1400*s);g.lineTo(x+200*s,Y-1400*s);g.stroke();break}
+    case 'tree':{const h=(700+o.extra*700)*s;g.fillStyle=F('#4a3322');g.fillRect(x-20*s,Y-h*.45,40*s,h*.45);g.fillStyle=F(P===SKY.suburb?'#2f4a26':'#3c6b2a');g.beginPath();g.arc(x,Y-h*.62,h*.32,0,7);g.fill();break}
+    case 'pine':{const h=(900+o.extra*900)*s;g.fillStyle=F('#0f2418');poly(g.fillStyle,[x,Y-h,x-h*.28,Y-h*.1,x+h*.28,Y-h*.1]);g.fillStyle=F('#2a1d14');g.fillRect(x-15*s,Y-h*.12,30*s,h*.12);break}
+    case 'palm':{const h=(1300+o.extra*600)*s;g.strokeStyle=F('#6b4a2b');g.lineWidth=Math.max(1,34*s);g.beginPath();g.moveTo(x,Y);g.quadraticCurveTo(x+120*s,Y-h*.5,x+60*s,Y-h);g.stroke();
+      g.strokeStyle=F('#2f6b35');g.lineWidth=Math.max(1,40*s);for(let k=0;k<5;k++){const a=-Math.PI/2+(k-2)*.6;g.beginPath();g.moveTo(x+60*s,Y-h);g.quadraticCurveTo(x+60*s+Math.cos(a)*300*s,Y-h+Math.sin(a)*300*s-60*s,x+60*s+Math.cos(a)*520*s,Y-h+Math.sin(a)*520*s+160*s);g.stroke()}break}
+    case 'house':{const w=(600+o.extra*300)*s,h=(420+o.extra*200)*s,xx=x-w/2;g.fillStyle=F(['#d9c7a8','#c9a07a','#e3d9c9'][o.i%3]);g.fillRect(xx,Y-h,w,h);poly(F('#8a3b2b'),[xx-30*s,Y-h,xx+w/2,Y-h-h*.6,xx+w+30*s,Y-h]);break}
+    case 'flower':{const c=['#ffd23d','#ff7aa8','#ffffff','#ff5a3d'][o.i%4];g.fillStyle=F(c);const r=Math.max(1,26*s);g.fillRect(x-r,Y-r*2,r*2,r*2);break}
+    case 'post':{g.fillStyle=F('#e8e8e8');g.fillRect(x-10*s,Y-260*s,20*s,260*s);g.fillStyle=F('#d13b3b');g.fillRect(x-10*s,Y-260*s,20*s,40*s);break}
+    case 'rail':{g.fillStyle=F('#9aa0ab');g.fillRect(x-8*s,Y-240*s,16*s,240*s);g.fillRect(x-(o.x<0?0:1)*SEG*s*.0,Y-230*s,Math.max(1,12*s),30*s);break}
+    case 'brail':{g.fillStyle=F('#c9ced8');g.fillRect(x-8*s,Y-320*s,16*s,320*s);break}
+    case 'tower':{g.fillStyle=F('#b8bcc8');g.fillRect(x-40*s,Y-4200*s,80*s,4200*s);g.strokeStyle=F('#b8bcc8');g.lineWidth=Math.max(1,8*s);g.beginPath();g.moveTo(x,Y-4200*s);g.lineTo(x+(o.x<0?1:-1)*2500*s,Y-600*s);g.stroke();break}
+    case 'tlight':{const c=P.night>.5?'255,190,90':'255,255,255';g.fillStyle=`rgba(${c},${1-fog})`;g.fillRect(x-120*s,Y-1700*s,240*s,40*s);break}
+  }
+}
+function drawObj(o,X,Y,s,fog,P,t){
+  const fade=clamp((7000*SEG/200-(o.z-camZ))/1500)*(1-fog*.6)*clamp((o.z-camZ-200)/500);if(fade<=0)return;
+  g.globalAlpha=fade;g.font='900 100px "Noto Sans JP"';const tw=g.measureText(o.label).width/100;
+  if(o.mode==='sign'){const f=190,w=tw*f+180,h=f+120,cx=X+o.side*(RW+380)*s,top=Y-(1500+h)*s;
+    g.fillStyle='#8a8f99';g.fillRect(cx-14*s,Y-1500*s,28*s,1500*s);
+    roundRect(cx-w/2*s,top,w*s,h*s,28*s);g.fillStyle=o.col;g.fill();g.lineWidth=Math.max(1,10*s);g.strokeStyle='#fff';
+    roundRect(cx-w/2*s+16*s,top+16*s,(w-32)*s,(h-32)*s,18*s);g.stroke();
+    g.font=`900 ${f*s}px "Noto Sans JP"`;g.textAlign='center';g.textBaseline='middle';g.fillStyle='#fff';g.fillText(o.label,cx,top+h/2*s);
+  }else{const f=220,w=Math.max(1300,tw*f+260),h=f+170,top=Y-(1750+h)*s;
+    g.fillStyle='#7d828c';g.fillRect(X-(w/2+60)*s,top,30*s,(1750+h)*s);g.fillRect(X+(w/2+30)*s,top,30*s,(1750+h)*s);g.fillRect(X-(w/2+60)*s,top-30*s,(w+120)*s,24*s);
+    roundRect(X-w/2*s,top,w*s,h*s,24*s);g.fillStyle=o.col;g.fill();g.lineWidth=Math.max(1,10*s);g.strokeStyle='#fff';
+    roundRect(X-w/2*s+16*s,top+16*s,(w-32)*s,(h-32)*s,16*s);g.stroke();
+    g.font=`900 ${f*s}px "Noto Sans JP"`;g.textAlign='center';g.textBaseline='middle';g.fillStyle='#fff';g.fillText(o.label,X,top+h/2*s);
+  }
+  g.globalAlpha=1;
+}
+let camZ=0;
+function drawRoad(t,P,sh){
+  camZ=Z(t);const base=Math.floor(camZ/SEG),pct=(camZ%SEG)/SEG;
+  const camY=CAMH+lerp(HILL[base],HILL[base+1],pct)+sh.y;
+  const bgOff=-(CUM[base]+CURV[base]*pct)*18;
+  const bio=SB[base];
+  drawSky(t,P,bgOff);drawFar(P,bgOff,bio);
+  if(P.water){g.fillStyle=css(mixc(P.hor,[10,30,80],.55));g.fillRect(0,HOR+10,W,H)}
+  else{g.fillStyle=css(P.ga);g.fillRect(0,HOR+10,W,H)}
+  let x=0,dx=-(CURV[base]*pct),maxy=H;const seg=[];
+  for(let n=0;n<DRAW;n++){
+    const i=base+n,z1=i*SEG-camZ,z2=z1+SEG;if(z2<=10){x+=dx;dx+=CURV[i];continue}
+    const s1=FOC/Math.max(10,z1),s2=FOC/z2;
+    const X1=W/2+s1*(-x)+sh.x,Y1=HOR-s1*(HILL[i]-camY),X2=W/2+s2*(-x-dx)+sh.x,Y2=HOR-s2*(HILL[i+1]-camY);
+    const fog=clamp(1-Math.exp(-n/DRAW*2.4)),Pi=SKY[SB[i]];
+    seg.push({i,X1,Y1,s1,X2,Y2,s2,clip:maxy,fog,Pi});
+    x+=dx;dx+=CURV[i];
+    if(Y2>=maxy||Y2>=Y1)continue;
+    const alt=Math.floor(i/3)%2;
+    if(!Pi.water||SB[i]==='coast'){g.fillStyle=fogc(alt?P.ga:P.gb,fog,P);g.fillRect(0,Y2,W,Y1-Y2+1)}
+    if(SB[i]==='bridge'||SB[i]==='coast'){g.fillStyle=fogc(mixc(P.hor,[10,30,80],.55+.1*alt),fog,P);if(SB[i]==='coast')g.fillRect(X2+s2*RW*1.6,Y2,W,Y1-Y2+1);else g.fillRect(0,Y2,W,Y1-Y2+1)}
+    const w1=s1*RW,w2=s2*RW,r1=w1*.1,r2=w2*.1;
+    poly(fogc(alt?P.ra:P.rb,fog,P),[X1-w1-r1,Y1,X1-w1,Y1,X2-w2,Y2,X2-w2-r2,Y2]);
+    poly(fogc(alt?P.ra:P.rb,fog,P),[X1+w1+r1,Y1,X1+w1,Y1,X2+w2,Y2,X2+w2+r2,Y2]);
+    poly(fogc(P.road,fog,P),[X1-w1,Y1,X1+w1,Y1,X2+w2,Y2,X2-w2,Y2]);
+    if(alt){const l1=w1*.03,l2=w2*.03;for(const k of [-1/3,1/3])poly(fogc(P.lane,fog,P),[X1+k*2*w1-l1,Y1,X1+k*2*w1+l1,Y1,X2+k*2*w2+l2,Y2,X2+k*2*w2-l2,Y2])}
+    maxy=Y2;
+  }
+  // tunnel walls/ceiling + scenery + lyric objects, far to near
+  const items=[];
+  const zEnd=camZ+DRAW*SEG;
+  let oi=0;while(oi<OBJ.length&&OBJ[oi].z<camZ+30)oi++;
+  for(let k=oi;k<OBJ.length&&OBJ[k].z<zEnd;k++)items.push({z:OBJ[k].z,obj:OBJ[k]});
+  for(const S of seg){const bi=SB[S.i];scenery(S.i,bi,o=>items.push({z:S.i*SEG,sc:o,S}));
+    if(bi==='tunnel'||bi==='light')items.push({z:S.i*SEG+1,tun:S})}
+  items.sort((a,b)=>b.z-a.z);
+  const segAt=z=>{const n=Math.floor(z/SEG)-base;return seg.find(q=>q.i===base+n)||null};
+  for(const it of items){
+    const S=it.S||it.tun||segAt(it.z);if(!S)continue;
+    const zr=it.z-camZ;if(zr<30)continue;
+    g.save();g.beginPath();g.rect(0,0,W,S.clip);g.clip();
+    if(it.tun){const T=it.tun,wall=1900,hc=T.s1*wall,hc2=T.s2*wall,w1=T.s1*RW*1.3,w2=T.s2*RW*1.3;
+      const c=fogc(SB[T.i]==='light'?[245,240,225]:(Math.floor(T.i/2)%2?[58,50,40]:[50,43,34]),T.fog,P);
+      poly(c,[T.X1-w1,T.Y1,T.X2-w2,T.Y2,T.X2-w2,T.Y2-hc2,T.X1-w1,T.Y1-hc]);
+      poly(c,[T.X1+w1,T.Y1,T.X2+w2,T.Y2,T.X2+w2,T.Y2-hc2,T.X1+w1,T.Y1-hc]);
+      poly(fogc(SB[T.i]==='light'?[250,248,240]:[34,29,22],T.fog,P),[T.X1-w1,T.Y1-hc,T.X2-w2,T.Y2-hc2,T.X2+w2,T.Y2-hc2,T.X1+w1,T.Y1-hc])}
+    else if(it.sc)drawScenery(it.sc,S.X1,S.Y1,S.s1,S.fog,S.Pi,t);
+    else{const s=FOC/zr,fr=(it.z-S.i*SEG)/SEG,Xc=lerp(S.X1,S.X2,fr),Yc=lerp(S.Y1,S.Y2,fr);drawObj(it.obj,Xc,Yc,s,S.fog*.5,P,t)}
+    g.restore();
+  }
+  return {bio,speed:spd(t)};
+}
+function drawWeather(t,info){
+  const b=info.bio;
+  if(b==='field'&&t>43.5&&t<47.5){const a=clamp((t-43.5)/.4)*(1-clamp((t-47)/.5));g.fillStyle=`rgba(255,255,255,${.85*a})`;
+    for(let j=0;j<160;j++){const x=((H1(j,11)*1300+t*(-260-200*H1(j,12)))%1300+1300)%1300-110,y=((H1(j,13)*2100+t*(500+400*H1(j,14)))%2100),r=3+H1(j,15)*7;g.beginPath();g.arc(x,y,r,0,7);g.fill()}}
+  if(b==='fog'){g.strokeStyle='rgba(255,255,255,.35)';g.lineWidth=2;g.beginPath();for(let j=0;j<120;j++){const x=H1(j,21)*W,y=((H1(j,22)*2200+t*1800)%2200)-100;g.moveTo(x,y);g.lineTo(x-8,y+60)}g.stroke()}
+  if(info.speed>3300){const a=clamp((info.speed-3300)/1200)*.5;g.strokeStyle=`rgba(255,255,255,${a})`;g.lineWidth=3;g.beginPath();
+    for(let j=0;j<48;j++){const an=H1(j,31)*Math.PI*2,ph=((t*3+H1(j,32))%1),r0=250+ph*1300,r1=r0+120+ph*300;g.moveTo(W/2+Math.cos(an)*r0,HOR+Math.sin(an)*r0*.8);g.lineTo(W/2+Math.cos(an)*r1,HOR+Math.sin(an)*r1*.8)}g.stroke()}
+}
+/* ---------- Sailing-style kinetic lyrics: extruded glyphs, staggered poster layout, per-line motion ---------- */
+const JF=f=>`900 ${f}px "Noto Sans JP"`;
+const eOutX=x=>x>=1?1:1-2**(-10*x);
+const eBk=(x,c=1.7)=>{x=clamp(x)-1;return 1+(c+1)*x*x*x+c*x*x};
+const oBounce=x=>{const n=7.5625,d=2.75;if(x<1/d)return n*x*x;if(x<2/d)return n*(x-=1.5/d)*x+.75;if(x<2.5/d)return n*(x-=2.25/d)*x+.9375;return n*(x-=2.625/d)*x+.984375};
+// line index -> motion (drop / stamp / dash / rise / thru / scatter)
+const LS=['drop','drop','drop','stamp','stamp',
+  'dash','rise','dash','rise','stamp','drop','rise','stamp',
+  'thru','stamp',
+  'stamp','dash','stamp','thru',
+  'drop','drop','drop','stamp',
+  'stamp','stamp','stamp','stamp',
+  'thru','rise','stamp','dash','rise','stamp',
+  'stamp','dash','rise','thru','stamp','dash','stamp','thru',
+  'scatter','scatter',
+  'stamp','stamp','rise','stamp',
+  'drop','drop','drop','stamp','stamp'];
+let LINES=[];
+function buildLines(){
+  g.font=JF(100);
+  LINES=D.lines.map((L,li)=>{
+    const st=LS[li]||'rise',nx=D.lines[li+1];
+    const out=nx&&nx.s-L.e<2.6?nx.s-.06:L.e+1.1;
+    const chunks=L.ch.map(([a,b,m])=>({emph:!!m,us:L.w.slice(a,b).map(([c,s,e])=>({c,s,e,wr:g.measureText(c).width/100}))}));
+    // greedy rows (thru keeps one block), then fit
+    const base=st==='thru'?170:150,MW=920;let f=base,rows;
+    for(;f>=70;f-=6){rows=[];let cur=[],w=0;
+      for(const c of chunks){const cf=f*(c.emph?1.4:1),cw=c.us.reduce((a,u)=>a+u.wr,0)*cf;
+        if(cur.length&&(w+cw+f*.25>MW||st!=='thru'&&cw>f*1.6&&cur.length)){rows.push(cur);cur=[];w=0}
+        cur.push(c);w+=cw+(cur.length>1?f*.25:0)}
+      rows.push(cur);
+      const ok=rows.every(r=>r.reduce((a,c)=>a+c.us.reduce((x,u)=>x+u.wr,0)*f*(c.emph?1.4:1),0)+(r.length-1)*f*.25<=MW);
+      const hh=rows.reduce((a,r)=>a+f*(r.some(c=>c.emph)?1.4:1)*1.12,0);
+      if(ok&&hh<=720&&rows.length<=4)break}
+    // place glyphs
+    const glyphs=[];let tot=rows.reduce((a,r)=>a+f*(r.some(c=>c.emph)?1.4:1)*1.12,0),y=600-tot/2;let k=0;
+    rows.forEach((r,ri)=>{const rh=f*(r.some(c=>c.emph)?1.4:1)*1.12,cy=y+rh/2;y+=rh;
+      const rw=r.reduce((a,c)=>a+c.us.reduce((x,u)=>x+u.wr,0)*f*(c.emph?1.4:1),0)+(r.length-1)*f*.25;
+      const slack=Math.max(0,MW-rw)/2,shift=st==='thru'||rows.length===1?0:(ri%2?1:-1)*Math.min(150,slack);
+      let x=W/2-rw/2+shift;
+      r.forEach((c,ci)=>{if(ci)x+=f*.25;const cf=f*(c.emph?1.4:1);
+        c.us.forEach(u=>{const w=u.wr*cf;glyphs.push({c:u.c,s:u.s,e:u.e,x:x+w/2,y:cy+(c.emph?0:cf*.04),f:cf,emph:c.emph,k:k++,r1:H1(li*31+k,5)-.5,r2:H1(li*31+k,6)-.5});x+=w})})});
+    return {li,L,st,out,glyphs,dir:li%2?1:-1};
+  });
+}
+// extruded bold glyph
+function glyph(ch,f,fill,alpha){
+  if(alpha<=0)return;g.globalAlpha=alpha;g.font=JF(f);g.textAlign='center';g.textBaseline='middle';
+  const d=Math.max(1,f*.016);g.fillStyle='#2a0c1c';for(let i=6;i>=1;i--)g.fillText(ch,i*d*.8,i*d);
+  g.lineJoin='round';g.lineWidth=f*.11;g.strokeStyle='#1a0816';g.strokeText(ch,0,0);
+  g.fillStyle=fill;g.fillText(ch,0,0);g.globalAlpha=1;
+}
+function motion(st,G,a,t,dir){ // -> {dx,dy,rot,sx,sy,al}
+  const o={dx:0,dy:0,rot:0,sx:1,sy:1,al:1};
+  switch(st){
+    case 'drop':{const p=clamp((a+.1)/.55);o.dy=-(1-oBounce(p))*760;o.rot=(1-p)*G.r1*.5;o.al=clamp((a+.1)/.06);if(p>=1&&a<.75){const q=(a-.45)/.3;o.sy=1-.12*Math.sin(clamp(q)*Math.PI);o.sx=1+.08*Math.sin(clamp(q)*Math.PI)}break}
+    case 'stamp':{const p=clamp((a+.05)/.18);let s=1+2.3*(1-eOutC(p));if(p>=1)s-=.12*Math.sin(clamp((a-.13)/.2)*Math.PI);o.sx=o.sy=s;o.rot=G.r1*.12*(1-p);o.al=clamp((a+.05)/.06);break}
+    case 'dash':{const p=clamp((a+.14)/.34),e=eOutX(p);o.dx=dir*(1-e)*1000;o.rot=dir*(1-e)*.25;o.sx=1+.5*(1-e);o.al=clamp((a+.14)/.05);break}
+    case 'rise':{const p=clamp((a+.1)/.45),e=eBk(p,1.6);o.dy=300*(1-e);o.rot=G.r1*.4*(1-p);o.sy=1+.3*(1-p);o.al=clamp((a+.1)/.08);break}
+    case 'thru':{const p=clamp((a+.08)/.3);o.sx=o.sy=Math.max(0,eBk(p,2.4));o.al=clamp((a+.08)/.05);break}
+    case 'scatter':{const p=clamp((a+.12)/.5),e=eOutC(p);o.dx=G.r1*900*(1-e);o.dy=G.r2*700*(1-e);o.rot=G.r1*4*(1-e);o.sx=o.sy=.5+.5*e;o.al=p;break}
+  }
+  return o;
+}
+let SHK=0;
+function drawLines(t){
+  const fx=[];
+  for(const Ln of LINES){
+    const {L,st,out,glyphs,dir}=Ln;if(t<L.s-.9||t>out+.8)continue;
+    // thru: the whole block approaches from the horizon, then the car drives through it
+    let gs=1,gy=0,ga=1,gb=0;
+    if(st==='thru'){const a=t-(L.s-.5),inP=eOutC(clamp(a/.55));gs=.25+.75*inP+.06*clamp((t-L.s)/Math.max(.5,out-L.s));gy=(1-inP)*(HOR-600);
+      const x=clamp((t-out)/.4);if(x>0){gs*=1+7*eInC(x);ga=1-clamp((x-.3)/.7);gb=x*16}}
+    g.save();if(gb>.5)g.filter=`blur(${gb.toFixed(1)}px)`;
+    for(const G of glyphs){
+      const a=t-G.s;if(a<-.16)continue;
+      const m=motion(st,G,a,t,dir);let {dx,dy,rot,sx,sy,al}=m;
+      if(st!=='thru'){const ex=clamp((t-out-G.k*.025)/.36);if(ex>0){const q=eInC(ex);
+        if(st==='dash'){dx+=-dir*q*1200;sx*=1+.4*q}else if(st==='scatter'){dx+=G.r1*1400*q;dy+=G.r2*900*q-300*q;rot+=G.r1*5*q}
+        else if(st==='drop'){dy+=q*900;rot+=G.r1*1.5*q}else{sx*=1+.5*q;sy*=1+.5*q;dy-=160*q}al*=1-ex}}
+      if(al<=0)continue;
+      const now=t>=G.s&&t<G.e+.05,hop=now?-Math.sin(clamp((t-G.s)/.24)*Math.PI)*16:0,big=now?1.1:1;
+      const col=now?'#FFD23D':G.emph?'#FF3B3B':'#FFFFFF';
+      let X=W/2+(G.x-W/2)*gs,Y=600+gy+(G.y-600)*gs;
+      // speed-line ghosts while dashing in
+      if(st==='dash'&&a<.3){for(let j=3;j>=1;j--){const m2=motion(st,G,a-j*.04,t,dir);g.save();g.translate(X+m2.dx*gs,Y+m2.dy*gs);g.scale(gs*m2.sx,gs*m2.sy);g.globalAlpha=.16*(4-j)/3*al*ga;g.font=JF(G.f);g.textAlign='center';g.textBaseline='middle';g.fillStyle=col;g.fillText(G.c,0,0);g.restore()}
+        g.strokeStyle=`rgba(255,255,255,${.5*(1-a/.3)*al})`;g.lineWidth=4;for(let j=0;j<3;j++){const yy=Y+(j-1)*G.f*.3;g.beginPath();g.moveTo(X+dx*gs+dir*G.f*.6,yy);g.lineTo(X+dx*gs+dir*(G.f*.6+260*(1-a/.3)),yy);g.stroke()}}
+      g.save();g.translate(X+dx*gs,Y+(dy+hop)*gs);g.rotate(rot);g.scale(gs*sx*big,gs*sy*big);glyph(G.c,G.f,col,al*ga);g.restore();
+      // stamp impact: ring + sparks + shake
+      if(st==='stamp'){const ia=a-.13;if(ia>0&&ia<.45){fx.push({x:X,y:Y,f:G.f*gs,ia,big:G.emph});}}
+    }
+    g.restore();
+  }
+  for(const e of fx){const p=e.ia/.45,r=e.f*(.5+(e.big?1.3:.8)*eOutC(p));g.strokeStyle=`rgba(255,255,255,${.8*(1-p)})`;g.lineWidth=(e.big?10:6)*(1-p)+1;g.beginPath();g.arc(e.x,e.y,r,0,7);g.stroke();
+    if(e.big)for(let j=0;j<10;j++){const an=j*.628+e.x*.01,rr2=r*1.1+40*p;g.fillStyle=j%2?'#FFD23D':'#FF3B3B';g.globalAlpha=1-p;g.fillRect(e.x+Math.cos(an)*rr2-5,e.y+Math.sin(an)*rr2-5,10,10);g.globalAlpha=1}}
+}
+function drawHud(t){
+  let A=null;for(const L of D.lines)if(t>=L.s-.05&&t<(L.e+1.2))A=L;
+  if(!A)return;
+  const nx=D.lines[D.lines.indexOf(A)+1];if(nx&&t>=nx.s-.05)return;
+  const p=clamp((t-A.s+.05)/.25);
+  g.font='700 44px "Noto Sans KR"';g.textAlign='center';g.textBaseline='middle';
+  const w=Math.min(960,g.measureText(A.ko).width+60),x=W/2,y=1440;
+  g.globalAlpha=p;g.fillStyle='rgba(0,0,0,.6)';roundRect(x-w/2,y-40,w,80,16);g.fill();
+  g.fillStyle='#fff';g.fillText(A.ko,x,y+2,920);
+  g.fillStyle='#ff2a2a';g.fillRect(x-w/2+24,y+30,(w-48)*clamp((t-A.s)/Math.max(.3,A.e-A.s)),5);g.globalAlpha=1;
+}
+function drawTitle(t){ // title stamp during the first instrumental and at the very end
+  const wins=[[15.3,27.9],[210.4,D.dur]];
+  for(const [a,b] of wins){if(t<a-.1||t>b+.5)continue;const q=clamp((t-b)/.45);
+    const chars=['劣','等','感'];chars.forEach((c,k)=>{const at=a+k*.418,x0=t-at;if(x0<-.05)return;
+      const p=clamp((x0+.05)/.18);let s=(1+2.3*(1-eOutC(p)))*(1+2.5*eInC(q));
+      g.save();g.translate(W/2+(k-1)*250*(1+q),560+Math.sin(t*2+k)*6);g.scale(s,s);glyph(c,240,k===2?'#FF3B3B':'#FFFFFF',clamp((x0+.05)/.06)*(1-q));g.restore();
+      const ia=x0-.13;if(ia>0&&ia<.45){g.strokeStyle=`rgba(255,255,255,${.8*(1-ia/.45)})`;g.lineWidth=8;g.beginPath();g.arc(W/2+(k-1)*250,560,120+200*eOutC(ia/.45),0,7);g.stroke()}});
+    const ka=clamp((t-a-1.3)/.4)*(1-q);if(ka>0){g.globalAlpha=ka;g.font='700 44px "Noto Sans KR"';g.textAlign='center';g.fillStyle='#fff';g.fillText('열 등 감',W/2,760);g.globalAlpha=1}}
+}
+function render(t){
+  const P=skyAt(t),pb=pulse(t);
+  SHK=0;for(const Ln of LINES)if(Ln.st==='stamp'&&t>Ln.L.s-.2&&t<Ln.out+.5)for(const G of Ln.glyphs){const ia=t-G.s-.13;if(ia>0&&ia<.25)SHK=Math.max(SHK,(G.emph?1:.45)*(1-ia/.25))}
+  const sh={x:18*SHK*nz(t*50,1),y:18*SHK*nz(t*47,2)+3*pb};
+  g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,W,H);
+  const info=drawRoad(t,P,sh);
+  drawWeather(t,info);
+  const vg=g.createRadialGradient(W/2,HOR,300,W/2,HOR,1300);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.4)');g.fillStyle=vg;g.fillRect(0,0,W,H);
+  drawTitle(t);
+  drawLines(t);
+  let wf=0;if(t>=168.1&&t<169.6)wf=Math.max(wf,1-Math.abs(t-168.4)/1.2);
+  if(wf>0){g.fillStyle=`rgba(255,255,255,${Math.min(.9,wf)})`;g.fillRect(0,0,W,H)}
+  drawHud(t);
+  const fd=clamp((t-(D.dur-1.2))/1.1);if(fd>0){g.fillStyle=`rgba(0,0,0,${fd})`;g.fillRect(0,0,W,H)}
+}
+window.DUR=D.dur;
+window.READY=(async()=>{
+  const all=D.lines.map(L=>L.w.map(w=>w[0]).join('')).join('')+'劣等感';
+  try{await Promise.all([document.fonts.load('900 100px "Noto Sans JP"',all),document.fonts.load('700 44px "Noto Sans KR"',D.lines.map(L=>L.ko).join('')+'열등감')])}catch(e){}
+  buildSigns();buildLines();window.renderAt=render;render(0);
+})();
+if(new URLSearchParams(location.search).has('render'))document.body.classList.add('render');
+else{const au=document.getElementById('au'),pp=document.getElementById('pp');
+  const loop=()=>{render(au.currentTime);document.getElementById('fill').style.width=(au.currentTime/D.dur*100)+'%';
+    document.getElementById('time').textContent=Math.floor(au.currentTime/60)+':'+String(Math.floor(au.currentTime%60)).padStart(2,'0');requestAnimationFrame(loop)};
+  pp.onclick=()=>{au.paused?au.play():au.pause()};au.onplay=()=>pp.textContent='❚❚';au.onpause=()=>pp.textContent='▶';
+  document.getElementById('bar').onclick=e=>{const r=e.currentTarget.getBoundingClientRect();au.currentTime=(e.clientX-r.left)/r.width*D.dur};
+  READY.then(()=>requestAnimationFrame(loop))}
+</script>
+</body>
+</html>
