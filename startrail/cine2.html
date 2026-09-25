@@ -122,19 +122,30 @@ shot(29.6,34.5,[[29.6,0,-260,1.08,0],[34.5,0,220,1.12,.02]],t=>{const i=2;
     // eight bright stars that go dark on 별조차 빛을 잃은 밤
     for(let k=0;k<8;k++){const x=-380+k*110,y=60+Math.sin(k*1.7)*80,off=T(i,8+k);const on=1-P(t,off,.35);flare(x,y,3,rgba(ACC,.8),on*(t>30?1:0),.6)}
     words(t,i,[8,9,10,11,12,13,14,15],0,280,KR(300,80),'rise',{out:34.4,col:'#B8C4E8'})})});
-// 3: a tear falls from 눈물, the camera follows it down to the water
-shot(34.5,39.7,[[34.5,0,-120,1.1,0],[T(3,6)+.3,0,-80,1.14,0],[39.7,0,560,1.0,.02]],t=>{const i=3;stars(t,.12,160,41,.5);
-  layer(1,()=>{words(t,i,[0,1,2,3,4],0,-420,KR(300,84),'twinkle',{});
-    words(t,i,[5,6,7,8,9,10],0,-230,KR(900,130),'rise',{});
-    const td=T(i,7)+.1,a=t-td;if(a>0){const y=lerp(-160,880,eInC(clamp(a/1.3)));if(a<1.3){g.save();g.fillStyle=rgba(ACC,.95);g.shadowColor=ACC;g.shadowBlur=30;g.beginPath();g.moveTo(40,y-40);g.quadraticCurveTo(64,y+10,40,y+26);g.quadraticCurveTo(16,y+10,40,y-40);g.fill();g.restore()}
-      for(let r=0;r<3;r++){const q=clamp((a-1.3-r*.25)/1.6);if(q>0&&q<1){g.strokeStyle=rgba(ACC,.7*(1-q));g.lineWidth=3;g.beginPath();g.ellipse(40,900,40+420*q,10+60*q,0,0,7);g.stroke()}}}
-    g.fillStyle='rgba(111,168,255,.06)';g.fillRect(-1200,900,2400,900);horizon(900,.12,'#030514')})});
-// 4: from the ripple up to the horizon, where luminous rises
-shot(39.7,44.6,[[39.7,0,560,1.0,.02],[41.8,0,300,1.0,0],[44.6,0,40,1.1,0]],t=>{const i=4;stars(t,.12,160,51,.7);
-  layer(1,()=>{horizon(620,.2+.8*P(t,T(i,14)-.4,1.4));g.fillStyle='rgba(111,168,255,.05)';g.fillRect(-1200,640,2400,900);
-    const q=clamp((t-39.7)/1.5);g.strokeStyle=rgba(ACC,.4*(1-q));g.lineWidth=2;g.beginPath();g.ellipse(40,900,460+300*q,70+30*q,0,0,7);g.stroke();
-    words(t,i,[0,1,2,3,4,5,6,7],0,820,KR(300,78),'rise',{});words(t,i,[8,9,10,11,12,13],0,520,KR(300,86),'rise',{});
-    g.save();g.beginPath();g.rect(-1200,-1400,2400,2020);g.clip();const a=t-T(i,14),p=eOutC(clamp((a+.2)/1.2));big(t,'luminous',T(i,14),0,lerp(740,300,p),EN(100,190),{sp:10,track:40,glow:50,dy:0});g.restore()})});
+// 3 + 4 (one continuous shot): a tear falls from 눈물, the camera follows it down; it lands on the water, ripples spread,
+// the next words rise out of the ripples, then the camera lifts to the horizon where luminous comes up
+const WY=900;
+shot(34.5,44.6,[[34.5,0,-120,1.1,0],[T(3,7)+.2,0,-80,1.14,0],[T(3,7)+1.5,0,560,1.04,.01],[T(4,0)+.4,0,620,1.02,.01],[T(4,8),0,520,1.02,0],[44.6,0,400,1.1,0]],t=>{
+  stars(t,.12,170,41,.6);const td=T(3,7)+.1,a=t-td,hit=1.3,land=td+hit;
+  layer(1,()=>{
+    // sky glow behind the horizon grows toward luminous
+    const lum=t-T(4,14),pl=eOutC(clamp((lum+.3)/1.3));horizon(WY,.12+.25*P(t,T(4,8),2)+.6*pl,'#030514');
+    // water below the horizon line
+    const wg=g.createLinearGradient(0,WY,0,WY+900);wg.addColorStop(0,rgba(ACC,.10+.12*pl));wg.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=wg;g.fillRect(-1400,WY+2,2800,900);
+    // line 3 words (leave upward just before line 4)
+    words(t,3,[0,1,2,3,4],0,-420,KR(300,84),'twinkle',{out:td+.5});words(t,3,[5,6,7,8,9,10],0,-230,KR(900,130),'rise',{out:td+.8});
+    // the tear
+    if(a>0&&a<hit){const y=lerp(-160,WY-10,eInC(clamp(a/hit)));g.save();g.fillStyle=rgba(ACC,.95);g.shadowColor=ACC;g.shadowBlur=30;g.beginPath();g.moveTo(40,y-40);g.quadraticCurveTo(64,y+10,40,y+26);g.quadraticCurveTo(16,y+10,40,y-40);g.fill();g.restore();
+      g.strokeStyle=rgba(ACC,.25*clamp(a/hit));g.lineWidth=2;g.beginPath();g.moveTo(40,y-40);g.lineTo(40,y-40-160*clamp(a/hit));g.stroke()}
+    // splash + ripples that keep going and carry the next words
+    if(t>land){const b=t-land;if(b<.5)for(let k=0;k<10;k++){const an=-Math.PI*(.15+.7*R(k,40)),v=160+160*R(k,41);g.fillStyle=rgba(ACC,.9*(1-b/.5));g.beginPath();g.arc(40+Math.cos(an)*v*b,WY+Math.sin(an)*v*b+300*b*b,3,0,7);g.fill()}
+      flare(40,WY,8,rgba(ACC,.9),clamp(1-b/.6));
+      for(let r=0;r<6;r++){const q=((b-r*.45)/2.6);if(q>0&&q<1){g.strokeStyle=rgba(ACC,.75*(1-q));g.lineWidth=3;g.beginPath();g.ellipse(40,WY+30,40+560*q,10+80*q,0,0,7);g.stroke()}}}
+    // line 4: the words rise out of the ripples, then the horizon line, then luminous
+    words(t,4,[0,1,2,3,4,5,6,7],0,WY-110,KR(300,80),'rise',{dist:60});
+    words(t,4,[8,9,10,11,12,13],0,WY-300,KR(300,88),'rise',{});
+    g.save();g.beginPath();g.rect(-1400,-1600,2800,WY+1600);g.clip();big(t,'luminous',T(4,14),0,lerp(WY+120,WY-520,pl),EN(100,190),{sp:10,track:40,glow:50,dy:0});g.restore()});
+});
 // 5: the faintest star — out of focus, a dim 6
 shot(44.6,49.5,[[44.6,0,-40,1.0,-.02],[49.5,0,20,1.14,.01]],t=>{const i=5;stars(t,.12,160,61,.6);
   layer(.4,()=>trails(t,.35,0,-700,.04));
