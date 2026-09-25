@@ -72,7 +72,14 @@ function words(t,i,ks,x,y,font,style='rise',o={}){
 function big(t,txt,t0,x,y,font,o={}){const a=t-t0;if(a<-.3)return;const p=eOutC(clamp((a+.1)/(o.dur??.6)));g.save();g.globalAlpha=clamp((a+.1)/.2)*(o.a??1)*(1-eInC(clamp((t-(o.out??1e9))/.4)));g.font=font;g.textAlign='center';g.textBaseline=o.base||'middle';g.fillStyle=o.col||'#fff';g.shadowColor=o.gcol||ACC;g.shadowBlur=o.glow??30;
   g.letterSpacing=`${Math.round((o.sp??10)+(o.track??40)*(1-p))}px`;g.translate(x,y+(1-p)*(o.dy??30));const s=o.s0!=null?lerp(o.s0,1,p):1;g.scale(s,s);g.fillText(txt,0,0);g.restore()}
 // translation line (Korean) that travels with its lyric: fades in with the line, out with it
-function sub(t,txt,t0,t1,x,y,o={}){const a=clamp((t-t0+.1)/.35)*(1-clamp((t-t1)/.35));if(a<=0)return;g.save();g.globalAlpha=a*(o.a??.8);g.font=KR(300,o.f??40);g.textAlign='center';g.textBaseline='middle';g.fillStyle=o.col||'#CFE0F5';g.shadowColor='rgba(0,0,0,.6)';g.shadowBlur=10;g.fillText(txt,x,y+(1-eOutC(clamp((t-t0+.1)/.5)))*16,o.maxW??940);g.restore()}
+function sub(t,txt,t0,t1,x,y,o={}){const a=clamp((t-t0+.1)/.35)*(1-clamp((t-t1)/.35));if(a<=0)return;
+  const box=typeof SUB_BOX!=='undefined'&&SUB_BOX,f=o.f??40,mw=o.maxW??940,yy=y+(1-eOutC(clamp((t-t0+.1)/.5)))*16;
+  g.save();g.font=KR(box?500:300,f);g.textAlign='center';g.textBaseline='middle';
+  if(box){const w=Math.min(g.measureText(txt).width,mw),px=f*.7,h=f*1.7;   // soft dark band so the line reads over bright painted plates
+    g.globalAlpha=a*.55;g.fillStyle='rgba(6,10,24,1)';g.shadowColor='rgba(6,10,24,1)';g.shadowBlur=f*.9;
+    g.beginPath();g.roundRect(x-w/2-px,yy-h/2,w+px*2,h,h/2);g.fill()}
+  g.globalAlpha=a*(box?Math.max(o.a??.8,.95):o.a??.8);g.fillStyle=o.col||(box?'#EAF3FF':'#CFE0F5');g.shadowColor=box?'rgba(0,0,0,.9)':'rgba(0,0,0,.6)';g.shadowBlur=box?6:10;
+  g.fillText(txt,x,yy,mw);g.restore()}
 
 /* ---------- post: bloom, vignette, grain ---------- */
 let BL,bg2,GR;

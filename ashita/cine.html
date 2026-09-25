@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Ashita Night Flight</title>
-<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@100;300;600&family=Noto+Sans+JP:wght@300;700;900&family=Noto+Sans+KR:wght@300;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@100;300;600&family=Noto+Sans+JP:wght@300;700;900&family=Noto+Sans+KR:wght@300;500;700&display=swap" rel="stylesheet">
 <style>*{margin:0}html,body{height:100%;background:#000;overflow:hidden}#cv{position:absolute;left:50%;top:50%;width:1080px;height:1920px;transform-origin:0 0}</style>
 </head>
 <body>
@@ -13,6 +13,7 @@
 <script>
 /* 明日の夜空哨戒班 — one continuous night flight (single camera path, no cuts) */
 const D=/*DATA*/null;
+var SUB_BOX=1;   // dark band behind the Korean subtitle so it reads over the painted plates
 CINE.init(document.getElementById('cv'),D);
 ACC='#8FE3FF';const ORG='#FFB547';B0=1.24%BEAT;
 const L=i=>Ln[i];
@@ -229,7 +230,7 @@ function lyrics(t){
   layer(1,()=>{let i=12,[x,y]=at(t,i,0,0);row(t,i,[0,1,2,3],x-70,y-120,170,'wind',{dir:1,out:outOf(i),exit:'wind'});row(t,i,[4,5,6,7,8],x+80,y+90,100,'wind',{dir:-1,w:300,out:outOf(i),exit:'wind'});subOf(t,i,x,y+220);
     i=13;[x,y]=at(t,i,-60,40);row(t,i,[0,1,2,3,4],x-40,y-260,86,'rise',{w:300,out:outOf(i)});row(t,i,[5,6],x,y-40,300,'pop',{hot:'#FFE2B0',gcol:ORG,hotGlow:80,glow:30,out:outOf(i)});subOf(t,i,x,y+170)});
   // above the clouds, following the leading star
-  layer(1,()=>{let i=14,[x,y]=at(t,i,0,-40);row(t,i,[0,1,2,3,4],x-60,y-80,100,'rise',{w:300,out:outOf(i)});row(t,i,[5,6,7,8,9,10,11,12,13,14,15,16],x,y+60,96,'rise',{out:outOf(i)});subOf(t,i,x,y+190);
+  layer(1,()=>{let i=14,[x,y]=at(t,i,0,-40);row(t,i,[0,1,2,3,4],x-60,y-80,100,'rise',{w:300,maxW:900,out:outOf(i)});row(t,i,[5,6,7,8,9,10,11,12,13,14,15,16],x,y+60,96,'rise',{maxW:940,out:outOf(i)});subOf(t,i,x,y+190);
     i=15;[x,y]=at(t,i,0,-40);row(t,i,[0,1,2,3,4],x-70,y-60,110,'rise',{out:outOf(i)});row(t,i,[5,6,7,8,9,10,11],x+80,y+80,96,'rise',{w:300,out:outOf(i)});subOf(t,i,x,y+200);
     // "let me change yesterday" — the words rewind, then dissolve (we will not ask for it)
     i=16;[x,y]=at(t,i,0,-20);{const rw=P(t,T(i,7)-.1,.8),gone=P(t,T(i,7)+.5,.7);g.save();g.translate(x,y);g.scale(1-.15*rw,1);row(t,i,[0,1,2,3,4,5,6,7],0,0,108,'rise',{maxW:940,a:1-gone});g.restore();
@@ -309,7 +310,7 @@ function render(t){CINE.begin();const c=cam(t),B=BOOST(t),IB=(t>61&&t<77)?.6:0;C
   windLines(t,camVel(t));layer(1.6,()=>dust(t,1));post(t);
   const fi=clamp(t/.6);if(fi<1){g.fillStyle=`rgba(0,0,0,${1-fi})`;g.fillRect(0,0,W,H)}const fo=P(t,176.5,3);if(fo>0){g.fillStyle=`rgba(0,0,0,${fo})`;g.fillRect(0,0,W,H)}}
 window.DUR=D.dur;
-window.READY=(async()=>{await loadPlates();const jp=Ln.map(l=>l.u.map(u=>u[0]).join('')).join(''),ko=Ln.map(l=>l.ko).join('');try{await Promise.all([document.fonts.load(JP(300,100),jp),document.fonts.load(JP(700,100),jp),document.fonts.load(JP(900,100),jp),document.fonts.load(KR(300,40),ko)])}catch(e){}window.renderAt=render;render(0)})();
+window.READY=(async()=>{await loadPlates();const jp=Ln.map(l=>l.u.map(u=>u[0]).join('')).join(''),ko=Ln.map(l=>l.ko).join('');try{await Promise.all([document.fonts.load(JP(300,100),jp),document.fonts.load(JP(700,100),jp),document.fonts.load(JP(900,100),jp),document.fonts.load(KR(300,40),ko),document.fonts.load(KR(500,40),ko)])}catch(e){}window.renderAt=render;render(0)})();
 </script>
 </body>
 </html>
