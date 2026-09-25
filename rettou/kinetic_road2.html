@@ -246,17 +246,17 @@ const eOutX=x=>x>=1?1:1-2**(-10*x);
 const eBk=(x,c=1.7)=>{x=clamp(x)-1;return 1+(c+1)*x*x*x+c*x*x};
 const oBounce=x=>{const n=7.5625,d=2.75;if(x<1/d)return n*x*x;if(x<2/d)return n*(x-=1.5/d)*x+.75;if(x<2.5/d)return n*(x-=2.25/d)*x+.9375;return n*(x-=2.625/d)*x+.984375};
 // line index -> motion (drop / stamp / dash / rise / thru / scatter)
-const LS=['drop','road','drop','stamp','stamp',
-  'side','thru','dash','road','stamp','drop','side','thru',
-  'road','stamp',
-  'thru','dash','side','stamp',
-  'road','side','drop','stamp',
-  'stamp','dash','stamp','dash',
-  'road','side','stamp','dash','thru','stamp',
-  'thru','dash','side','stamp','road','dash','thru','stamp',
+const LS=['drop','road','drop','land','land',
+  'side','thru','dash','road','land','drop','side','thru',
+  'road','land',
+  'thru','dash','side','land',
+  'road','side','drop','land',
+  'flip','flip','flip','flip',
+  'road','side','land','dash','thru','land',
+  'thru','dash','side','land','road','dash','thru','land',
   'scatter','scatter',
-  'side','dash','thru','stamp',
-  'road','side','drop','stamp','stamp'];
+  'side','dash','thru','land',
+  'road','side','drop','land','land'];
 let SEGI={};
 function worldPt(z,xo,up){const i=Math.floor(z/SEG),q=SEGI[i];if(!q)return null;const fr=(z-i*SEG)/SEG,s=lerp(q.s1,q.s2,fr);return {x:lerp(q.X1,q.X2,fr)+xo*s,y:lerp(q.Y1,q.Y2,fr)-up*s,s}}
 let LINES=[];
@@ -298,6 +298,11 @@ function motion(st,G,a,t,dir){ // -> {dx,dy,rot,sx,sy,al}
   const o={dx:0,dy:0,rot:0,sx:1,sy:1,al:1};
   switch(st){
     case 'drop':{const p=clamp((a+.1)/.55);o.dy=-(1-oBounce(p))*760;o.rot=(1-p)*G.r1*.5;o.al=clamp((a+.1)/.06);if(p>=1&&a<.75){const q=(a-.45)/.3;o.sy=1-.12*Math.sin(clamp(q)*Math.PI);o.sx=1+.08*Math.sin(clamp(q)*Math.PI)}break}
+    case 'land':{ // shoots out of the vanishing point and lands in place with a small bounce, never larger than its final size
+      const p=clamp((a+.24)/.26),e=eOutC(p);o.dx=(W/2-G.x)*(1-e);o.dy=(HOR-40-G.y)*(1-e);o.sx=o.sy=.08+.92*e;o.rot=G.r1*.3*(1-e);o.al=clamp((a+.24)/.05);
+      if(p>=1){const q=clamp((a-.02)/.22);o.sy=1-.14*Math.sin(q*Math.PI);o.sx=1+.07*Math.sin(q*Math.PI)}break}
+    case 'flip':{ // lies flat on the ground and snaps upright like a sign on the beat
+      const p=clamp((a+.1)/.3),e=eBk(p,2.2);o.sy=Math.max(.04,e);o.dy=G.f*.5*(1-Math.min(1,e));o.al=clamp((a+.1)/.05);break}
     case 'stamp':{const p=clamp((a+.05)/.18);let s=1+2.3*(1-eOutC(p));if(p>=1)s-=.12*Math.sin(clamp((a-.13)/.2)*Math.PI);o.sx=o.sy=s;o.rot=G.r1*.12*(1-p);o.al=clamp((a+.05)/.06);break}
     case 'dash':{const p=clamp((a+.14)/.34),e=eOutX(p);o.dx=dir*(1-e)*1000;o.rot=dir*(1-e)*.25;o.sx=1+.5*(1-e);o.al=clamp((a+.14)/.05);break}
     case 'rise':{const p=clamp((a+.1)/.45),e=eBk(p,1.6);o.dy=300*(1-e);o.rot=G.r1*.4*(1-p);o.sy=1+.3*(1-p);o.al=clamp((a+.1)/.08);break}
@@ -312,22 +317,22 @@ function drawLines(t){
   for(const Ln of LINES){
     const {L,st,out,glyphs,dir}=Ln;if(t<L.s-.9||t>out+2.5)continue;
     if(st==='road'||st==='side'){ // the whole line lives in the world and approaches during the line; the car passes it as the line ends
-      const t0=L.s-.45,pr=clamp((t-t0)/(out-t0)),px=clamp((t-out)/.4),zr=px>0?lerp(st==='road'?750:1000,160,eInC(px)):lerp(st==='road'?1650:2000,st==='road'?750:1000,pr);if(px>=1)continue;
-      const n=glyphs.length,chH=Math.min(240,1500/n);
+      const HOLD=st==='road'?1800:1700,FAR=9000,pin=clamp((t-(L.s-.5))/.55),px=clamp((t-out)/.6);if(px>=1)continue;
+      const zr=px>0?lerp(HOLD,FAR,eInC(px)):lerp(FAR,HOLD,1-(1-pin)**3),fadeW=(1-px)*clamp(pin*3);
+      const n=glyphs.length,chH=Math.min(300,1700/n);
       for(const G of glyphs){const a=t-G.s;if(a<-.12)continue;
         let p;if(st==='road')p=worldPt(camZ+zr-(G.y-600)*3,(G.x-W/2)*2,0);else p=worldPt(camZ+zr,dir*RW*.9,(n-G.k)*chH+250);if(!p)continue;
         const pop=Math.max(0,eBk(clamp((a+.12)/.3),2.2)),now=t>=G.s&&t<G.e+.05;
-        let al=clamp((a+.12)/.06)*clamp((zr-200)/250);if(st==='road')al*=clamp((1400-p.y)/220);if(al<=0)continue;
+        let al=clamp((a+.12)/.06)*fadeW;if(al<=0)continue;
         g.save();g.translate(p.x,p.y);
         if(st==='road'){const k=2*p.s*pop;g.scale(k,k*.62);g.translate(0,-G.f*.5)}else{const k=chH*.95*p.s/G.f*pop;g.scale(k,k)}
         glyph(G.c,G.f,now?'#FFD23D':G.emph?'#FF3B3B':'#FFFFFF',al);g.restore()}
       continue}
-    if(st==='thru'){ // the whole line hangs over the road ahead like a gantry; it grows as we approach and the car drives under it at the line's end
-      const z0=Z(L.s-.5),zr0=Math.max(900,Z(out)-z0+350),zr=z0+zr0-camZ;if(zr<150)continue;
-      const sc=.6*zr0/zr,p=worldPt(z0+zr0,0,850+180*zr0/FOC);if(!p)continue;
-      const ga=clamp((t-L.s+.5)/.3)*clamp((zr-150)/300)*(1-clamp((sc-3.5)/2.5));if(ga<=0)continue;
+    if(st==='thru'){ // hangs over the road ahead: grows out of the horizon, rides with us, then speeds away into the distance
+      const pin=eOutC(clamp((t-(L.s-.5))/.55)),px=eInC(clamp((t-out)/.55));if(px>=1)continue;
+      const sc=(.12+.88*pin)*(1-.9*px),vp=worldPt(camZ+8000,0,0),vx=vp?vp.x:W/2,vy=HOR-60,k=pin*(1-px),cx=lerp(vx,W/2,k),cy=lerp(vy,600,k),ga=clamp(pin*2)*(1-px);
       for(const G of glyphs){const a=t-G.s;if(a<-.1)continue;const m=motion('thru',G,a,t,dir),now=t>=G.s&&t<G.e+.05,hop=now?-Math.sin(clamp((t-G.s)/.24)*Math.PI)*16:0;
-        g.save();g.translate(p.x+(G.x-W/2)*sc,p.y+(G.y-600+hop)*sc);g.scale(sc*m.sx,sc*m.sy);glyph(G.c,G.f,now?'#FFD23D':G.emph?'#FF3B3B':'#FFFFFF',m.al*ga);g.restore()}
+        g.save();g.translate(cx+(G.x-W/2)*sc,cy+(G.y-600+hop)*sc);g.scale(sc*m.sx,sc*m.sy);glyph(G.c,G.f,now?'#FFD23D':G.emph?'#FF3B3B':'#FFFFFF',m.al*ga);g.restore()}
       continue}
     // thru: the whole block approaches from the horizon, then the car drives through it
     let gs=1,gy=0,ga=1,gb=0;
@@ -339,7 +344,7 @@ function drawLines(t){
       const m=motion(st,G,a,t,dir);let {dx,dy,rot,sx,sy,al}=m;
       if(st!=='thru'){const ex=clamp((t-out-G.k*.025)/.36);if(ex>0){const q=eInC(ex);
         if(st==='dash'){dx+=-dir*q*1200;sx*=1+.4*q}else if(st==='scatter'){dx+=G.r1*1400*q;dy+=G.r2*900*q-300*q;rot+=G.r1*5*q}
-        else if(st==='drop'){dy+=q*900;rot+=G.r1*1.5*q}else{sx*=1+.5*q;sy*=1+.5*q;dy-=160*q}al*=1-ex}}
+        else if(st==='drop'){dy+=q*900;rot+=G.r1*1.5*q}else if(st==='land'){dx+=(W/2-G.x)*q;dy+=(HOR-40-G.y)*q;sx*=1-.85*q;sy*=1-.85*q}else if(st==='flip'){sy*=1-.95*q;dy+=G.f*.45*q}else{sx*=1-.3*q;sy*=1-.3*q;dy-=120*q}al*=1-ex}}
       if(al<=0)continue;
       const now=t>=G.s&&t<G.e+.05,hop=now?-Math.sin(clamp((t-G.s)/.24)*Math.PI)*16:0,big=now?1.1:1;
       const col=now?'#FFD23D':G.emph?'#FF3B3B':'#FFFFFF';
@@ -349,7 +354,7 @@ function drawLines(t){
         g.strokeStyle=`rgba(255,255,255,${.5*(1-a/.3)*al})`;g.lineWidth=4;for(let j=0;j<3;j++){const yy=Y+(j-1)*G.f*.3;g.beginPath();g.moveTo(X+dx*gs+dir*G.f*.6,yy);g.lineTo(X+dx*gs+dir*(G.f*.6+260*(1-a/.3)),yy);g.stroke()}}
       g.save();g.translate(X+dx*gs,Y+(dy+hop)*gs);g.rotate(rot);g.scale(gs*sx*big,gs*sy*big);glyph(G.c,G.f,col,al*ga);g.restore();
       // stamp impact: ring + sparks + shake
-      if(st==='stamp'){const ia=a-.13;if(ia>0&&ia<.45){fx.push({x:X,y:Y,f:G.f*gs,ia,big:G.emph});}}
+      if(st==='land'){const ia=a-.02;if(ia>0&&ia<.45){fx.push({x:X,y:Y,f:G.f*gs,ia,big:G.emph});}}
     }
     g.restore();
   }
@@ -371,14 +376,14 @@ function drawTitle(t){ // title stamp during the first instrumental and at the v
   const wins=[[15.3,27.9],[210.4,D.dur]];
   for(const [a,b] of wins){if(t<a-.1||t>b+.5)continue;const q=clamp((t-b)/.45);
     const chars=['劣','等','感'];chars.forEach((c,k)=>{const at=a+k*.418,x0=t-at;if(x0<-.05)return;
-      const p=clamp((x0+.05)/.18);let s=(1+2.3*(1-eOutC(p)))*(1+2.5*eInC(q));
-      g.save();g.translate(W/2+(k-1)*250*(1+q),560+Math.sin(t*2+k)*6);g.scale(s,s);glyph(c,240,k===2?'#FF3B3B':'#FFFFFF',clamp((x0+.05)/.06)*(1-q));g.restore();
-      const ia=x0-.13;if(ia>0&&ia<.45){g.strokeStyle=`rgba(255,255,255,${.8*(1-ia/.45)})`;g.lineWidth=8;g.beginPath();g.arc(W/2+(k-1)*250,560,120+200*eOutC(ia/.45),0,7);g.stroke()}});
+      const p=clamp((x0+.24)/.26),e=eOutC(p),s=(.08+.92*e)*(1-.85*eInC(q)),tx=W/2+(k-1)*250,ty=560;
+      g.save();g.translate(lerp(W/2,tx,e)+(W/2-tx)*eInC(q),lerp(HOR-40,ty,e)+(HOR-40-ty)*eInC(q)+Math.sin(t*2+k)*6);g.scale(s,s);glyph(c,240,k===2?'#FF3B3B':'#FFFFFF',clamp((x0+.24)/.05)*(1-q));g.restore();
+      const ia=x0-.02;if(ia>0&&ia<.45){g.strokeStyle=`rgba(255,255,255,${.8*(1-ia/.45)})`;g.lineWidth=8;g.beginPath();g.arc(W/2+(k-1)*250,560,120+200*eOutC(ia/.45),0,7);g.stroke()}});
     const ka=clamp((t-a-1.3)/.4)*(1-q);if(ka>0){g.globalAlpha=ka;g.font='700 44px "Noto Sans KR"';g.textAlign='center';g.fillStyle='#fff';g.fillText('열 등 감',W/2,760);g.globalAlpha=1}}
 }
 function render(t){
   const P=skyAt(t),pb=pulse(t);
-  SHK=0;for(const Ln of LINES)if(Ln.st==='stamp'&&t>Ln.L.s-.2&&t<Ln.out+.5)for(const G of Ln.glyphs){const ia=t-G.s-.13;if(ia>0&&ia<.25)SHK=Math.max(SHK,(G.emph?1:.45)*(1-ia/.25))}
+  SHK=0;for(const Ln of LINES)if(Ln.st==='land'&&t>Ln.L.s-.2&&t<Ln.out+.5)for(const G of Ln.glyphs){const ia=t-G.s-.02;if(ia>0&&ia<.25)SHK=Math.max(SHK,(G.emph?1:.45)*(1-ia/.25))}
   const sh={x:18*SHK*nz(t*50,1),y:18*SHK*nz(t*47,2)+3*pb};
   g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,W,H);
   const info=drawRoad(t,P,sh);
