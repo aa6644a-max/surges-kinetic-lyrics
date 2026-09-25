@@ -80,17 +80,19 @@ for(let i=0;i<NSEG;i++){const t=tOfZ(i*SEG);SB[i]=BIO[bioIdxT(t)][1]}
 const CUM=new Float32Array(NSEG);for(let i=1;i<NSEG;i++)CUM[i]=CUM[i-1]+CURV[i];
 
 /* ---------- lyrics objects in the world ---------- */
-let OBJ=[],OVER=[];
+let OBJ=[],OVER=[],FLY=[];
 const FONT='900 100px "Noto Sans JP"';
 g.font=FONT;
 const em=s=>{g.font=FONT;return g.measureText(s).width/100||1};
 function buildLyrics(){
   let side=1;
   D.lines.forEach((L,li)=>{
-    const mode=L.fl[0],next=D.lines[li+1];
+    const [scr,acc]=L.fl[0].split('+'),mode=acc,next=D.lines[li+1];
     const out=next&&next.s-L.e<2.5?next.s-.06:L.e+1;
     const chunks=L.ch.map(([a,b,m])=>({us:L.w.slice(a,b).map(([c,s,e])=>({c,s,e,wr:em(c)})),emph:!!m}));
-    if(mode==='over'){OVER.push({li,L,out,chunks});return}
+    if(scr==='over'){OVER.push({li,L,out,chunks});return}
+    FLY.push({li,L,out,chunks,dir:FLY.length%2?1:-1});
+    if(!mode)return;
     chunks.forEach((c,k)=>{
       const s0=c.us[0].s,e0=c.us[c.us.length-1].e;
       const ahead=mode==='road'?1050:mode==='gantry'?1700:1450;
@@ -295,6 +297,36 @@ function drawOver(t,sh){
   }
   return flash;
 }
+function drawFly(t,sh){
+  for(const O of FLY){
+    const L=O.L;if(t<L.s-.5||t>O.out+.45)continue;
+    // wrap chunks into rows
+    const MW=920;let f=150,rows;
+    for(;f>=70;f-=5){rows=[];let cur=[],w=0;for(const c of O.chunks){const cw=c.us.reduce((a,u)=>a+u.wr,0)*f*(c.emph?1.15:1)+(cur.length?f*.3:0);
+        if(cur.length&&w+cw>MW){rows.push(cur);cur=[];w=0}cur.push(c);w+=cw}rows.push(cur);if(rows.length<=2)break}
+    const x=t-O.out,ex=clamp(x/.35),rowH=f*1.3,top=1080-rows.length*rowH/2,dir=1;
+    const vis=clamp((t-L.s+.4)/.25)*(1-ex);
+    // readability band
+    g.save();g.translate(sh.x,sh.y);
+    g.globalAlpha=.5*vis;g.fillStyle='#000';roundRect(40,top-30,W-80,rows.length*rowH+60,26);g.fill();g.globalAlpha=1;
+    rows.forEach((row,ri)=>{
+      const items=[];row.forEach((c,ci)=>{if(ci)items.push({gap:f*.3});c.us.forEach(u=>items.push({u,emph:c.emph}))});
+      const tot=items.reduce((a,it)=>a+(it.gap||it.u.wr*f*(it.emph?1.15:1)),0);let xx=W/2-tot/2;const cy=top+rowH*(ri+.5);
+      for(const it of items){if(it.gap){xx+=it.gap;continue}
+        const u=it.u,ff=f*(it.emph?1.15:1),w=u.wr*ff,a=t-(u.s-.28);
+        if(a<0){xx+=w;continue}
+        const p=clamp(a/.34),e=1-(1-p)**4,off=(1-e)*800-ex*ex*1300;
+        const now=t>=u.s&&t<u.e+.05;
+        g.font=`900 ${ff}px "Noto Sans JP"`;g.textAlign='center';g.textBaseline='middle';
+        for(let k=3;k>=0;k--){const tr=k*(1-e)*90-k*ex*70;g.globalAlpha=(k?(.18*(1-e)+.15*ex)/k:1)*(1-ex*.9);
+          g.save();g.translate(xx+w/2+off-tr,cy);g.transform(1,0,-.25*(1-e)+.25*ex,1,0,0);
+          if(!k){g.fillStyle='rgba(0,0,0,.8)';g.fillText(u.c,ff*.035,ff*.05)}
+          g.fillStyle=now?'#ffd23d':it.emph?'#ff3b3b':'#ffffff';g.fillText(u.c,0,0);g.restore()}
+        g.globalAlpha=1;xx+=w}
+    });
+    g.restore();
+  }
+}
 function drawHud(t){
   let A=null;for(const L of D.lines)if(t>=L.s-.05&&t<(L.e+1.2))A=L;
   if(!A)return;
@@ -324,6 +356,7 @@ function render(t){
   // vignette + dash hint (car hood shadow)
   const vg=g.createRadialGradient(W/2,HOR,300,W/2,HOR,1300);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.45)');g.fillStyle=vg;g.fillRect(0,0,W,H);
   drawTitle(t);
+  drawFly(t,sh);
   const fl=drawOver(t,sh);
   let wf=0;if(t>=168.1&&t<169.6)wf=Math.max(wf,1-Math.abs(t-168.4)/1.2);
   if(fl+wf>0){g.fillStyle=`rgba(255,255,255,${Math.min(.9,fl+wf)})`;g.fillRect(0,0,W,H)}
