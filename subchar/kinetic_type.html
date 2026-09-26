@@ -54,7 +54,7 @@ function kt(t,i,ks,x,y,o){const f=o.f;g.save();const lo=lay(i,ks,o.font(f),o.tra
 // free text (not tied to a sung line)
 function tx(txt,x,y,font,col,o={}){g.save();g.font=font;g.textAlign=o.align||'center';g.textBaseline='middle';if(o.sp)g.letterSpacing=o.sp+'px';g.globalAlpha=o.a??1;g.translate(x,y);if(o.rot)g.rotate(o.rot);if(o.s)g.scale(o.s,o.s);
   if(o.stroke){g.lineWidth=o.lw||5;g.strokeStyle=col;g.lineJoin='round';g.strokeText(txt,0,0)}else{g.fillStyle=col;g.fillText(txt,0,0)}const w=g.measureText(txt).width;g.restore();return w}
-const bg=c=>{g.fillStyle=c;g.fillRect(0,0,W,H)};
+const bg=c=>{if(REC){REC.c=c;throw REC}g.fillStyle=c;g.beginPath();g.arc(CX,CY,RAD,0,7);g.fill();g.beginPath();g.arc(CX,CY,RAD,0,7);g.clip()};   // a disc of colour in the one continuous space
 function circ(x,y,r,col){if(r<=0)return;g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,7);g.fill()}
 function lineP(x0,y0,x1,y1,p,col,w){if(p<=0)return;g.strokeStyle=col;g.lineWidth=w;g.lineCap='butt';g.beginPath();g.moveTo(x0,y0);g.lineTo(lerp(x0,x1,p),lerp(y0,y1,p));g.stroke()}
 const since=(t,t0,d)=>clamp((t-t0)/d);
@@ -233,44 +233,57 @@ const F=(w,f)=>KR(w,f);
 const r_=(a,b)=>[...Array(b-a+1)].map((_,k)=>a+k);
 S.blank=()=>bg(PAPER);
 
-// ---------- the world: every line is a screen-sized panel on one big poster, laid out as a snake ----------
-const COLS=10,ORDER=['introA','introB',...r_(0,27),'inter',...r_(28,81),'c1','c2','c3','c4','c5','c6'],PAN=[];
-{let cell=0;for(const id of ORDER){const row=Math.floor(cell/COLS);if(id==='inter'){PAN.push({id,x:COLS*W/2,y:(row+.5)*H,w:COLS*W,h:H});cell=(row+1)*COLS;continue}
-  const c=cell%COLS,col=row%2?COLS-1-c:c;PAN.push({id,x:(col+.5)*W,y:(row+.5)*H,w:W,h:H});cell++}}
-PAN.forEach((p,k)=>{p.row=Math.floor(p.y/H);p.dir=p.row%2?-1:1;p.k=k;const t0=typeof p.id==='number'?L(p.id).s:p.id==='inter'?70.1:p.id==='introA'?0:p.id==='introB'?bt(11.5):p.id==='c1'?204.6:p.id==='c2'?206:p.id==='c3'?207.3:null;
-  p.t0=t0;});PAN.forEach((p,k)=>{if(p.t0==null)return;const nx=PAN.slice(k+1).find(q=>q.t0!=null);p.t1=nx?nx.t0:p.t0+1.2});
-// the timeline: one rule that snakes through every panel; a yellow playhead runs along it with the song
-const LY=H/2+820;
-function timeline(t){g.save();g.strokeStyle=GREY;g.fillStyle=GREY;g.lineWidth=4;const rows=COLS;
-  for(let r=0;r<rows;r++){const y=r*H+LY;g.beginPath();g.moveTo(40,y);g.lineTo(COLS*W-40,y);g.stroke();if(r<rows-1){const x=r%2?40:COLS*W-40;g.beginPath();g.moveTo(x,y);g.lineTo(x,y+H);g.stroke()}
-    for(let x=60;x<COLS*W;x+=120)g.fillRect(x,y-(x%600<120?22:10),3,x%600<120?22:10)}
-  g.font=MO(400,24);g.textBaseline='bottom';PAN.forEach(p=>{if(typeof p.id!=='number')return;g.textAlign=p.dir>0?'left':'right';g.fillText('07-'+String(p.id+1).padStart(2,'0'),p.x-p.dir*(p.w/2-50),p.row*H+LY-30)});
-  const cur=PAN.find(p=>p.t0!=null&&t>=p.t0&&t<p.t1);if(cur){const u=eIOs(clamp((t-cur.t0)/(cur.t1-cur.t0))),x0=cur.x-cur.dir*(cur.w/2-40),x=x0+cur.dir*(cur.w-80)*u,y=cur.row*H+LY;
-    g.strokeStyle=YEL;g.lineWidth=10;g.beginPath();g.moveTo(x0,y);g.lineTo(x,y);g.stroke();g.fillStyle=YEL;g.beginPath();g.arc(x,y,18,0,7);g.fill();g.strokeStyle=INK;g.lineWidth=4;g.stroke()}
-  g.restore()}
-// the instrumental: one long film strip the camera travels along
-const FW=['주인공','EXTRA','너','나','SUB','MAIN','CAST','#7'];
-function inter(t,p){bg(INK);g.save();g.font=AN(1100);g.textAlign='center';g.textBaseline='middle';g.lineWidth=6;g.strokeStyle='#2C2C33';g.letterSpacing='40px';g.strokeText('SUB CHARACTER',p.w/2,CY);g.restore();
-  for(let s=0;s<3;s++){const y=CY-560+s*560,off=t*(90+60*s)*(s%2?1:-1),fw=460;g.fillStyle='#0B0B0E';g.fillRect(0,y-190,p.w,380);g.fillStyle='#2A2A31';for(let x=((off%64)+64)%64-64;x<p.w;x+=64){g.fillRect(x,y-176,34,22);g.fillRect(x,y+154,34,22)}
-    for(let k=-1;k<p.w/fw+1;k++){const fx=k*fw+((off%fw)+fw)%fw,id=((k+s*3)%FW.length+FW.length)%FW.length,hot=id%2===0,fl=pulse(t)*(R(k,s)>.6?1:0),en=id===1||id>3;
-      g.fillStyle=mix(hot?YEL:'#3A3A42',PAPER,fl*.5);g.fillRect(fx+14,y-140,fw-28,280);tx(FW[id],fx+fw/2,y+4,en?AN(120):HV(120),hot?INK:PAPER,{sp:en?6:0})}}}
-// camera keys: arrive on each panel just before its line; hold with a slow push-in; travel with a small pull-back arc
-const KEY=[];
-PAN.forEach(p=>{let ta=null;if(typeof p.id==='number')ta=L(p.id).s-.05;else if(p.id==='introA')ta=0;else if(p.id==='introB')ta=bt(11.5);else if(p.id==='c1')ta=205;else if(p.id==='c2')ta=206.3;else if(p.id==='c3')ta=207.6;
-  if(p.id==='inter'){KEY.push({t:70.4,x:p.x+4.5*W,y:p.y,s:1});KEY.push({t:81.8,x:p.x-4.5*W,y:p.y,s:1,md:11.2,lin:1});return}if(ta!=null)KEY.push({t:ta,x:p.x,y:p.y,s:1})});
-KEY.push({t:209.6,x:COLS*W/2,y:COLS*H/2,s:10.05,md:2.2,big:1});
-KEY.forEach((k,j)=>{if(!j){k.md=0;return}const pv=KEY[j-1],gap=k.t-pv.t,down=Math.abs(k.y-pv.y)>H*.5;k.md=k.md??clamp(gap*.32,.28,down?.6:.45);k.bump=k.big||k.lin?0:down?.55:.3;k.roll=down||k.big||k.lin?0:(j%2?1:-1)*.035});
+// ---------- one take: every line hangs on one winding path in a single space; the camera never stops ----------
+// Each line's composition sits on a big disc of its colour (painted only where the colour changes), rotated
+// to the path heading, so the camera rolls through the bends. Earlier lines stay in the world behind us.
+const RAD=1150;
+const SEQ=['introA','introB',...r_(0,27),'inter',...r_(28,81),'c1','c2','c3'];
+const TURN={introB:0,6:.9,10:-.9,13:.3,17:1.2,20:-.6,24:-.6,26:.4,28:1.2,31:-.5,33:-.7,36:.5,38:.5,41:-.5,43:-1.0,46:.6,47:.4,50:-.5,53:1.0,55:-.5,57:-.5,60:1.3,63:-.7,66:-.6,69:.3,71:.6,74:-.6,77:.8,79:-.8,81:0,c1:0};
+const ANC=[];{let h=0,px=0,py=0;SEQ.forEach((id,k)=>{let d=1800;if(k){const tn=TURN[id]??(k%4===0?(k%8?.22:-.22):0);h+=tn;if(Math.abs(tn)>.8)d=2300}
+  if(id==='inter'){px+=Math.cos(h)*1700;py+=Math.sin(h)*1700;const len=9000;ANC.push({id,x:px,y:py,r:h,len,ex:px+Math.cos(h)*len,ey:py+Math.sin(h)*len,c:INK});px+=Math.cos(h)*len;py+=Math.sin(h)*len;return}
+  if(k){px+=Math.cos(h)*d;py+=Math.sin(h)*d}ANC.push({id,x:px,y:py,r:h})})}
+// record each composition's background colour once (bg() throws while recording)
+let REC=null,CURK=-1;
+ANC.forEach(a=>{if(a.id==='inter')return;REC={};try{(S[a.id]||S.blank)(-9,a.id)}catch(e){if(e!==REC)throw e}a.c=REC.c;REC=null});
+// camera keys: dwell on each line while it is sung (a slow dolly along the path), travel in the gap;
+// the dolly and the travel meet with the same velocity (Hermite), so the camera never stops or jolts
+const KEY=[],DRIFT=60,STAY=[];
+ANC.forEach((a,k)=>{let tIn=null;if(a.id==='introA')tIn=0;else if(a.id==='introB')tIn=5.9;else if(a.id==='inter')tIn=70.5;else if(typeof a.id==='number')tIn=L(a.id).s+.18;else tIn={c1:205.1,c2:206.4,c3:207.7}[a.id];STAY.push({a,tIn})});
+STAY.forEach((st,k)=>{const nx=STAY[k+1],a=st.a,turn=nx&&Math.abs(nx.a.r-a.r)>.8,md=turn?.7:.5;
+  st.tOut=a.id==='introA'?4.9:a.id==='inter'?81.7:nx?Math.max(st.tIn+.35,nx.tIn-Math.min(md,nx.tIn-st.tIn-.35)):208.4;
+  const dx=Math.cos(a.r),dy=Math.sin(a.r),T=st.tOut-st.tIn;let x0,y0,x1,y1;
+  if(a.id==='inter'){x0=a.x;y0=a.y;x1=a.ex;y1=a.ey}else{const D=Math.min(160,DRIFT*T);x0=a.x-dx*D/2;y0=a.y-dy*D/2;x1=a.x+dx*D/2;y1=a.y+dy*D/2}
+  const vx=(x1-x0)/T,vy=(y1-y0)/T,s0=a.id==='introA'?1.06:a.id==='introB'?1.04:1,s1=a.id==='introA'?.97:a.id==='introB'?.93:1;
+  KEY.push({t:st.tIn,x:x0,y:y0,r:a.r,s:s0,vx,vy,seg:'travel'});KEY.push({t:st.tOut,x:x1,y:y1,r:a.r,s:s1,vx,vy,seg:'drift'})});
+{const la=ANC[ANC.length-1];KEY.push({t:212.2,x:la.x-Math.cos(la.r)*5200,y:la.y-Math.sin(la.r)*5200,r:la.r*.3,s:9,vx:0,vy:0,seg:'travel'})}
 const CH=[[48.2,70.2],[70.2,82],[114.95,131.2],[156.5,178.7]],inCh=t=>CH.some(([a,b])=>t>a&&t<b);
-function camW(t){let j=0;while(j+1<KEY.length&&t>=KEY[j+1].t)j++;const A=KEY[j],B=KEY[j+1];let x=A.x,y=A.y,s=A.s,r=0;
-  if(B&&t>=B.t-B.md){const u=clamp((t-(B.t-B.md))/B.md),p=B.lin?u:eIO(u);s=A.s*Math.pow(B.s/A.s,p);const w=Math.abs(B.s/A.s-1)>1.5?(s-A.s)/(B.s-A.s):p;x=lerp(A.x,B.x,w);y=lerp(A.y,B.y,w);s*=1+B.bump*Math.sin(Math.PI*u);r=B.roll*Math.sin(Math.PI*u)}
-  else if(!A.big){const nx=B?B.t-B.md:D.dur,h=clamp((t-A.t)/Math.max(.1,nx-A.t));s*=1-.04*eIOs(h)}
-  if(inCh(t))s*=1-.014*pulse(t);return {x,y,s,r}}
-function render(t){CINE.begin();bg('#0E0E12');const c=camW(t),vr=Math.hypot(CX,CY)*c.s;
+function camW(t){let j=0;while(j+1<KEY.length&&t>=KEY[j+1].t)j++;const A=KEY[j],B=KEY[j+1];let x=A.x,y=A.y,r=A.r,s=A.s;
+  if(B){const T=B.t-A.t,u=clamp((t-A.t)/T);
+    if(B.seg==='drift'){x=lerp(A.x,B.x,u);y=lerp(A.y,B.y,u);s=lerp(A.s,B.s,u)}
+    else{const e=eIOs(u),big=Math.abs(Math.log(B.s/A.s))>1;s=A.s*Math.pow(B.s/A.s,e);r=lerp(A.r,B.r,e);
+      if(big){const w=(s-A.s)/(B.s-A.s);x=lerp(A.x,B.x,w);y=lerp(A.y,B.y,w)}
+      else{const u2=u*u,u3=u2*u,h00=2*u3-3*u2+1,h10=u3-2*u2+u,h01=-2*u3+3*u2,h11=u3-u2;x=h00*A.x+h10*A.vx*T+h01*B.x+h11*B.vx*T;y=h00*A.y+h10*A.vy*T+h01*B.y+h11*B.vy*T;s*=1+.12*Math.sin(Math.PI*u)}}}
+  x+=Math.sin(t*.7)*14;y+=Math.cos(t*.9)*10;r+=Math.sin(t*.45)*.008;if(inCh(t))s*=1-.014*pulse(t);return {x,y,r,s}}   // handheld float, beat breath
+
+// the instrumental: a film-strip road the camera runs along
+const FW=['주인공','EXTRA','너','나','SUB','MAIN','CAST','#7'];
+function interRoad(t,a){g.fillStyle=INK;g.beginPath();g.roundRect(-1600,-1500,a.len+3200,3000,1500);g.fill();
+  g.save();g.font=AN(1100);g.textAlign='left';g.textBaseline='middle';g.lineWidth=6;g.strokeStyle='#2C2C33';g.letterSpacing='40px';g.strokeText('SUB CHARACTER  SUB CHARACTER',-800,0);g.restore();
+  for(let s=0;s<3;s++){const y=-560+s*560,off=t*(90+60*s)*(s%2?1:-1),fw=460,x0=-1500,x1=a.len+1500;g.fillStyle='#0B0B0E';g.fillRect(x0,y-190,x1-x0,380);g.fillStyle='#2A2A31';
+    for(let x=x0+((off%64)+64)%64-64;x<x1;x+=64){g.fillRect(x,y-176,34,22);g.fillRect(x,y+154,34,22)}
+    for(let k=Math.floor(x0/fw)-1;k<x1/fw+1;k++){const fx=k*fw+((off%fw)+fw)%fw,id=((k+s*3)%FW.length+FW.length)%FW.length,hot=id%2===0,fl=pulse(t)*(R(k,s)>.6?1:0),en=id===1||id>3;
+      g.fillStyle=mix(hot?YEL:'#3A3A42',PAPER,fl*.5);g.fillRect(fx+14,y-140,fw-28,280);tx(FW[id],fx+fw/2,y+4,en?AN(120):HV(120),hot?INK:PAPER,{sp:en?6:0})}}}
+// depth: huge outline glyphs drifting slower than the camera (parallax), laid along the path
+const GLY=['S','U','B','너','나','?','#7','주인공'];
+function decor(c){g.save();g.globalAlpha=.09;g.strokeStyle='#808080';g.lineWidth=8;g.textAlign='center';g.textBaseline='middle';
+  ANC.forEach((a,k)=>{if(k%2)return;const pf=.55,side=k%4?1:-1,bx=a.x-Math.sin(a.r)*1300*side,by=a.y+Math.cos(a.r)*1300*side,x=bx+(c.x-bx)*(1-pf),y=by+(c.y-by)*(1-pf);
+    if(Math.hypot(x-c.x,y-c.y)>Math.hypot(CX,CY)*c.s+1600)return;const gl=GLY[k/2%GLY.length|0];g.save();g.translate(x,y);g.rotate(a.r+(R(k,3)-.5)*.6);g.font=/[A-Z#?]/.test(gl)?AN(1500):HV(1100);g.strokeText(gl,0,0);g.restore()});g.restore()}
+function render(t){CINE.begin();g.fillStyle=PAPER;g.fillRect(0,0,W,H);const c=camW(t),vr=Math.hypot(CX,CY)*c.s;
   g.save();g.translate(CX,CY);g.scale(1/c.s,1/c.s);g.rotate(-c.r);g.translate(-c.x,-c.y);
-  g.fillStyle='#D8D3C8';g.fillRect(-1600,-1600,COLS*W+3200,COLS*H+3200);   // the table the poster lies on
-  for(const p of PAN){if(Math.abs(p.x-c.x)>p.w/2+vr||Math.abs(p.y-c.y)>p.h/2+vr)continue;g.save();g.translate(p.x-p.w/2,p.y-p.h/2);g.beginPath();g.rect(0,0,p.w,p.h);g.clip();
-    if(p.id==='inter')inter(t,p);else (S[p.id]||S.blank)(t,p.id);g.strokeStyle='rgba(14,14,18,.22)';g.lineWidth=6;g.strokeRect(0,0,p.w,p.h);g.restore()}
-  timeline(t);g.restore();
+  ANC.forEach((a,k)=>{if(a.id==='inter'){const dx=Math.cos(a.r),dy=Math.sin(a.r),q=clamp((c.x-a.x)*dx+(c.y-a.y)*dy,-2000,a.len+2000),nx=a.x+dx*q,ny=a.y+dy*q;if(Math.hypot(c.x-nx,c.y-ny)>vr+1600)return;
+      g.save();g.translate(a.x,a.y);g.rotate(a.r);interRoad(t,a);g.restore();return}
+    if(Math.hypot(a.x-c.x,a.y-c.y)>vr+RAD)return;CURK=k;g.save();g.translate(a.x,a.y);g.rotate(a.r);g.translate(-CX,-CY);(S[a.id]||S.blank)(t,a.id);g.restore()});
+  decor(c);g.restore();
   g.save();g.globalCompositeOperation='multiply';g.globalAlpha=.5;const ox=Math.floor(R(Math.floor(t*12),1)*256),oy=Math.floor(R(Math.floor(t*12),2)*256);for(let y=-oy;y<H;y+=256)for(let x=-ox;x<W;x+=256)g.drawImage(GR,x,y);g.restore();   // paper grain
   const ea=since(t,210.4,1)*(1-since(t,D.dur-1.6,1.2));if(ea>0){g.fillStyle=`rgba(14,14,18,${.72*ea})`;g.fillRect(0,CY-230,W,420);tx('Sub character',CX,CY-50,AN(130),PAPER,{sp:4,a:ea});tx('윤하  ·  YOUNHA',CX,CY+100,JO(300,40),YEL,{sp:12,a:ea})}
   const fo=since(t,D.dur-1.2,1.1);if(fo>0){g.fillStyle=`rgba(0,0,0,${fo})`;g.fillRect(0,0,W,H)}}
