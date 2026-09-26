@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sub Character Transitions</title>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;600&family=Noto+Sans+KR:wght@300;500;700;900&display=swap" rel="stylesheet">
+<style>*{margin:0}html,body{height:100%;background:#000;overflow:hidden}#cv{position:absolute;left:50%;top:50%;width:1080px;height:1920px;transform-origin:0 0}</style>
+</head>
+<body>
+<canvas id="cv" width="1080" height="1920"></canvas>
+<script src="../shared/cine.js"></script>
+<script>
+/* Sub character — transition sketch (0:00-0:32). No slide cuts: every scene is reached by an expand, a morph,
+   a push into a card, a tilt, a liquid wipe, following an object, an ink burst or a flood of light.
+   Characters are flat silhouettes generated with Codex and tinted here. */
+const D=/*DATA*/null;
+CINE.init(document.getElementById('cv'),D);const MAIN=g;
+BEAT=60/123.5;B0=.205;const L=i=>Ln[i],bt=n=>B0+n*BEAT,since=(t,a,d)=>clamp((t-a)/d);
+const C={peach:'#FFB86B',peri:'#6C5CFF',pink:'#FF7AA8',mint:'#35E0C6',night:'#241B55',deep:'#140F33',cream:'#FFF4E6',ink:'#121016',ice:'#CFE6FF',lilac:'#B9A8FF'};
+const JO=(w,f)=>`${w} ${f}px "Josefin Sans"`;   // KR comes from cine.js
+const lg=(y0,y1,a,b)=>{const q=g.createLinearGradient(0,y0,0,y1);q.addColorStop(0,a);q.addColorStop(1,b);return q};
+const bgGrad=(a,b)=>{g.fillStyle=lg(0,H,a,b);g.fillRect(0,0,W,H)};
+function circ(x,y,r,f){if(r<=0)return;g.fillStyle=f;g.beginPath();g.arc(x,y,r,0,7);g.fill()}
+function rrect(x,y,w,h,r){g.beginPath();g.roundRect(x-w/2,y-h/2,w,h,Math.max(0,Math.min(r,w/2,h/2)))}
+
+// ---------- silhouettes: black-on-white PNGs turned into masks, tinted with a gradient ----------
+const SIL={},SILN=['boy_back','girl_profile','legs_walk','hand_reach'],TINT={};
+function sil(id,x,y,h,c0,c1,o={}){const im=SIL[id];const w=im?im.width*h/im.height:h*.45;const key=id+c0+c1;
+  if(!im){g.fillStyle=c0;g.beginPath();g.ellipse(x,y,w/2,h/2,0,0,7);g.fill();return}
+  if(!TINT[key]){const cv=document.createElement('canvas');cv.width=im.width;cv.height=im.height;const x2=cv.getContext('2d');x2.drawImage(im,0,0);x2.globalCompositeOperation='source-in';
+    const q=x2.createLinearGradient(0,0,0,im.height);q.addColorStop(0,c0);q.addColorStop(1,c1);x2.fillStyle=q;x2.fillRect(0,0,im.width,im.height);TINT[key]=cv}
+  g.save();g.globalAlpha=o.a??1;g.translate(x,y);if(o.rot)g.rotate(o.rot);if(o.flip)g.scale(-1,1);g.drawImage(TINT[key],-w/2,-h/2,w,h);g.restore()}
+
+// ---------- quiet, elegant type: syllables fade up on their own timing ----------
+function lay(i,ks,font){g.font=font;const sp=g.measureText(' ').width;const its=[];let x=0;ks.forEach((k,j)=>{const u=U(i,k);if(j>0&&u[4])x+=sp;[...u[0]].forEach((ch,q)=>{const w=g.measureText(ch).width;its.push({ch,ts:u[1]+q*.04,x:x+w/2});x+=w})});return {its,w:x}}
+// type scale: three sizes only, and a word or phrase is never split across sizes
+const TS={L:{f:120,bold:900},M:{f:84,bold:700},S:{f:60,w:500}};
+function say(t,i,ks,x,y,o={}){o={...(TS[o.size||'M']),...o};const f=o.f,font=(o.bold?KR(o.bold,f):KR(o.w||500,f)),lo=lay(i,ks,font),tr=o.track||0,tot=lo.w+tr*(lo.its.length-1),x0=o.align==='left'?x:o.align==='right'?x-tot:x-tot/2;
+  g.save();g.font=font;g.textAlign='center';g.textBaseline='middle';
+  lo.its.forEach((it,n)=>{const a=t-it.ts+(o.lead??0);if(a<-.08)return;const p=eOutC(clamp((a+.08)/(o.dur||.6)));let dx=0,dy=(1-p)*(o.rise??34),s=1,al=clamp((a+.08)/.35)*(o.a??1),bl=(1-p)*10;   // syllables drift up out of a blur
+    if(o.st==='track')dx=(n-lo.its.length/2)*(1-p)*70;if(o.st==='pop')s=.6+.4*eBk(clamp((a+.08)/.4),1.8);if(o.st==='sink'){const q=Math.max(0,a-.5);dy+=q*q*150;al*=1-clamp(q/2.4)*.55}
+    if(o.out!=null&&t>o.out)al*=1-clamp((t-o.out)/.5);if(al<=0)return;
+    g.save();g.globalAlpha=al;g.translate(x0+it.x+n*tr+dx,y+dy);g.scale(s,s);if(bl>.4)g.filter=`blur(${bl.toFixed(1)}px)`;g.fillStyle=o.col||'#fff';g.fillText(it.ch,0,0);g.restore()});g.restore()}
+// every scene keeps moving: a slow drift and push, stronger on the near layers (parallax)
+let S0=0;const drift=t=>{const u=t-S0;return {x:Math.sin(u*.33+S0)*22,y:Math.cos(u*.27+S0)*16,z:1+.045*Math.min(1,u/9)}};
+function lyr(t,pf,fn){const d=drift(t);g.save();g.translate(CX,CY);g.scale(1+(d.z-1)*pf,1+(d.z-1)*pf);g.translate(-CX+d.x*pf,-CY+d.y*pf);fn();g.restore()}
+const breathe=(t,k=0)=>({s:1+.012*Math.sin(t*1.6+k),r:.012*Math.sin(t*.9+k)});
+function word(txt,x,y,font,col,a=1,sp=0){if(a<=0)return;g.save();g.globalAlpha=a;g.font=font;g.textAlign='center';g.textBaseline='middle';g.letterSpacing=sp+'px';g.fillStyle=col;g.fillText(txt,x+sp/2,y);g.restore()}
+function arcs(t,x,y,r,col,a){g.save();g.strokeStyle=col;g.globalAlpha=a;g.lineWidth=2;for(let k=0;k<3;k++){g.beginPath();g.arc(x,y,r+k*70,t*.3*(k%2?1:-1)+k,t*.3*(k%2?1:-1)+k+2.2);g.stroke()}g.restore()}   // thin orbit lines, like the reference
+
+// ---------- scenes (each draws a full frame at its own time) ----------
+const SC={};
+SC.black=t=>{g.fillStyle='#07060C';g.fillRect(0,0,W,H);circ(CX,CY,14+6*pulse(t),C.peach)};
+SC.stage=t=>{lyr(t,.3,()=>{bgGrad(C.night,C.deep);arcs(t,CX,CY-120,430,C.lilac,.5)});   // a spotlight on MAIN CHARACTER
+  lyr(t,.7,()=>{const sp=eOutC(since(t,1.4,1.2))*(1+.03*Math.sin(t*1.3));const q=g.createRadialGradient(CX,CY-120,10,CX,CY-120,560*sp);q.addColorStop(0,'rgba(255,244,230,.95)');q.addColorStop(.62,'rgba(255,214,170,.55)');q.addColorStop(1,'rgba(255,184,107,0)');g.fillStyle=q;g.fillRect(-200,-200,W+400,H+400)});
+  lyr(t,1,()=>{const fq=eInC(since(t,bt(10),.9));const ma=clamp((t-bt(2))/.6);if(fq<1){word('MAIN',CX,CY-200+fq*900,JO(600,190),C.night,ma*(1-fq),10+50*(1-eOutC(since(t,bt(2),1.2))));
+    const sl=eOutC(since(t,bt(8),.45));if(sl>0){g.strokeStyle=C.pink;g.lineWidth=12;g.globalAlpha=1-fq;g.beginPath();g.moveTo(CX-300,CY-200+fq*900);g.lineTo(CX-300+600*sl,CY-200+fq*900);g.stroke();g.globalAlpha=1}}
+    word('CHARACTER',CX,CY-40,JO(300,70),C.night,since(t,bt(4),.8),22+30*(1-eOutC(since(t,bt(4),1.4))));
+    const sb=eOutC(since(t,bt(12),.9));if(sb>0)word('SUB',CX+(1-sb)*260,CY-200,JO(600,190),C.pink,sb,10);
+    word('윤하  ·  YOUNHA',CX,CY+120,JO(300,34),C.lilac,since(t,bt(16),.8),12)})};
+// verse 1 lives on a tall canvas: my walking legs below, your back far above; the camera tilts up between them
+const TALL=H*2.2;
+function verseCanvas(t){const q=lg(0,TALL,'#FFD6A6','#FF9E8F');g.fillStyle=q;g.fillRect(-300,-300,W+600,TALL+600);
+  lyr(t,.4,()=>{circ(CX,560,300*(1+.02*Math.sin(t*1.2)),'rgba(255,244,230,.9)');arcs(t,CX,560,330,'#FFFFFF',.5)});   // the pale sun you walk into
+  lyr(t,.7,()=>{const b=breathe(t);sil('boy_back',CX+Math.sin(t*1.7)*6,600,520*b.s,'#5B3F8F','#3A2766',{rot:b.r})});   // you, walking away
+  g.fillStyle='rgba(255,255,255,.35)';g.fillRect(-300,TALL-420,W+600,4);
+  lyr(t,1,()=>{sil('legs_walk',CX-60+((t*80)%40),TALL-620,560,'#6E4AA8','#3E2A6E',{rot:Math.sin(t*Math.PI/BEAT)*.03})});   // my steps, on the beat
+  lyr(t,1,()=>{say(t,0,r_(0,4),120,TALL-1080,{size:'M',col:'#5B3F8F',align:'left'});
+    say(t,1,r_(0,4),CX,1080,{size:'L',col:'#3A2766',st:'track'});
+    const s2=since(t,L(2).s,1.4);if(s2>0){g.strokeStyle='rgba(58,39,102,.5)';g.lineWidth=3;for(const sd of [-1,1]){g.beginPath();g.moveTo(CX+sd*540,1500);g.lineTo(lerp(CX+sd*540,CX+sd*40,eOutC(s2)),lerp(1500,700,eOutC(s2)));g.stroke()}}   // the stare converges on you
+    say(t,2,r_(0,3),CX,1300,{size:'M',col:'#3A2766',st:'track',track:14});say(t,2,r_(4,7),CX,1420,{size:'M',col:'#3A2766',st:'track',track:14})})}
+SC.verse=t=>{const up=eIOs(since(t,L(1).s-.9,1.6)),push=eIOs(since(t,L(2).s-.3,2.6));const camY=lerp(TALL-H/2-60,H/2+120,up),z=1+.16*push;   // tilt up, then lean in
+  g.save();g.translate(CX,CY);g.scale(z,z);g.translate(-CX,-camY+40*push);verseCanvas(t);g.restore()};
+SC.thought=t=>{lyr(t,.25,()=>{bgGrad('#8F7DFF','#4B3AB8');arcs(t,CX+120,760,360,'#FFFFFF',.35)});   // my profile, a thought orbiting it
+  lyr(t,.6,()=>{const b=breathe(t,1);sil('girl_profile',CX-150,1080,1300*b.s,'#2A1F66','#1A1245',{rot:b.r*.5})});
+  const fl=since(t,L(5).s-.5,1.5),or=t*1.4,px=lerp(CX+250+Math.cos(or)*80,CX+170,eIOs(fl)),py=lerp(640+Math.sin(or)*60,780,eIOs(fl)),pr=lerp(46,190,eOutC(fl));
+  lyr(t,.85,()=>circ(px,py,pr,C.mint));
+  lyr(t,1,()=>{say(t,3,r_(0,5),CX+230,500,{size:'M',col:'#FFFFFF'});
+    say(t,4,r_(0,4),CX+230,1420,{size:'M',col:'#FFFFFF',st:'track',track:6});
+    say(t,5,[0,1,2],px,py,{size:'S',bold:900,col:C.night,st:'pop'});say(t,5,r_(3,7),CX+230,1540,{size:'M',col:'rgba(255,255,255,.9)'})})};
+SC.sink=t=>{lyr(t,.2,()=>{bgGrad('#1C1650','#0B0920');for(let k=0;k<60;k++){circ(R(k,1)*W,((R(k,2)*H-t*40)%H+H)%H,1.5+R(k,3)*2,'rgba(255,255,255,.35)')}});   // the planet sinks; a hand reaches and misses
+  const py=lerp(420,1250,eIOs(since(t,L(6).s-.2,3.2)));lyr(t,.8,()=>circ(CX+60,py,60,C.mint));
+  const hr=eOutC(since(t,L(6).s+1.1,1.4))-eInC(since(t,L(7).s+.5,1.3));lyr(t,.9,()=>sil('hand_reach',CX-40,H+220-560*hr,1200,'#6C5CFF','#2A1F66',{rot:.04*Math.sin(t*1.3)}));
+  lyr(t,1,()=>{say(t,6,[0,1,2],CX,360,{size:'S',col:C.lilac});say(t,6,r_(3,8),CX,500,{size:'L',col:'#FFFFFF',st:'sink'});
+    say(t,7,r_(0,4),CX,1540,{size:'M',col:C.lilac})})};
+SC.ink=t=>{g.fillStyle=C.ink;g.fillRect(0,0,W,H);lyr(t,1,()=>say(t,8,r_(0,4),CX,920,{size:'L',col:'#E9E4F5',st:'sink'}))};
+SC.cold=t=>{lyr(t,.3,()=>{bgGrad('#E6F2FF','#9CC4F2');for(let k=0;k<7;k++){g.fillStyle='rgba(255,255,255,.28)';g.fillRect(-200,300+k*230+Math.sin(t+k)*20,W+400,40)}});
+  lyr(t,1,()=>{say(t,9,[0,1,2],CX,800,{size:'M',col:'#2B4E86',st:'track',track:10});say(t,9,[3,4,5],CX,960,{size:'L',col:'#1E3A6E'})})};
+
+// ---------- transitions: each draws scene A and scene B together ----------
+const OFF=[0,1].map(()=>{const c=document.createElement('canvas');c.width=W;c.height=H;return c});
+const ST0={};function into(k,id,t){const c=OFF[k],x=c.getContext('2d');const g0=g;g=x;g.setTransform(1,0,0,1,0,0);g.globalAlpha=1;g.filter='none';g.clearRect(0,0,W,H);S0=ST0[id]??0;SC[id](t);g=g0;return c}
+const SM=x=>x*x*x*(x*(x*6-15)+10);
+const TR={
+  expand(t,p,A,B,o){g.drawImage(into(0,A,t),0,0);const r=SM(p)**1.4*1300;g.save();g.beginPath();g.arc(o.x,o.y,Math.max(1,r),0,7);g.clip();g.drawImage(into(1,B,t),0,0);g.restore()},   // a dot grows into the next scene
+  morphPush(t,p,A,B){g.drawImage(into(0,A,t),0,0);const m=eIO(clamp(p/.55)),k=eInC(clamp((p-.45)/.55));   // the spotlight becomes a card, then we fall into it
+    const cw=lerp(520,460,m),bh=H*cw/W,ch=lerp(lerp(520,700,m),bh,k),rr=lerp(260,36,m)*(1-k),rot=Math.PI/2*m*(1-k),cy=CY-120*(1-k),s=1+k*(W/cw-1);
+    g.save();g.translate(CX,cy);g.rotate(rot);g.scale(s,s);rrect(0,0,cw,ch,rr);g.fillStyle=C.cream;g.globalAlpha=clamp(p/.2);g.fill();g.globalAlpha=1;g.clip();
+    g.rotate(-rot);g.globalAlpha=clamp((p-.3)/.3);g.drawImage(into(1,B,t),-cw/2,-bh/2,cw,bh);g.restore()},
+  wave(t,p,A,B){g.drawImage(into(0,A,t),0,0);const e=SM(p);g.save();g.beginPath();g.moveTo(W+10,-10);for(let y=-10;y<=H+10;y+=20){const x=W+60-e*(W+260)+Math.sin(y*.006+p*7)*90*(1-e*.6)+Math.sin(y*.013)*40;g.lineTo(x,y)}g.lineTo(W+10,H+10);g.closePath();g.clip();
+    g.drawImage(into(1,B,t),0,0);g.restore()},
+  follow(t,p,A,B,o){const e=SM(p),a=into(0,A,t),b=into(1,B,t),x=a.getContext('2d');x.save();x.globalCompositeOperation='destination-out';const q=x.createLinearGradient(0,H-520,0,H);q.addColorStop(0,'rgba(0,0,0,0)');q.addColorStop(1,'rgba(0,0,0,1)');x.fillStyle=q;x.fillRect(0,H-520,W,520);x.restore();   // no hard seam: the scenes melt into each other
+    g.drawImage(b,0,(H-260)*(1-e));g.drawImage(a,0,-e*(H-260))},   // the camera chases the planet down
+  burst(t,p,A,B){g.drawImage(into(0,A,t),0,0);for(let k=0;k<26;k++){const d=R(k,7)*.35,q=eOutC(clamp((p-d)/.55)),r=q*(160+520*R(k,8)),a=R(k,9)*6.28,dist=q*(120+500*R(k,10));
+    circ(CX+Math.cos(a)*dist,900+Math.sin(a)*dist*1.2,r,C.ink);for(let j=0;j<3;j++)circ(CX+Math.cos(a+j*.3)*dist*1.6,900+Math.sin(a+j*.3)*dist*1.9,r*.12,C.ink)}   // ink splashes out and takes over
+    if(p>.8){g.globalAlpha=(p-.8)/.2;g.drawImage(into(1,B,t),0,0);g.globalAlpha=1}},
+  light(t,p,A,B){g.drawImage(into(0,A,t),0,0);g.save();g.globalCompositeOperation='lighter';const e=eInC(clamp(p/.7));for(let k=0;k<6;k++){const an=-.9+k*.36+Math.sin(t*2+k)*.05;g.save();g.translate(CX+(k-2.5)*120,-80);g.rotate(an*.35);
+      const q=g.createLinearGradient(0,0,0,H*1.3);q.addColorStop(0,`rgba(230,242,255,${.9*e})`);q.addColorStop(1,'rgba(230,242,255,0)');g.fillStyle=q;const w=40+e*420;g.fillRect(-w/2,0,w,H*1.3);g.restore()}g.restore();   // cold light floods in
+    const wh=clamp((p-.55)/.25)*(1-clamp((p-.8)/.2));g.fillStyle=`rgba(240,247,255,${wh})`;g.fillRect(0,0,W,H);if(p>.8){g.globalAlpha=(p-.8)/.2;g.drawImage(into(1,B,t),0,0);g.globalAlpha=1;g.fillStyle=`rgba(240,247,255,${1-(p-.8)/.2})`;g.fillRect(0,0,W,H)}}};
+// ---------- timeline ----------
+const TL=[];function build(){
+  TL.push({s:'black',t0:0},{tr:'expand',t0:1.05,t1:2.15,A:'black',B:'stage',o:{x:CX,y:CY}},{s:'stage',t0:2.15},
+    {tr:'morphPush',t0:bt(24.5),t1:15.1,A:'stage',B:'verse'},{s:'verse',t0:15.1},
+    {tr:'wave',t0:L(3).s-1.0,t1:L(3).s-.02,A:'verse',B:'thought'},{s:'thought',t0:L(3).s-.02},
+    {tr:'follow',t0:L(6).s-.8,t1:L(6).s+.3,A:'thought',B:'sink',o:{x0:CX+170,y0:780}},{s:'sink',t0:L(6).s+.3},
+    {tr:'burst',t0:T(8,0)-.6,t1:T(8,0)+.2,A:'sink',B:'ink'},{s:'ink',t0:T(8,0)+.2},
+    {tr:'light',t0:L(9).s-.8,t1:L(9).s+.2,A:'ink',B:'cold'},{s:'cold',t0:L(9).s+.2});
+  for(const e of TL){if(e.tr){if(ST0[e.B]==null)ST0[e.B]=e.t0}else if(ST0[e.s]==null)ST0[e.s]=e.t0}}
+const r_=(a,b)=>[...Array(b-a+1)].map((_,k)=>a+k);
+const SAMP=document.createElement('canvas');SAMP.width=W;SAMP.height=H;
+function frame(t){let cur=TL[0];for(const e of TL)if(t>=e.t0)cur=e;
+  if(cur.tr&&t<cur.t1){TR[cur.tr](t,clamp((t-cur.t0)/(cur.t1-cur.t0)),cur.A,cur.B,cur.o||{});return}S0=ST0[cur.s]??0;SC[cur.s](t)}
+function render(t){CINE.begin();g.filter='none';let cur=TL[0];for(const e of TL)if(t>=e.t0)cur=e;
+  if(cur.tr&&t<cur.t1){const n=9,sx=SAMP.getContext('2d');g.fillStyle='#000';g.fillRect(0,0,W,H);   // motion blur while a transition moves: average several instants
+    for(let k=0;k<n;k++){const g0=g;g=sx;g.setTransform(1,0,0,1,0,0);g.globalAlpha=1;g.filter='none';g.clearRect(0,0,W,H);frame(t+(k/(n-1)-.5)*.5/30);g=g0;g.globalAlpha=1/(k+1);g.drawImage(SAMP,0,0)}g.globalAlpha=1}
+  else frame(t);
+  g.save();g.globalCompositeOperation='overlay';g.globalAlpha=.35;const ox=Math.floor(R(Math.floor(t*12),1)*256),oy=Math.floor(R(Math.floor(t*12),2)*256);for(let y=-oy;y<H;y+=256)for(let x=-ox;x<W;x+=256)g.drawImage(GR,x,y);g.restore();   // grain
+  const fo=since(t,31.3,.6);if(fo>0){g.fillStyle=`rgba(0,0,0,${fo})`;g.fillRect(0,0,W,H)}}
+window.DUR=32;
+window.READY=(async()=>{await Promise.all(SILN.map(id=>new Promise(r=>{const im=new Image();im.onload=()=>{SIL[id]=im;r()};im.onerror=()=>r();im.src='sil/'+id+'.png'})));
+  const ko=Ln.map(l=>l.t).join('');try{await Promise.all([300,500,700,900].map(w=>document.fonts.load(KR(w,100),ko)).concat([document.fonts.load(JO(600,100),'MAINSUB'),document.fonts.load(JO(300,40),'CHARACTER YOUNHA')]))}catch(e){}
+  build();window.renderAt=render;render(0)})();
+</script>
+</body>
+</html>
