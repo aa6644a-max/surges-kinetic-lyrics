@@ -9,6 +9,11 @@ STYLE = ("Japanese anime illustration for a music video, clean cel shading with 
          "school uniform with a pink ribbon; 'YOU' = a teenage boy with messy dark-brown hair in a plain white hoodie. "
          "The character is isolated on a perfectly flat pure chroma-green (#00FF00) background filling the rest of the canvas: "
          "no green inside the character, no shadow on the background, no text, no logo.")
+MEMSTYLE = ("Japanese anime illustration for a music video, a nostalgic school memory, full scene with a detailed background, warm soft light, "
+            "gentle film grain, cel shading with crisp lineart. Original characters (not from any existing work): 'ME' = a teenage girl with long "
+            "straight black hair with a light-blue inner color, a navy sailor school uniform with a pink ribbon; 'YOU' = a teenage boy with messy "
+            "dark-brown hair in a white hoodie over a school uniform. YOU is always the center of attention; ME is always small, at the edge or in "
+            "the background, quietly watching him. No text, no logo.")
 ART = [
  ("me_profile", "1024x1536", "ME, head and shoulders in side profile facing right, a quiet longing expression, hair slightly moving in the wind."),
  ("you_back", "1024x1536", "YOU, full body seen from behind walking away from the viewer, hands in hoodie pocket, mid-stride."),
@@ -33,6 +38,17 @@ ART = [
  ("me_run", "1024x1536", "ME, full body running toward the viewer with determination, hair and skirt flying, one arm swinging forward, dynamic foreshortening."),
  ("you_hand", "1024x1536", "YOU, upper body facing the viewer, a gentle warm smile, holding his open hand out toward the camera as if offering to take the viewer's hand."),
  ("me_smile", "1024x1536", "ME, close-up of the face and shoulders facing the viewer, smiling brightly with tears still in her eyes, relieved and hopeful, soft golden light."),
+ ("mem_entrance", "1536x1024", "MEM: school entrance ceremony under falling cherry blossoms, YOU laughing with new friends in the middle, ME standing alone at the side holding her bag, seeing him for the first time."),
+ ("mem_class", "1536x1024", "MEM: a sunny classroom at break time, YOU sitting on a desk surrounded by laughing classmates, ME at the back seat by the window watching over her book."),
+ ("mem_race", "1536x1024", "MEM: sports day relay race, YOU breaking the finish tape with arms raised while the crowd cheers, ME small among the spectators behind the rope."),
+ ("mem_festival", "1536x1024", "MEM: school festival concert in the gym, YOU singing on stage with a band under colorful lights, ME in the dark audience at the very back."),
+ ("mem_rain", "1536x1024", "MEM: a rainy afternoon at the school gate, YOU sharing an umbrella with friends and laughing, ME alone under the building eaves without an umbrella."),
+ ("mem_library", "1536x1024", "MEM: a quiet library in afternoon light, YOU studying at a table by the window, ME hiding behind a bookshelf peeking at him over an open book."),
+ ("mem_lunch", "1536x1024", "MEM: a busy school cafeteria, YOU at the center table with many friends, ME eating alone at a small corner table."),
+ ("mem_sunset", "1536x1024", "MEM: walking home along a riverside road at sunset, YOU and his friends ahead laughing, ME far behind following at a distance, long shadows."),
+ ("mem_rooftop", "1536x1024", "MEM: school rooftop at lunch under a blue sky, YOU laughing with friends sitting in a circle, ME alone by the fence holding a bread roll."),
+ ("mem_photo", "1536x1024", "MEM: a class group photo in front of the school, YOU in the middle of the front row making a peace sign, ME at the far edge of the frame half cut off."),
+ ("mem_award", "1536x1024", "MEM: an award ceremony in the school hall, YOU on the stage receiving a trophy, ME clapping quietly in the back rows."),
 ]
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--only"); ap.add_argument("--force", action="store_true"); a = ap.parse_args()
@@ -45,7 +61,7 @@ def main():
         text = (f"Use your image generation tool to create exactly ONE image, size {size}.\n"
                 + ("The attached image is the style and character reference: keep the same drawing style and the same character designs.\n" if ref else "")
                 + f"Save it as a PNG file at this exact path: {out}\nDo not create or modify any other file and do not run anything else. Reply DONE when the file exists.\n\n"
-                f"IMAGE PROMPT:\n{STYLE}\n{prompt}")
+                + (f"IMAGE PROMPT:\n{MEMSTYLE}\n{prompt[5:]}" if prompt.startswith("MEM: ") else f"IMAGE PROMPT:\n{STYLE}\n{prompt}"))
         cmd = [codex, "exec"] + (["-i", anchor] if ref else []) + ["-s", "workspace-write", "--skip-git-repo-check", "-C", RAW, "-"]
         print("->", aid, flush=True); t0 = time.time(); subprocess.run(cmd, input=text, text=True, encoding="utf-8")
         print("   ok" if os.path.exists(out) else "   FAILED", f"({time.time()-t0:.0f}s)", flush=True)

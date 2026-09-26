@@ -34,7 +34,7 @@ function sil(id,x,y,h,c0,c1,o={}){const im=SIL[id];const w=im?im.width*h/im.heig
   g.save();g.globalAlpha=o.a??1;g.translate(x,y);if(o.rot)g.rotate(o.rot);if(o.flip)g.scale(-1,1);g.drawImage(TINT[key],-w/2,-h/2,w,h);g.restore()}
 
 // ---------- anime character art (Codex, keyed); falls back to the tinted silhouettes ----------
-const ART={},ARTN=['me_profile','you_back','me_legs','me_hand','me_back','you_front','me_cry','you_sit','me_reach','hands_hold','you_turn','you_stage','you_crowd','me_angry','me_envy','me_mirror','me_sit_dark','me_write','me_script','both_apart','me_run','you_hand','me_smile'],ALT=new Proxy({me_profile:'girl_profile',you_back:'boy_back',me_legs:'legs_walk',me_hand:'hand_reach',me_back:'girl_profile'},{get:(o,k)=>o[k]||(String(k).startsWith('you')?'boy_back':'girl_profile')});
+const ART={},ARTN=['mem_entrance','mem_class','mem_race','mem_festival','mem_rain','mem_library','mem_lunch','mem_sunset','mem_rooftop','mem_photo','mem_award','me_profile','you_back','me_legs','me_hand','me_back','you_front','me_cry','you_sit','me_reach','hands_hold','you_turn','you_stage','you_crowd','me_angry','me_envy','me_mirror','me_sit_dark','me_write','me_script','both_apart','me_run','you_hand','me_smile'],ALT=new Proxy({me_profile:'girl_profile',you_back:'boy_back',me_legs:'legs_walk',me_hand:'hand_reach',me_back:'girl_profile'},{get:(o,k)=>o[k]||(String(k).startsWith('you')?'boy_back':'girl_profile')});
 const FULL={};function art(id,x,y,h,o={}){const im=ART[id];if(!im){sil(ALT[id],x,y,h,o.c0||'#2A1F66',o.c1||'#1A1245',o);return}const w=im.width*h/im.height;
   if(FULL[id]){const pw=Math.min(w,W*.86),ph=h*.78;g.save();g.globalAlpha=o.a??1;g.translate(x,y);g.rotate((o.rot||0)-.03);g.fillStyle='#FFFFFF';g.beginPath();g.roundRect(-pw/2-16,-ph/2-16,pw+32,ph+32,22);g.fill();   // a painted scene: shown as a framed panel
     g.beginPath();g.roundRect(-pw/2,-ph/2,pw,ph,14);g.clip();const sc=Math.max(pw/im.width,ph/im.height);g.drawImage(im,-im.width*sc/2,-im.height*sc/2,im.width*sc,im.height*sc);g.restore();return}
@@ -55,7 +55,8 @@ function panel(x,y,w,h,sk,col,lw=14){g.beginPath();g.moveTo(x-w/2+sk,y-h/2);g.li
 function lay(i,ks,font){g.font=font;const sp=g.measureText(' ').width;const its=[];let x=0;ks.forEach((k,j)=>{const u=U(i,k);if(j>0&&u[4])x+=sp;[...u[0]].forEach((ch,q)=>{const w=g.measureText(ch).width;its.push({ch,ts:u[1]+q*.04,x:x+w/2});x+=w})});return {its,w:x}}
 // type scale: three sizes only, and a word or phrase is never split across sizes
 const TS={L:{f:124,bold:900},M:{f:86,bold:900},S:{f:60,bold:700}};
-function say(t,i,ks,x,y,o={}){o={...(TS[o.size||'M']),...o};const f=o.f,font=(o.bold?KR(o.bold,f):KR(o.w||500,f)),lo=lay(i,ks,font),tr=o.track||0,tot=lo.w+tr*(lo.its.length-1),x0=o.align==='left'?x:o.align==='right'?x-tot:x-tot/2;
+function say(){}   // lyrics are drawn by the kinetic layer on top of every scene
+function say0(t,i,ks,x,y,o={}){o={...(TS[o.size||'M']),...o};const f=o.f,font=(o.bold?KR(o.bold,f):KR(o.w||500,f)),lo=lay(i,ks,font),tr=o.track||0,tot=lo.w+tr*(lo.its.length-1),x0=o.align==='left'?x:o.align==='right'?x-tot:x-tot/2;
   g.save();g.font=font;g.textAlign='center';g.textBaseline='middle';
   lo.its.forEach((it,n)=>{const a=t-it.ts+(o.lead??0);if(a<-.08)return;const p=eOutC(clamp((a+.08)/(o.dur||.6)));let dx=0,dy=(1-p)*(o.rise??34),s=1,al=clamp((a+.08)/.35)*(o.a??1),bl=(1-p)*10;   // syllables drift up out of a blur
     if(o.st==='track')dx=(n-lo.its.length/2)*(1-p)*70;if(o.st==='pop')s=.6+.4*eBk(clamp((a+.08)/.4),1.8);if(o.st==='sink'){const q=Math.max(0,a-.5);dy+=q*q*150;al*=1-clamp(q/2.4)*.55}
@@ -146,8 +147,7 @@ function chorusA(t,b){const who=b===17?'you_stage':'you_crowd';const hype=clamp(
   lyr(t,.55,()=>{const br=breathe(t);if(!artFull(who,t,{z:1.1*(1+.015*pulse(t))})){const q=g.createRadialGradient(CX,900,20,CX,900,650);q.addColorStop(0,'rgba(255,240,200,.55)');q.addColorStop(1,'rgba(255,240,200,0)');g.fillStyle=q;g.fillRect(-200,-200,W+400,H+400);art(who,CX,1060,1380*br.s,{rot:br.r,rim:'#FFFFFF'})}g.fillStyle=lg(0,H,'rgba(12,10,28,.55)','rgba(12,10,28,0)');g.fillRect(-200,-200,W+400,700);g.fillStyle=lg(H-700,H,'rgba(12,10,28,0)','rgba(12,10,28,.6)');g.fillRect(-200,H-700,W+400,900)});
   lyr(t,1.25,()=>heads(t,1800,'#0C0A1C',hype));
   const bu=t-T(b+2,8);if(bu>0&&bu<1.2)lyr(t,1,()=>{focus(CX,900,`rgba(255,228,92,${.7*(1-bu/1.2)})`,1,t,50,200+bu*600)});
-  lyr(t,1,()=>{const sb=eBk(since(t,L(b).s-.15,.4),2);if(sb>0){g.save();g.translate(CX,300);g.scale(sb,sb);g.rotate(-.05);g.font=DG(96);g.textAlign='center';g.textBaseline='middle';g.fillStyle=C.navy;g.fillText("I'M A SUB",8,8);g.lineWidth=18;g.strokeStyle='#FFFFFF';g.lineJoin='round';g.strokeText("I'M A SUB",0,0);g.fillStyle=C.hot;g.fillText("I'M A SUB",0,0);g.restore();
-      word('CHARACTER',CX,400,JO(600,56),'#FFFFFF',sb,16)}
+  lyr(t,1,()=>{
     say(t,b+1,r_(0,5),CX,560,{size:'M',...STK,sh:C.cyan});say(t,b+2,r_(0,7),CX,1430,{size:'M',...GOLD});say(t,b+2,r_(8,11),CX,1560,{size:'L',...GOLD,st:'pop'});
     const lv=(t>L(b+3).s-.2&&t<L(b+5).s)?1:0;if(lv){for(let k=0;k<3;k++){const off=((t*260*(k%2?1:-1))%700+700)%700;g.font=HV(70);g.fillStyle='rgba(255,79,154,.35)';for(let j=-1;j<3;j++)g.fillText('좋아해 ♥',j*700+off-300,700+k*90)}}
     say(t,b+3,r_(0,5),CX,700+90,{size:'L',...STK});stamp('인정',CX+260,1260,T(b+4,3),t,'#FF2A4F',90);say(t,b+4,r_(0,6),CX-120,1250,{size:'M',...STK,out:L(b+5).s});say(t,b+5,r_(0,4),CX,1250,{size:'L',...GOLD,st:'pop'})})}
@@ -159,12 +159,6 @@ function chorusB(t,b){const me=b===23?'me_profile':'me_envy',yo=b===23?'you_fron
   lyr(t,1,()=>{say(t,b,r_(0,3),CX,300,{size:'M',...STK,f:92,bold:900});say(t,b+1,r_(0,2),CX,430,{size:'M',...STK,sh:C.cyan});say(t,b+2,r_(0,5),CX,560,{size:'L',...RED});
     say(t,b+3,r_(0,1),CX,1480,{size:'M',...STK});say(t,b+3,r_(2,8),CX,1600,{size:'M',...STK});say(t,b+4,r_(0,3),CX,1740,{size:'L',...GOLD,st:'pop'})})}
 SC.chA1=t=>chorusA(t,17);SC.chB1=t=>chorusB(t,23);SC.chA3=t=>chorusA(t,60);SC.chB3=t=>chorusB(t,66);
-// instrumental: gacha cards spin on a carousel
-SC.inter=t=>{lyr(t,.2,()=>{bgGrad('#3A1C7A','#0C0A1C');sparks(t,90,'#FFE45C',14);focus(CX,CY,'rgba(255,255,255,.06)',1,t,48,500)});
-  const imgs=['you_stage','me_profile','you_front','me_back','you_crowd','me_cry'];for(let k=0;k<6;k++){const an=(t-70)*1.1+k*Math.PI/3,z=Math.cos(an),x=CX+Math.sin(an)*380,sc=.55+.25*(z+1)/2,flip=Math.abs(Math.cos(an*2+t));
-    if(z<0)continue;lyr(t,.9,()=>{g.save();g.translate(x,CY);g.scale(Math.max(.05,flip),1);card(0,0,440,640,imgs[k],{s:sc,frame:k%2?'#FFFFFF':'#FFE45C',label:k%2?'EXTRA':'MAIN',lc:k%2?'#C9C7D8':C.yel,grey:k%2});g.restore()})}
-  const fl=pulse(t)*.12;if(fl>0){g.fillStyle=`rgba(255,255,255,${fl})`;g.fillRect(0,0,W,H)}
-  lyr(t,1,()=>{const off=((t*300)%1400);g.save();g.font=DG(120);g.fillStyle='rgba(255,255,255,.12)';for(const [yy,d] of [[330,1],[1620,-1]])for(let j=-1;j<3;j++)g.fillText('SUB CHARACTER',j*1400+off*d-400,yy);g.restore()})};
 // verse 2: the mirror
 SC.mirror=t=>{lyr(t,.25,()=>{bgGrad('#2B2466','#0F0B26');tone(-100,-100,W+200,H,'rgba(185,168,255,.12)',1,32)});
   lyr(t,.6,()=>{g.save();g.fillStyle='#FFFFFF';g.beginPath();g.roundRect(150,330,780,1180,390);g.fill();g.beginPath();g.roundRect(170,350,740,1140,370);g.clip();bgGrad('#B8D8FF','#6C5CFF');const br=breathe(t,5);art('me_mirror',CX,1000,1320*br.s);
@@ -189,11 +183,11 @@ SC.erase=t=>{lyr(t,.25,()=>{bgGrad('#8ED0FF','#5E6FB8');tone(-100,-100,W+200,H,'
 SC.script=t=>{lyr(t,.25,()=>{bgGrad('#FFE9D2','#FFC4DA');tone(-100,-100,W+200,H,'rgba(255,79,154,.12)',1,30)});lyr(t,.45,()=>{const b=breathe(t,11);art('me_script',CX+60,1180,1450*b.s,{rim:'#FFFFFF',a:1-since(t,L(46).s-.4,.5)*(1-since(t,L(47).s,.4))*.7})});
   lyr(t,.6,()=>{for(let k=0;k<5;k++){g.save();g.translate(120+k*230,300+R(k,61)*1300);g.rotate((R(k,62)-.5)*.6);g.fillStyle='#FFFFFF';g.fillRect(-150,-200,300,400);g.fillStyle='rgba(22,20,58,.15)';for(let j=0;j<8;j++)g.fillRect(-120,-160+j*40,200+R(k*8+j,63)*40,10);g.restore()}
     const fs=since(t,L(46).s-.4,.5)*(1-since(t,L(47).s,.4));if(fs>0){g.save();g.globalAlpha=fs;g.fillStyle='#16143A';g.fillRect(0,640,W,560);const imgs=['me_cry','me_back','me_envy','me_hand'];for(let k=0;k<4;k++){const x=((k*300-(t-L(46).s)*260)%1200+1200)%1200-60;g.fillStyle='#FFFFFF';g.fillRect(x,700,260,440);g.save();g.beginPath();g.rect(x+10,710,240,420);g.clip();g.fillStyle='#B8D8FF';g.fillRect(x+10,710,240,420);art(imgs[k],x+130,960,520);g.restore()}g.restore()}});   // the loser's montage
-  lyr(t,1,()=>{const sb=eBk(since(t,L(43).s-.15,.4),2)*(1-since(t,L(44).s-.2,.3));if(sb>0){g.save();g.translate(CX,320);g.scale(sb,sb);g.font=DG(96);g.textAlign='center';g.textBaseline='middle';g.lineWidth=18;g.strokeStyle='#FFFFFF';g.lineJoin='round';g.strokeText("I'M A SUB",0,0);g.fillStyle=C.hot;g.fillText("I'M A SUB",0,0);g.restore()}
+  lyr(t,1,()=>{
     say(t,44,r_(0,5),CX+300,1820,{size:'S',...STK,f:40,out:L(45).s});say(t,45,r_(0,10),CX,320,{size:'M',...STK,out:L(46).s-.2});
     say(t,46,r_(0,4),CX,500,{size:'M',...STK,out:L(47).s-.2});say(t,46,r_(5,9),CX,1320,{size:'M',...STK,out:L(47).s-.2});
     say(t,47,r_(0,7),CX,960,{size:'L',col:'#16143A',ol:'#FFFFFF',sh:C.hot,out:L(48).s-.2});stamp('THE END?',CX+200,1180,T(47,7)+.2,t,'#FF2A4F',70);
-    const sb2=eBk(since(t,L(48).s-.15,.4),2)*(1-since(t,L(49).s-.1,.3));if(sb2>0){g.save();g.translate(CX,700);g.scale(sb2,sb2);g.font=DG(96);g.textAlign='center';g.textBaseline='middle';g.lineWidth=18;g.strokeStyle='#FFFFFF';g.strokeText("I'M A SUB",0,0);g.fillStyle=C.hot;g.fillText("I'M A SUB",0,0);g.restore()}
+    
     say(t,49,r_(0,2),CX,960,{size:'L',...RED,out:L(50).s-.1});say(t,50,r_(0,6),CX,1100,{size:'L',...STK})})};
 // "is my story going to be thrown away?" — the pages fall
 SC.throw=t=>{lyr(t,.25,()=>{bgGrad('#6C5CFF','#241B55');sparks(t,95,'#FFFFFF',6)});const f0=L(52).s-.2;
@@ -218,19 +212,19 @@ SC.dark=t=>{const off=since(t,L(71).s,6);lyr(t,.2,()=>{bgGrad(mix('#2A1066','#05
   lyr(t,.55,()=>{const q=g.createRadialGradient(CX,760,10,CX,760,420*(1-off*.7));q.addColorStop(0,'rgba(255,240,200,.5)');q.addColorStop(1,'rgba(255,240,200,0)');g.fillStyle=q;g.fillRect(-200,-200,W+400,H+400);art('both_apart',CX,860,640*(1-off*.25),{rim:'#FFFFFF',a:1-off*.3})});   // walking away
   const ROLL=[['주인공','너'],['친구 1','—'],['친구 2','—'],['EXTRA #1','—'],['EXTRA #2','—'],['EXTRA #3','—'],['EXTRA #7','나'],['EXTRA #8','—']];
   lyr(t,.8,()=>{g.save();g.font=JO(600,34);g.textBaseline='middle';ROLL.forEach(([a,b2],k)=>{const y=H+60+k*110-(t-L(72).s)*120;if(y<-40||y>H+40)return;g.globalAlpha=b2==='나'?.9:.45;g.fillStyle=b2==='나'?C.yel:'#FFFFFF';g.textAlign='right';g.fillText(a,CX-30,y);g.textAlign='left';g.fillText(b2,CX+30,y)});g.restore()});
-  lyr(t,1,()=>{say(t,71,r_(0,6),CX,1320,{size:'M',...SAD,out:L(72).s-.2});const sb=eBk(since(t,L(72).s-.15,.4),2)*(1-since(t,L(73).s,.3));if(sb>0){g.save();g.translate(CX,1320);g.scale(sb,sb);g.font=DG(96);g.textAlign='center';g.textBaseline='middle';g.lineWidth=18;g.strokeStyle='#FFFFFF';g.strokeText("I'M A SUB",0,0);g.fillStyle=C.hot;g.fillText("I'M A SUB",0,0);g.restore()}
+  lyr(t,1,()=>{say(t,71,r_(0,6),CX,1320,{size:'M',...SAD,out:L(72).s-.2});
     say(t,73,r_(0,5),CX-280,1860-40,{size:'S',...STK,f:40,out:L(74).s});say(t,74,r_(0,2),CX,1320,{size:'M',...STK,out:L(75).s-.2});say(t,74,r_(3,10),CX,1440,{size:'M',...STK,out:L(75).s-.2});
     say(t,75,r_(0,9),CX,1320,{size:'M',...SAD,out:L(76).s-.2});say(t,76,r_(0,5),CX,1320,{size:'L',...STK});stamp('THE END',CX+120,1520,T(76,5)+.3,t,'#FF2A4F',80)})};
 // "I don't care — even as a loser, I can hang on"
 SC.reach=t=>{lyr(t,.2,()=>{bgGrad('#FF4F9A','#6C5CFF');focus(CX,860,'rgba(255,255,255,.35)',1,t,70,300);sparks(t,110,'#FFFFFF',10)});
   lyr(t,.6,()=>{const b=breathe(t,9),sw=since(t,L(79).s-.3,.5);g.save();g.globalAlpha=1-sw;art('me_run',CX,1080,1700*b.s*(1+.02*pulse(t)),{rim:'#FFFFFF'});g.restore();if(sw>0){g.save();g.globalAlpha=sw;art('me_reach',CX,1050,1650*b.s,{rim:'#FFFFFF'});g.restore()}});
-  lyr(t,1,()=>{const sb=eBk(since(t,L(77).s-.1,.35),2);if(sb>0){g.save();g.translate(CX,300);g.scale(sb,sb);g.rotate(-.05);g.font=DG(96);g.textAlign='center';g.textBaseline='middle';g.lineWidth=18;g.strokeStyle=C.navy;g.lineJoin='round';g.strokeText("I DON'T CARE",0,0);g.fillStyle='#FFFFFF';g.fillText("I DON'T CARE",0,0);g.restore()}
+  lyr(t,1,()=>{
     say(t,77,r_(3,5),CX,440,{size:'L',...STK});say(t,78,r_(0,4),CX,1560,{size:'L',...STK,out:L(79).s-.1});say(t,79,r_(0,6),CX,1560,{size:'L',...GOLD,st:'pop'})})};
 // "help me, take my hand"
 SC.hands=t=>{lyr(t,.2,()=>{bgGrad('#FFE7A8','#FF9E6B');focus(CX,960,'rgba(255,255,255,.4)',1,t,60,340)});const m=eIOs(since(t,L(80).s,T(80,5)-L(80).s+.2));
   lyr(t,.6,()=>{const yh=1-since(t,T(80,4),.5);if(yh>0){g.save();g.globalAlpha=yh;art('you_hand',CX,1050,1600,{rim:'#FFFFFF'});g.restore()}g.globalAlpha=1-yh;if(ART.hands_hold){g.save();g.beginPath();g.rect(CX-lerp(60,W,m),-200,lerp(120,2*W,m),H+400);g.clip();artFull('hands_hold',t,{z:1.02+.06*m});g.restore()}g.globalAlpha=1;
     const f=t-T(80,5);if(f>0&&f<1.2){g.save();g.globalCompositeOperation='lighter';const q=g.createRadialGradient(CX,1000,0,CX,1000,700*eOutC(f/1.2));q.addColorStop(0,`rgba(255,255,255,${1-f/1.2})`);q.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=q;g.fillRect(0,0,W,H);g.restore()}});   // they meet
-  lyr(t,1,()=>{const sb=eBk(since(t,L(80).s-.1,.35),2);if(sb>0){g.save();g.translate(CX,330);g.scale(sb,sb);g.font=DG(110);g.textAlign='center';g.textBaseline='middle';g.lineWidth=20;g.strokeStyle='#7A3B00';g.lineJoin='round';g.strokeText('HELP ME',0,0);g.fillStyle='#FFFFFF';g.fillText('HELP ME',0,0);g.restore()}
+  lyr(t,1,()=>{
     say(t,80,r_(2,7),CX,1580,{size:'L',...GOLD})})};
 // "because you are the main character" — you turn back and smile
 SC.finale=t=>{lyr(t,.2,()=>{bgGrad('#FFF1C9','#FFB86B');for(let k=0;k<12;k++){const an=k/12*6.283+t*.15;g.save();g.translate(CX,700);g.rotate(an);g.fillStyle='rgba(255,255,255,.35)';g.beginPath();g.moveTo(0,0);g.lineTo(-70,1600);g.lineTo(70,1600);g.fill();g.restore()}sparks(t,120,'#FFFFFF',14)});
@@ -239,6 +233,156 @@ SC.finale=t=>{lyr(t,.2,()=>{bgGrad('#FFF1C9','#FFB86B');for(let k=0;k<12;k++){co
 SC.end=t=>{lyr(t,.3,()=>{bgGrad('#1E1A55','#0C0A1C');sparks(t,130,'rgba(255,228,92,.9)',10);tone(-100,H*.6,W+200,H*.5,'rgba(255,79,154,.25)',1,30)});lyr(t,.6,()=>{const b=breathe(t,12);art('me_smile',CX,1320,1300*b.s,{rim:'#FFFFFF',a:.95})});const a=since(t,206.6,.8)*(1-since(t,213,1.2));
   lyr(t,1,()=>{const sb=eBk(since(t,206.6,.5),2);if(sb>0){g.save();g.globalAlpha=a;g.translate(CX,330);g.scale(sb,sb);g.rotate(-.05);g.font=DG(150);g.textAlign='center';g.textBaseline='middle';g.fillStyle=C.navy;g.fillText('SUB',12,12);g.lineWidth=24;g.strokeStyle='#FFFFFF';g.lineJoin='round';g.strokeText('SUB',0,0);g.fillStyle=C.hot;g.fillText('SUB',0,0);g.restore()}
     word('CHARACTER',CX,480,JO(600,64),'#FFFFFF',a,18);tag('윤하  ·  YOUNHA',CX,590,'#FFFFFF',C.navy,a,32);tag('CAST : YOU — MAIN',CX-150,700,C.yel,C.navy,a*since(t,207.6,.4),26);tag('ME — MAIN',CX+220,770,C.hot,'#FFFFFF',a*since(t,208.2,.4),26)})};
+
+// ================= kinetic lyric layer (Surges-style), drawn over every scene =================
+// One row per line: style | chunks ("/" separates, "!" marks the emphasis) | zone (T top, B bottom, C centre).
+// A chunk is never split across sizes; sizes only change from chunk to chunk.
+const KSPEC=`stack|언제나처럼|T
+shout|네/!뒷모습만|T
+stack|뚫어지게/!쳐다보다|T
+bounce|갑자기/온 생각|T
+stack|내가/뭘 해도|B
+cam|!너처럼/될 순/있을까|B
+tate|또다시/!열등감에/빠져|T
+stack|마음은/점점|B
+shout|!오염되어 가|C
+scatter|빠르게/!식어 가|C
+cam|알고 있어,/난 아니야/!주인공|T
+stack|그저 한 명의/!extra일 뿐|B
+cam|Oh,/그저 네가/!완벽해/보여서|T
+shout|아무 이유 없이/널/!미워했어|B
+stack|미안해,/but 어쩔 수/없었어|T
+bounce|사실/지금도|B
+stack|애써/!버티고 있어|B
+shout|I'm a/!sub character|B
+cam|우린/!안 비슷해|B
+stack|부러워/넌 어찌 그리/!빛나는지|B
+scatter|모두 널/!좋아해|B
+stack|모두의/!인정받고|B
+bounce|!행복해 보여|B
+stack|I'm a sub/!character|T
+shout|Just another/!loser|T
+tate|!열등감으로/찬|T
+cam|Tell me/내가/!나쁜 맘일까|B
+stack|I wanna/!be you|B
+stack|언젠가부터/내 자신이/점점|T
+shout|!싫어져만/갔어|B
+bounce|문득/든 생각|T
+cam|이건/!누구 탓이지|T
+stack|아마도/!너일 거야|B
+stack|알아 나도|T
+scatter|넌/!잘못 없어|B
+stack|그저 내가/이런 나라서/그랬어|T
+cam|어떤 기분이니,/!주인공|T
+tate|혹시/너도/!아프고 있니|T
+scatter|이젠 난/아예 다/!모르겠어|T
+cam|복잡하게/서로/!얽혀져 있어|B
+stack|미안해,/미워하기만 해서|T
+bounce|그래도/!어려워|T
+stack|이 마음을/!지우는 건|B
+shout|I'm a/!sub character|T
+stack|딱히/안 중요해|B
+cam|말해줘/넌 이 기분/!알고 있니|T
+stack|알아 난 추해,/패배자의/!montage|T
+tate|결말이/!정해져 있는|T
+stack|I'm a sub/!character|T
+shout|Just another/!loser|C
+scatter|어디로/!가야 할까|B
+cam|Tell me/내 이야기는/!결국|T
+bounce|!버려지는 걸까|B
+stack|아무도/아무 말도/하지 않아도|T
+cam|자꾸만 혼자/너와 날/!비교해|T
+stack|널 가능한 한/!나쁘게/생각한 뒤|T
+scatter|안도의/한숨을 내쉬어|B
+stack|알아 나도,/!진짜 별로지 나|T
+bounce|몇 번이고/!고치려 해도|B
+shout|!안 되더라|C
+shout|I'm a/!sub character|B
+cam|우린/!안 비슷해|B
+stack|부러워/넌 어찌 그리/!빛나는지|B
+scatter|모두 널/!좋아해|B
+stack|모두의/!인정받고|B
+bounce|!행복해 보여|B
+stack|I'm a sub/!character|T
+shout|Just another/!loser|T
+tate|!열등감으로/찬|T
+cam|Tell me/내가/!나쁜 맘일까|B
+stack|I wanna/!be you|B
+tate|내 이야기는/결국|T
+stack|I'm a sub/character|B
+stack|전혀/안 중요해|B
+cam|말해줘/누군가는/!아니라고|B
+stack|알아,/더 이상/의미 없단 걸|B
+shout|!정해져 있었어|B
+shout|I don't care/!그래도|T
+bounce|!패배자여도|B
+stack|매달릴 순/!있잖아|B
+cam|Help me,/내 손을/!잡아 줘|B
+shout|넌/!주인공이니까|T`.split('\n').map(r=>{const [st,ch,zone]=r.split('|');return {st,zone,chunks:ch.split('/').map(c=>({txt:c.replace('!',''),emph:c.startsWith('!')}))}});
+// chunk text -> the units it covers
+function chunkUnits(i){const sp=KSPEC[i],u=L(i).u;let k=0;return sp.chunks.map(c=>{const want=c.txt.replace(/\s/g,'').length,ks=[];let got=0;while(k<u.length&&got<want){ks.push(k);got+=u[k][0].replace(/\s/g,'').length;k++}return {...c,ks}}).filter(c=>c.ks.length)}
+const ZONE={T:[150,780],B:[1180,1820],C:[620,1300]};
+const isLatin=s=>/^[\x00-\x7F]+$/.test(s.replace(/\s/g,''));
+const KF=(c,f)=>isLatin(c.txt)?DG(f*.82):HV(f);
+function chunkChars(i,c,font){g.font=font;const sp=g.measureText(' ').width*.9,its=[];let x=0;c.ks.forEach((k,j)=>{const u=U(i,k);if(j>0&&u[4])x+=sp;const txt=isLatin(c.txt)?u[0].toUpperCase():u[0];[...txt].forEach((ch,q)=>{const w=g.measureText(ch).width;its.push({ch,ts:u[1]+q*.035,x:x+w/2,w});x+=w})});return {its,w:x}}
+const KL={};   // cached layouts per line
+function layoutLine(i){if(KL[i])return KL[i];const sp=KSPEC[i],cs=chunkUnits(i),[z0,z1]=ZONE[sp.zone],zh=z1-z0,zw=W-140,out={cs,st:sp.st};
+  if(sp.st==='tate'){const n=cs.length;cs.forEach((c,k)=>{const nch=[...c.txt.replace(/\s/g,'')].length;c.f=Math.min(c.emph?210:150,zh*.95/(nch*1.04));c.vert=1;c.cx=CX+((n-1)/2-k)*Math.min(260,zw/n);c.cy=(z0+z1)/2})}
+  else{let tot=0;cs.forEach(c=>{const m=chunkChars(i,c,KF(c,100)).w/100;c.f=clamp(zw*(c.emph?.96:.8)/m,70,c.emph?(sp.st==='shout'?300:250):(sp.st==='shout'?120:180));tot+=c.f*1.1});
+    const s=tot>zh?zh/tot:1;let y=(z0+z1)/2-tot*s/2;cs.forEach((c,k)=>{c.f*=s;y+=c.f*.55;c.cx=CX+(sp.st==='cam'?0:(k%2?1:-1)*20);c.cy=y;c.rot=sp.st==='cam'?0:(c.emph?-.05:(k%2?.025:-.025));y+=c.f*.55})
+    if(sp.st==='cam'){cs.forEach((c,k)=>{c.cx=CX+(k%2?1:-1)*(k?90:0);c.cy=(z0+z1)/2+(k-(cs.length-1)/2)*Math.min(c.f*1.15,zh/cs.length);c.rot=(k%3===1?-Math.PI/2*0:0)})}}
+  cs.forEach(c=>{c.lo=chunkChars(i,c,KF(c,c.f));c.t0=c.lo.its[0].ts});KL[i]=out;return out}
+const ENTRY=['pop','flip','drop','fly'];
+function charPose(style,a,n,c,t){   // entrance of one character; a = time since its syllable
+  const p=clamp(a/.28);switch(style){
+    case 'slam':{const q=eOutC(clamp(a/.14));return {s:1+1.6*(1-q),al:clamp(a/.05)}}
+    case 'pop':return {s:Math.max(0,eBk(clamp(a/.3),2.4)),al:clamp(a/.06)}
+    case 'flip':return {sy:Math.max(.02,eBk(clamp(a/.3),2)),al:clamp(a/.06)}
+    case 'drop':return {dy:-(1-oB(clamp(a/.5)))*420,al:clamp(a/.05)}
+    case 'fly':{const q=eOutX(clamp(a/.35));return {dx:(1-q)*(n%2?700:-700),sx:1+(1-q)*1.2,al:clamp(a/.08)}}
+    case 'scatter':{const q=eOutX(clamp(a/.45));return {dx:(1-q)*(R(n,71)-.5)*1400,dy:(1-q)*(R(n,72)-.5)*1600,rot:(1-q)*(R(n,73)-.5)*6,al:clamp(a/.1)}}
+    case 'bounce':{const q=clamp(a/.6),y=-(1-oB(q))*520,land=a>.35&&a<.55?Math.sin((a-.35)/.2*Math.PI)*.25:0;return {dy:y,sx:1+land,sy:1-land,al:clamp(a/.05)}}
+    case 'tate':{const q=eOutC(clamp(a/.3));return {dy:-(1-q)*260,al:clamp(a/.1)}}}
+  return {}}
+const IMP=[];   // impacts: emphasis chunks shake, flash, ring and burst confetti
+function buildImpacts(){for(let i=0;i<Ln.length;i++){const lo=layoutLine(i);lo.cs.forEach(c=>{if(c.emph)IMP.push({t:c.t0,x:c.cx,y:c.cy,big:lo.st==='shout'?1.4:1})})}IMP.sort((a,b)=>a.t-b.t)}
+const lineOut=i=>Ln[i+1]?Math.min(Ln[i+1].s-.12,L(i).e+1.6):L(i).e+1.6;
+function kineticLyrics(t){for(let i=0;i<Ln.length;i++){const s=L(i).s,o=lineOut(i);if(t<s-.4||t>o+.55)continue;const lo=layoutLine(i);
+  // "cam": the whole line group glides so the chunk being sung sits in the middle of its zone
+  let gx=0,gy=0;if(lo.st==='cam'){let k=0;lo.cs.forEach((c,j)=>{if(t>=c.t0-.1)k=j});const prev=lo.cs[Math.max(0,k-1)],cur=lo.cs[k],q=eIO(clamp((t-cur.t0+.1)/.3));const zc=(ZONE[KSPEC[i].zone][0]+ZONE[KSPEC[i].zone][1])/2;gy=zc-lerp(prev.cy,cur.cy,k?q:1);gx=CX-lerp(prev.cx,cur.cx,k?q:1)}
+  const ex=t-o;   // exit: the letters explode
+  lo.cs.forEach((c,ci)=>{const st=c.emph?'slam':lo.st==='stack'?ENTRY[ci%4]:lo.st==='shout'?'pop':lo.st==='cam'?(ci%2?'fly':'pop'):lo.st;const f=c.f,font=KF(c,f),col=c.emph?C.yel:'#FFFFFF',sh=c.emph?C.hot:C.hot;
+    g.save();g.translate(gx,gy);g.font=font;g.textAlign='center';g.textBaseline='middle';g.lineJoin='round';
+    c.lo.its.forEach((it,n)=>{const a=t-it.ts;if(a<-.02)return;const P=charPose(st,a,n,c,t);let x,y;
+      if(c.vert){x=c.cx;y=c.cy+(n-(c.lo.its.length-1)/2)*f*1.04}else{x=c.cx+(it.x-c.lo.w/2)*Math.cos(c.rot||0);y=c.cy+(it.x-c.lo.w/2)*Math.sin(c.rot||0)}
+      let al=P.al??1,dx=P.dx||0,dy=P.dy||0,rot=(P.rot||0)+(c.vert?0:(c.rot||0)),s=P.s??1;
+      if(ex>0){const q=clamp(ex/.5),an=Math.atan2(y-c.cy+(R(n,81)-.5)*80,x-CX+(R(n,82)-.5)*200);dx+=Math.cos(an)*q*(500+500*R(n,83));dy+=Math.sin(an)*q*(500+500*R(n,84))+q*q*300;rot+=(R(n,85)-.5)*q*8;al*=1-q}   // explode away
+      if(al<=0)return;g.save();g.globalAlpha=clamp(al);g.translate(x+dx,y+dy);g.rotate(rot);g.scale((P.sx??s)*(1+(c.emph?.04*pulse(t):0)),(P.sy??s)*(1+(c.emph?.04*pulse(t):0)));
+      g.fillStyle=sh;g.fillText(it.ch,f*.06,f*.06);g.lineWidth=f*.15;g.strokeStyle=C.navy;g.strokeText(it.ch,0,0);g.fillStyle=col;g.fillText(it.ch,0,0);g.restore()});
+    g.restore()})}}
+function impacts(t){let sh=0;for(const m of IMP){const a=t-m.t;if(a<0||a>1.3)continue;
+    if(a<.3)sh=Math.max(sh,26*m.big*(1-a/.3));
+    if(a<.16){g.fillStyle=`rgba(255,255,255,${.35*m.big*(1-a/.16)})`;g.fillRect(0,0,W,H)}
+    for(let r=0;r<2;r++){const q=clamp((a-r*.1)/.7);if(q>0&&q<1){g.strokeStyle=r?rgba(C.hot,1-q):`rgba(255,255,255,${1-q})`;g.lineWidth=14*(1-q)+2;g.beginPath();g.arc(m.x,m.y,40+900*m.big*eOutC(q),0,7);g.stroke()}}
+    for(let k=0;k<26*m.big;k++){const an=R(k,m.t*7)*6.283,v=500+900*R(k,m.t*7+1),q=clamp(a/1.2),x=m.x+Math.cos(an)*v*eOutC(q),y=m.y+Math.sin(an)*v*eOutC(q)+500*q*q;g.save();g.translate(x,y);g.rotate(q*8*(R(k,3)-.5));g.globalAlpha=1-q;g.fillStyle=[C.yel,C.hot,C.cyan,'#FFFFFF'][k%4];g.fillRect(-10,-5,20,10);g.restore()}}
+  return sh}
+
+// ================= instrumental: a film reel of memories (you at the centre, me at the edge) =================
+const MEM=['mem_entrance','mem_class','mem_race','mem_festival','mem_rain','mem_library','mem_lunch','mem_sunset','mem_rooftop','mem_photo','mem_award'];
+function memFrame(id,x,y,w,h,lit,cap){const im=ART[id];g.save();g.translate(x,y);g.fillStyle='#FFF7EA';g.fillRect(-w/2-12,-h/2-12,w+24,h+24);
+  if(im){const sc=Math.max(w/im.width,h/im.height);g.save();g.beginPath();g.rect(-w/2,-h/2,w,h);g.clip();g.drawImage(im,-im.width*sc/2,-im.height*sc/2,im.width*sc,im.height*sc);g.restore()}else{g.fillStyle='#3A2A40';g.fillRect(-w/2,-h/2,w,h)}
+  g.fillStyle=`rgba(255,170,90,${.14+.2*(1-lit)})`;g.globalCompositeOperation='multiply';g.fillRect(-w/2,-h/2,w,h);g.globalCompositeOperation='source-over';   // warm, faded like an old print
+  g.fillStyle=`rgba(10,6,16,${.62*(1-lit)})`;g.fillRect(-w/2,-h/2,w,h);if(cap){g.font=JO(600,22);g.fillStyle='rgba(22,20,58,.7)';g.textAlign='left';g.fillText(cap,-w/2,h/2+30)}g.restore()}
+function strip(y,h,w,gap,off,ids,dir,alpha,lit){g.save();g.globalAlpha=alpha;g.fillStyle='#120B14';g.fillRect(-100,y-h/2-70,W+200,h+140);g.fillStyle='#2A1E2C';
+  for(let x=((off*.5)%60+60)%60-60;x<W+60;x+=60){g.fillRect(x,y-h/2-52,30,24);g.fillRect(x,y+h/2+28,30,24)}
+  const step=w+gap;for(let k=-2;k<ids.length+2;k++){const x=off+k*step;if(x<-w||x>W+w)continue;const d=Math.abs(x-CX)/step,L0=lit?clamp(1-d*1.3):.35,id=ids[((k%ids.length)+ids.length)%ids.length];
+    g.save();const s=1+.06*(lit?clamp(1-d*2):0);g.translate(x,y);g.scale(s,s);memFrame(id,0,0,w,h,L0,lit?`SCENE 07-${String(k+1).padStart(2,'0')}`:'');g.restore()}g.restore()}
+SC.inter=t=>{const u=t-70.1;lyr(t,.2,()=>{bgGrad('#23142C','#08050C');const q=g.createRadialGradient(CX,CY,50,CX,CY,900);q.addColorStop(0,'rgba(255,214,160,.18)');q.addColorStop(1,'rgba(255,214,160,0)');g.fillStyle=q;g.fillRect(-200,-200,W+400,H+400)});
+  const v=(11*920+W)/12.2;strip(330,230,340,40,-(u*140)%380+W,[...MEM].reverse(),1,.55,0);strip(1590,230,340,40,(u*140)%380-380,MEM.slice(3).concat(MEM.slice(0,3)),-1,.55,0);   // small reels, drifting the other way
+  lyr(t,1,()=>strip(CY,574,860,60,W+460-u*v,MEM,1,1,1));   // the main reel: each memory lights up as it passes the middle
+  const fl=.06*R(1,Math.floor(t*18))+.1*pulse(t);g.fillStyle=`rgba(255,240,220,${fl})`;g.fillRect(0,0,W,H);   // projector flicker
+  for(let k=0;k<30;k++){const x=R(k,Math.floor(t*12))*W,y=R(k+50,Math.floor(t*12))*H;g.fillStyle='rgba(255,240,220,.35)';g.fillRect(x,y,2+R(k,9)*3,2+R(k,8)*3)}   // dust
+  const tt=eOutC(since(t,70.4,.8))*(1-since(t,81.3,.6));tag('MEMORIES',CX,160,'rgba(255,255,255,.14)','#FFFFFF',tt,26)};
 
 // ---------- transitions: each draws scene A and scene B together ----------
 const OFF=[0,1].map(()=>{const c=document.createElement('canvas');c.width=W;c.height=H;return c});
@@ -279,22 +423,28 @@ const r_=(a,b)=>[...Array(b-a+1)].map((_,k)=>a+k);
 const SAMP=document.createElement('canvas');SAMP.width=W;SAMP.height=H;
 const GL=document.createElement('canvas');GL.width=W;GL.height=H;
 function glitch(t){let q=0;for(const e of TL)if(e.tr){const d=Math.abs(t-(e.t0+e.t1)/2);q=Math.max(q,1-d/.18)}if(q<=0)return;   // RGB slice glitch around each cut
-  const x=GL.getContext('2d');x.clearRect(0,0,W,H);x.drawImage(g.canvas,0,0);const fr=Math.floor(t*30);
+  const x=GL.getContext('2d');x.clearRect(0,0,W,H);x.drawImage(MAIN.canvas,0,0);const fr=Math.floor(t*30);
   for(let k=0;k<7;k++){const y=R(k,fr)*H,h=20+R(k,fr+1)*120,dx=(R(k,fr+2)-.5)*80*q;g.drawImage(GL,0,y,W,h,dx,y,W,h)}
   g.save();g.globalCompositeOperation='screen';g.globalAlpha=.3*q;g.drawImage(GL,10*q,0);g.drawImage(GL,-10*q,0);g.restore()}
 function frame(t){let cur=TL[0];for(const e of TL)if(t>=e.t0)cur=e;
   if(cur.tr&&t<cur.t1){TR[cur.tr](t,clamp((t-cur.t0)/(cur.t1-cur.t0)),cur.A,cur.B,cur.o||{});return}S0=ST0[cur.s]??0;SC[cur.s](t)}
-function render(t){CINE.begin();g.filter='none';let cur=TL[0];for(const e of TL)if(t>=e.t0)cur=e;
+const BUF=document.createElement('canvas');BUF.width=W;BUF.height=H;
+function shakeAt(t){let sh=0;for(const m of IMP){const a=t-m.t;if(a>=0&&a<.3)sh=Math.max(sh,26*m.big*(1-a/.3))}return sh}
+function render(t){CINE.begin();g.filter='none';let cur=TL[0];for(const e of TL)if(t>=e.t0)cur=e;const g0=g,bx=BUF.getContext('2d');g=bx;g.setTransform(1,0,0,1,0,0);g.globalAlpha=1;g.filter='none';
   if(cur.tr&&t<cur.t1){const n=9,sx=SAMP.getContext('2d');g.fillStyle='#000';g.fillRect(0,0,W,H);   // motion blur while a transition moves: average several instants
-    for(let k=0;k<n;k++){const g0=g;g=sx;g.setTransform(1,0,0,1,0,0);g.globalAlpha=1;g.filter='none';g.clearRect(0,0,W,H);frame(t+(k/(n-1)-.5)*.5/30);g=g0;g.globalAlpha=1/(k+1);g.drawImage(SAMP,0,0)}g.globalAlpha=1}
+    for(let k=0;k<n;k++){const gb=g;g=sx;g.setTransform(1,0,0,1,0,0);g.globalAlpha=1;g.filter='none';g.clearRect(0,0,W,H);frame(t+(k/(n-1)-.5)*.5/30);g=gb;g.globalAlpha=1/(k+1);g.drawImage(SAMP,0,0)}g.globalAlpha=1}
   else frame(t);
+  g=g0;g.setTransform(1,0,0,1,0,0);g.fillStyle='#000';g.fillRect(0,0,W,H);const sh=shakeAt(t),sx2=(R(1,Math.floor(t*30))-.5)*sh,sy2=(R(2,Math.floor(t*30))-.5)*sh,ov=sh>0?1.04:1;
+  g.save();g.translate(CX+sx2,CY+sy2);g.scale(ov,ov);g.drawImage(BUF,-CX,-CY);g.restore();
+  g.save();g.translate(sx2,sy2);kineticLyrics(t);g.restore();impacts(t);
   glitch(t);
   g.save();g.globalCompositeOperation='overlay';g.globalAlpha=.35;const ox=Math.floor(R(Math.floor(t*12),1)*256),oy=Math.floor(R(Math.floor(t*12),2)*256);for(let y=-oy;y<H;y+=256)for(let x=-ox;x<W;x+=256)g.drawImage(GR,x,y);g.restore();   // grain
   const fo=since(t,D.dur-1.4,1.3);if(fo>0){g.fillStyle=`rgba(0,0,0,${fo})`;g.fillRect(0,0,W,H)}}
 window.DUR=D.dur;
 window.READY=(async()=>{await Promise.all(ARTN.map(id=>new Promise(r=>{const im=new Image();im.onload=()=>{ART[id]=im;const c=document.createElement('canvas');c.width=c.height=1;const x=c.getContext('2d');x.drawImage(im,2,2,1,1,0,0,1,1);FULL[id]=x.getImageData(0,0,1,1).data[3]>250;r()};im.onerror=()=>r();im.src='art/'+id+'.png'})));await Promise.all(SILN.map(id=>new Promise(r=>{const im=new Image();im.onload=()=>{SIL[id]=im;r()};im.onerror=()=>r();im.src='sil/'+id+'.png'})));
   const ko=Ln.map(l=>l.t).join('');try{await Promise.all([300,500,700,900].map(w=>document.fonts.load(KR(w,100),ko)).concat([document.fonts.load(JO(600,100),'MAINSUB'),document.fonts.load(DG(100),'MAINSUB'),document.fonts.load(JO(600,40),'CAST : EXTRA #7 ME YOU NOW PLAYING'),document.fonts.load(JO(300,40),'CHARACTER YOUNHA')]))}catch(e){}
-  build();window.renderAt=render;render(0)})();
+  try{await Promise.all([document.fonts.load(HV(100),Ln.map(l=>l.t).join('')),document.fonts.load(DG(100),"I'M A SUB CHARACTER JUST ANOTHER LOSER I WANNA BE YOU TELL ME HELP ME, I DON'T CARE EXTRA MONTAGE OH,")])}catch(e){}
+  build();buildImpacts();window.renderAt=render;render(0)})();
 </script>
 </body>
 </html>
