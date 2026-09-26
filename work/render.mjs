@@ -25,7 +25,9 @@ async function openPage() {
   page.on('pageerror', e => console.log('pageerror', e.message));
   // serve local files through routing (the outbound proxy only tunnels HTTPS)
   await page.route('http://local.test/**', r => {
-    try { r.fulfill({ body: readFileSync(root + decodeURIComponent(new URL(r.request().url()).pathname)) }); } catch { r.fulfill({ status: 404 }); }
+    const path = decodeURIComponent(new URL(r.request().url()).pathname), ext = path.split('.').pop().toLowerCase();
+    const type = { html: 'text/html', js: 'text/javascript', mjs: 'text/javascript', css: 'text/css', json: 'application/json', webp: 'image/webp', png: 'image/png', jpg: 'image/jpeg', svg: 'image/svg+xml' }[ext];   // ES modules need a JS MIME type
+    try { r.fulfill({ body: readFileSync(root + path), headers: type ? { 'content-type': type } : {} }); } catch { r.fulfill({ status: 404 }); }
   });
   // Google Fonts go through curl (it trusts the proxy CA; Chromium does not)
   await page.route(/https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/, r => {
