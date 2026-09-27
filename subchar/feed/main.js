@@ -20,7 +20,7 @@ async function loadFonts() {
   if (!(wd(`500 40px ${KR}`) !== wd('500 40px serif') && wd(`500 40px ${EN}`) !== wd('500 40px serif'))) { console.warn('[feed] fonts did not load: READY is held.'); await new Promise(() => { }) }
 }
 window.DUR = DUR;
-window.READY = (async () => { await loadFonts(); window.renderAt = renderAt; renderAt(0); if (!RENDER) player() })();
+window.READY = (async () => { await loadFonts(); await loadArt(); window.renderAt = renderAt; renderAt(0); if (!RENDER) player() })();
 function player() {
   const bar = document.getElementById('bar'), au = new Audio('../song.mp3'), rng = document.getElementById('rng'), btn = document.getElementById('play'), lab = document.getElementById('lab');
   bar.hidden = false; rng.min = 0; rng.max = DUR; rng.step = .01; rng.value = 0; let playing = false;

@@ -63,3 +63,38 @@ function drawPath(pts, p, lw, col) { if (p <= 0) return; let tot = 0; const L = 
   for (let i = 1; i < pts.length && left > 0; i++) { const f = Math.min(1, left / L[i - 1]); g.lineTo(lerp(pts[i - 1][0], pts[i][0], f), lerp(pts[i - 1][1], pts[i][1], f)); left -= L[i - 1] } g.stroke() }
 // a label inside a pill: text centred
 function pillText(x, y, s, o) { txt(s, x, y, { size: o.size, w: o.w ?? 600, fam: o.fam ?? KR, col: o.col, al: 'center', base: 'middle', alpha: o.alpha, tr: o.tr ?? 0, upper: false }) }
+
+// ---------- anime art (restored subculture illustrations in subchar/art) ----------
+const ART = {}, ARTS = ['mem_class', 'mem_sunset', 'mem_festival', 'mem_award', 'mem_race', 'mem_rooftop', 'mem_photo', 'you_front', 'you_stage', 'you_crowd', 'me_profile', 'me_smile'];
+const loadArt = () => Promise.all(ARTS.map(id => new Promise(r => { const im = new Image(); im.onload = () => { ART[id] = im; r() }; im.onerror = () => r(); im.src = `../art/${id}.png` })));
+// faces for avatars: focus point (0..1) and how many avatar-widths the whole picture spans
+const FACE = { you_front: [.44, .2, 1.8], you_stage: [.46, .27, 1.9], me_profile: [.52, .26, 2.0], me_smile: [.5, .27, 1.6] };   // [focus x, focus y, picture width in avatar diameters]
+// faces in the class photo (mem_photo), for the likes crowd
+const CROWD = [[.15, .14], [.32, .13], [.53, .16], [.62, .15], [.78, .14], [.12, .33], [.26, .35], [.39, .31], [.69, .32], [.81, .34], [.95, .29], [.18, .47], [.3, .49], [.5, .44], [.65, .47], [.8, .5]];
+// a picture inside a rounded rect, cover-fit around a focus point
+function photo(id, cx, cy, w, h, o = {}) {
+  const im = ART[id]; if (!im || w < 2 || h < 2) return;
+  const z = o.zoom ?? 1, s = Math.max(w / im.width, h / im.height) * z, iw = im.width * s, ih = im.height * s;
+  const fx = o.fx ?? .5, fy = o.fy ?? .5, x = clamp(cx - iw * fx, cx + w / 2 - iw, cx - w / 2), y = clamp(cy - ih * fy, cy + h / 2 - ih, cy - h / 2);
+  g.save(); g.beginPath(); g.roundRect(cx - w / 2, cy - h / 2, w, h, o.r ?? 30); g.clip();
+  if (o.bg) { g.fillStyle = o.bg; g.fillRect(cx - w / 2, cy - h / 2, w, h) }
+  if (o.filter) g.filter = o.filter; g.globalAlpha = o.alpha ?? 1; g.drawImage(im, x, y, iw, ih); g.filter = 'none'; g.restore(); g.globalAlpha = 1;
+}
+function avatar(id, cx, cy, r, o = {}) {
+  const im = ART[id]; if (!im || r < 1) return; const [fx, fy, span] = o.face || FACE[id] || [.5, .3, 3], iw = 2 * r * span, s = iw / im.width, ih = im.height * s;
+  g.save(); g.beginPath(); g.arc(cx, cy, r, 0, 7); g.clip(); g.fillStyle = o.bg || '#EDE7F2'; g.fillRect(cx - r, cy - r, 2 * r, 2 * r);
+  if (o.filter) g.filter = o.filter; g.globalAlpha = o.alpha ?? 1; g.drawImage(im, cx - iw * fx, cy - ih * fy, iw, ih); g.filter = 'none'; g.restore(); g.globalAlpha = 1;
+}
+// a whole-page background: the picture, heavily blurred once (cached), under a wash of the section colour
+const BLUR = {};
+function blurBg(id, tint, a = .8) {
+  let c = BLUR[id]; const im = ART[id];
+  if (!c && im) { c = document.createElement('canvas'); c.width = 270; c.height = 480; const x = c.getContext('2d'), s = Math.max(270 / im.width, 480 / im.height);
+    x.filter = 'blur(10px)'; x.drawImage(im, (270 - im.width * s) / 2 - 20, (480 - im.height * s) / 2 - 20, im.width * s + 40, im.height * s + 40); BLUR[id] = c }
+  if (c) { g.save(); g.imageSmoothingQuality = 'high'; g.drawImage(c, 0, 0, W, H); g.restore() }
+  rect(0, 0, W, H, tint, a);
+}
+
+// a small round crop of a picture at (fx, fy): used for the faces in the likes crowd
+function photoCrop(id, cx, cy, r, fx, fy, span = 12) { const im = ART[id]; if (!im) return; const iw = 2 * r * span, s = iw / im.width, ih = im.height * s;
+  g.save(); g.beginPath(); g.arc(cx, cy, r, 0, 7); g.clip(); g.drawImage(im, cx - iw * fx, cy - ih * fy, iw, ih); g.restore() }

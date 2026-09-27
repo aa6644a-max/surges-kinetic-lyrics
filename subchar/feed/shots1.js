@@ -18,7 +18,7 @@ function I0(t) {
   const Yx = CX, Yy = 1010, yr = t0 => spr(t0, [[0, 0], [4.09, 170, 2, .33]]);
   if (t > 4) {
     layered(t, [.12, .06, 0], [MECOL, YEL, WHITE], (tt, col) => blob(Yx, Yy + (1 - clamp(yr(tt) / 170)) * 60, yr(tt) * 2, yr(tt) * 2, { col, wob: wob(tt - 4.09, .22) }));
-    if (t > 4.5) personIcon(Yx, Yy, yr(t) * .62, YOUCOL);
+    if (t > 4.3) avatar('you_front', Yx, Yy, yr(t) * .9, { alpha: seg(t, 4.3, .4) });
     const ring = eOut(seg(t, 6.03, .9)); g.save(); g.lineCap = 'round'; for (const [col, lag, rr] of [[YEL, .12, 206], [YOUCOL, 0, 206]]) { const p = eOut(seg(t, 6.03 + lag, .9)); if (p <= 0) continue; g.strokeStyle = col; g.lineWidth = 14; g.beginPath(); g.arc(Yx, Yy, rr + wob(t - 6.9, 6), -Math.PI / 2, -Math.PI / 2 + p * Math.PI * 2); g.stroke() } g.restore();
     // other people: small dots that pop in around YOU on the beat and slowly orbit
     for (let j = 0; j < 7; j++) { const tj = onBeat(13 + j), s = spr(t, [[0, 0], [tj, 1, 3, .32]]), an = j / 7 * 6.28 + .6 + t * .07, d = 330 + 70 * R(j, 2);
@@ -42,17 +42,17 @@ function I0(t) {
 function card(cx, cy, sc, kind, t, capFn) {
   g.save(); g.translate(cx, cy); g.scale(sc, sc);
   blob(0, 14, 900, 980, { col: 'rgba(109,91,128,.14)', round: .09 }); blob(0, 0, 900, 980, { col: WHITE, round: .09 });
-  disc(-380, -420, 40, YOUCOL); ring(-380, -420, 50, 6, YEL); blob(-230, -432, 200, 26, { col: GREY, round: 1 }); blob(-260, -398, 140, 18, { col: '#E4DFEA', round: 1 });
+  avatar('you_front', -380, -420, 40); ring(-380, -420, 50, 6, YEL); blob(-230, -432, 200, 26, { col: GREY, round: 1 }); blob(-260, -398, 140, 18, { col: '#E4DFEA', round: 1 });
   g.save(); g.beginPath(); g.roundRect(-410, -360, 820, 620, 30); g.clip();
-  if (kind === 0) { rect(-410, -360, 820, 620, TEAL); disc(0, -60, 140 + 6 * pulse(t), YEL); blob(0, 190, 900, 180, { col: '#4F9C9D', round: 1 }) }
-  else { rect(-410, -360, 820, 620, PEACH); disc(0, -120, 120, YOUCOL); blob(0, 170, 460, 300, { col: YOUCOL, round: 1 }); blob(0, -120 - 60, 210, 90, { col: '#3E27B8', round: 1 }) }   // YOU, from behind
+  if (kind === 0) photo('mem_class', 0, -50, 820, 620, { fx: .42, fy: .45, r: 0 });                                       // YOU among friends; ME by the window
+  else photo('mem_sunset', 0, -50, 820, 620, { fx: .42, fy: .5, r: 0 });                                                 // YOU walking ahead with friends; ME far behind
   g.restore();
   heart(-372, 330, 64, { stroke: INK, lw: 6 }); txt('12.4K', -320, 344, { size: 36, w: 600, fam: EN, col: INK, upper: false });
   if (capFn) capFn();
   g.restore();
 }
 function V1(t) {
-  fill(CREAM);
+  fill(CREAM); blurBg('mem_class', CREAM, .82);
   const feedA = 1 - seg(t, S(5) - .1, .35);
   const zoom = spr(t, [[0, 1], [S(2) - .1, 1.75, 1.5, .5], [S(3) - .35, 1, 1.6, .45]]);
   const sy = spr(t, [[0, 1900], [15.2, 0, 1.8, .45], [S(1) - .12, -1080, 1.8, .42]]);
@@ -81,7 +81,7 @@ function V1(t) {
       if (t < S(4) + .2) cap(t, 3, 0, null, 230, by + 14, { size: 42, w: 600, col: INK, alpha: 1 - seg(t, S(4), .2) });
       if (t > S(4) - .1 && bh > 300) {
         const a = seg(t, S(4) + .05, .3) * (1 - seg(t, S(5) - .2, .15));
-        disc(250, bcy - bh / 2 + 150, 80 * a, GREY); disc(300, bcy - bh / 2 + 100, 18 * a, MECOL);          // ME's avatar: grey, one coral dot
+        avatar('me_profile', 250, bcy - bh / 2 + 150, 80 * a, { filter: 'grayscale(.75) brightness(1.05)' }); disc(300, bcy - bh / 2 + 100, 18 * a, MECOL);          // ME's avatar: grey, one coral dot
         for (const [k, s, xx] of [[0, '게시물 0', 520], [1, '팔로워 38', 780]]) { blob(xx, bcy - bh / 2 + 150, 220, 80, { col: CREAM, round: 1, alpha: a }); txt(s, xx, bcy - bh / 2 + 150, { size: 34, w: 600, col: INK, al: 'center', base: 'middle', alpha: a }) }
         cap(t, 4, 0, null, 150, bcy - bh / 2 + 330, { size: 48, w: 500, col: INK, alpha: a });
       }
@@ -103,6 +103,7 @@ function V1(t) {
   if (t > S(7) - .4) {
     const ky = 1100, kx = spr(t, [[0, 190], ...chars(8).map((G, k) => [G.t, 190 + (k + 1) * 130, 2.6, .35])]), kIn = fall(t, S(7) - .4, S(7) - .05, 2100, ky);
     const drain = seg(t, S(8) - .1, E(8) - S(8) + .3), cool = seg(t, S(9), .6);
+    const pa = seg(t, S(7) - .3, .4); if (pa > 0) { const ps = spr(t, [[0, 0], [S(7) - .3, 1, 2.2, .38]]); g.save(); g.translate(CX, 440); g.scale(ps, ps); blob(0, 8, 840, 540, { col: 'rgba(109,91,128,.18)', round: .1 }); photo('mem_race', 0, 0, 820, 520, { fx: .5, fy: .4, r: 34, filter: `grayscale(${drain}) contrast(${1 - .15 * drain}) brightness(${1 - .15 * cool})` }); g.restore() }
     rect(0, 0, W, H, '#8E8A96', .45 * drain);                                                                          // the page loses its colour
     for (let k = 0; k < 5; k++) { const G = chars(8)[k], a = seg(t, G.t, 1.2); if (a > 0) blob(190 + (k + 1) * 130, ky + 180 + 40 * R(k, 4), 260 * eOut(a), 180 * eOut(a), { col: '#6F6A78', alpha: .35 * (1 - cool), wob: .4, ph: t * 2 + k }) }
     blob(CX, ky, 760, 26, { col: GREY, round: 1 }); blob((190 + Math.max(190, kx)) / 2, ky, Math.max(26, kx - 190), 26, { col: lerpCol(MECOL, GREY, drain), round: 1 });
@@ -118,11 +119,11 @@ function lerpCol(a, b, x) { const p = [1, 3, 5].map(i => parseInt(a.slice(i, i +
 
 // ================= PRE-CHORUS 31.0 - 48.4: tags, the likes list, a badge, a heart pressed and taken back, a comment deleted, a spinner holding on =================
 function P1(t) {
-  fill(DEEP);
+  fill(DEEP); blurBg('mem_festival', DEEP, .8);
   // L10 "@주인공" pops; ME's "@나" appears on 난 and deflates on 아니야
   const chipS = spr(t, [[0, 0], [S(10), 1, 2.4, .35], [S(11) - .1, .72, 1.8, .5], [S(12) - .1, 1.1, 2, .4], [S(13) - .1, 0, 2.6, .6]]);
   const chipY = spr(t, [[0, 900], [S(11) - .1, 470, 1.6, .5], [S(12) - .1, 880, 1.6, .5]]);
-  if (chipS > .01 && t < S(13) + .6) { g.save(); g.translate(CX, chipY); g.scale(chipS, chipS); blob(0, 0, 560, 140, { col: WHITE, round: 1, wob: wob(t - S(10), .12) }); pillText(0, 4, '@주인공', { size: 64, w: 800, col: YOUCOL }); g.restore() }
+  if (chipS > .01 && t < S(13) + .6) { g.save(); g.translate(CX, chipY); g.scale(chipS, chipS); blob(0, 0, 560, 140, { col: WHITE, round: 1, wob: wob(t - S(10), .12) }); avatar('you_front', -205, 0, 48); pillText(40, 4, '@주인공', { size: 64, w: 800, col: YOUCOL }); g.restore() }
   if (t < S(11) + .4) {
     const ms = spr(t, [[0, 0], [cT(10, 5), 1, 3, .35], [cT(10, 6) + .15, 0, 2.2, .7]]);
     if (ms > .01) { g.save(); g.translate(CX, 1120); g.scale(ms, ms * (1 + wob(t - cT(10, 6) - .15, .4))); blob(0, 0, 200, 80, { col: GREY, round: 1 }); pillText(0, 3, '@나', { size: 36, w: 600, col: INK }); g.restore() }
@@ -135,7 +136,7 @@ function P1(t) {
       const n = r * 7 + c, me = r === 5 && c === 1, gx = CX + (c - 3) * 120, gy = 1010 + (r - 3) * 120, d = Math.hypot(c - 3, r - 3);
       const s = spr(t, [[0, 0], [S(11) + d * .07, 1, 2.6, .35]]) * (1 - gather) * (me ? 1 + .5 * pulse(t) * (t > cT(11, 5)) : 1);
       const x = lerp(gx, CX, gather), y = lerp(gy, chipY, gather);
-      if (s > .01) blob(x, y, 60 * s, 60 * s, { col: me ? MECOL : [GREY, TEAL, PEACH, WHITE, MAUVE][n % 5], alpha: me ? 1 : .85 });
+      if (s > .01) { if (me) blob(x, y, 60 * s, 60 * s, { col: MECOL }); else { g.save(); g.translate(x, y); g.scale(s, s); disc(0, 0, 32, WHITE); photoCrop('mem_photo', 0, 0, 29, ...CROWD[(n * 7) % CROWD.length], 9); g.restore() } }   // other people's faces; ME is the coral dot
     }
     const ls = spr(t, [[0, 0], [cT(11, 5), 1, 2.6, .35]]) * (1 - gather); if (ls > .01) { g.save(); g.translate(CX, 1560); g.scale(ls, ls); blob(0, 0, 380, 96, { col: WHITE, round: 1 }); pillText(0, 3, '외 1,203명', { size: 40, w: 600, col: INK }); g.restore() }
     cap(t, 11, 0, 5, CX - 60, 1720, { size: 40, w: 400, tr: .1, col: WHITE, al: 'center', hide: S(12) - .1 });
@@ -154,8 +155,9 @@ function P1(t) {
   if (t > S(13) - .15 && t < S(15) + .2) {
     const hs = spr(t, [[0, 0], [S(13), 1, 2.2, .35], [S(14) - .1, .6, 1.6, .5], [S(15) - .2, 0, 2.4, .6]]), hy = spr(t, [[0, 960], [S(14) - .1, 720, 1.6, .5]]);
     const fillA = seg(t, cT(13, 6), .06) * (1 - seg(t, cT(13, 8) + .1, .45)), hp = wob(t - cT(13, 6), .35) - wob(t - cT(13, 8) - .1, .25);
-    heart(CX, hy, 420 * hs * (1 + hp * .4), { col: fillA > 0 ? MECOL : null, alpha: 1, stroke: WHITE, lw: 14 }); if (fillA > 0 && fillA < 1) heart(CX, hy, 420 * hs * (1 + hp * .4), { col: DEEP, alpha: 1 - fillA, stroke: WHITE, lw: 14 });
-    cap(t, 13, 0, 7, CX, 1400, { size: 44, w: 400, tr: .1, col: WHITE, al: 'center', hide: S(14) - .1 }); cap(t, 13, 7, null, CX, 1490, { size: 64, w: 700, col: MECOL, al: 'center', hide: S(14) - .1 });
+    { g.save(); g.translate(CX, hy); g.scale(hs, hs); blob(0, 8, 860, 640, { col: 'rgba(0,0,0,.25)', round: .08 }); photo('mem_award', 0, 0, 840, 620, { fx: .45, fy: .4, r: 34 }); g.restore() }
+    heart(CX, hy, 360 * hs * (1 + hp * .4), { col: MECOL, alpha: fillA }); heart(CX, hy, 360 * hs * (1 + hp * .4), { stroke: WHITE, lw: 14 });                     // double-tap on YOU's photo
+    cap(t, 13, 0, 7, CX, 1420, { size: 44, w: 400, tr: .1, col: WHITE, al: 'center', hide: S(14) - .1 }); cap(t, 13, 7, null, CX, 1490, { size: 64, w: 700, col: MECOL, al: 'center', hide: S(14) - .1 });
     if (t > S(14) - .4) {
       const iy = spr(t, [[0, 2100], [S(14) - .3, 1600, 2, .45], [S(15) - .25, 2200, 1.6, .5]]);
       blob(CX, iy, 920, 140, { col: WHITE, round: 1, sq: wob(t - S(14) + .1, .15) }); disc(930, iy, 44, YOUCOL);
@@ -182,12 +184,12 @@ function P1(t) {
 const HEARTS = Array.from({ length: 28 }, (_, j) => ({ x: 90 + (j % 7) * 150 + (R(j, 1) - .5) * 40, row: Math.floor(j / 7), t0: 48.35 + j * .032 + R(j, 2) * .15, s: 100 + 40 * R(j, 3), rot: (R(j, 4) - .5) * .6, col: [MECOL, PINK, YEL, WHITE, PEACH][j % 5] }));
 function C1(t) {
   const peach = eOut(seg(t, S(22) - .05, .5)), teal = eIO(seg(t, S(26) - .3, .55));
-  fill(VIOLET);
+  fill(VIOLET); blurBg('you_stage', VIOLET, .78);
   // YOU's circle (it will shine, collect the likes, then wait at the end)
   const Yx = spr(t, [[0, 380], [cT(18, 2), 330, 2.4, .35], [S(19) - .1, CX, 1.4, .5], [S(27) - .2, 760, 1.4, .5]]), Yy = spr(t, [[0, 820], [S(27) - .2, 1000, 1.4, .5]]);
   const Yr = spr(t, [[0, 0], [S(18), 200, 2.2, .33], [S(19) - .1, 280, 1.6, .4], [S(22) - .1, 0, 2.2, .7], [S(27) - .25, 190, 2.2, .35]]);
-  if (peach > 0) disc(Yx, Yy, peach * 2400, PEACH);
-  if (teal > 0) { g.save(); g.fillStyle = TEAL; g.beginPath(); const off = (1 - teal) * 2200; g.moveTo(off - 300, 0); g.lineTo(off + 1600, 0); g.lineTo(off + 1300, H); g.lineTo(off - 600, H); g.fill(); g.restore() }
+  if (peach > 0) { g.save(); g.beginPath(); g.arc(Yx, Yy, peach * 2400, 0, 7); g.clip(); fill(PEACH); blurBg('mem_rooftop', PEACH, .74); g.restore() }
+  if (teal > 0) { g.save(); g.beginPath(); const off = (1 - teal) * 2200; g.moveTo(off - 300, 0); g.lineTo(off + 1600, 0); g.lineTo(off + 1300, H); g.lineTo(off - 600, H); g.clip(); fill(TEAL); blurBg('mem_sunset', TEAL, .78); g.restore() }
   // hearts rain down and pile up; on "모두 널 좋아해" they fly up into the counter
   if (t < S(21) + .5) HEARTS.forEach((h, j) => {
     const land = h.t0 + .55, yl = 1850 - h.row * 118, y = fall(t, h.t0, land, -120, yl), fly = eIn(seg(t, S(20) + j * .018, .45));
@@ -200,7 +202,7 @@ function C1(t) {
     const ringsOn = t > S(19) && t < S(20) + .3;
     if (ringsOn) for (let k = 0; k < 6; k++) { const tb = onBeat(Math.floor(beatN(S(19))) + k), a = t - tb; if (a > 0 && a < 1.2) ring(Yx, Yy, Yr + 30 + a * 520, 12 * (1 - a / 1.2) + 2, YEL, 1 - a / 1.2) }
     layered(t, [.08, 0], [YEL, WHITE], (tt, col) => blob(Yx, Yy, Yr * 2, Yr * 2, { col, wob: wob(tt - S(18), .15) + wob(tt - cT(18, 2), .2) }));
-    personIcon(Yx, Yy, Yr * .62, YOUCOL); ring(Yx, Yy, Yr + 22, 12, YOUCOL);
+    avatar(t < S(26) ? 'you_stage' : 'you_front', Yx, Yy, Yr * .92); ring(Yx, Yy, Yr + 22, 12, YOUCOL);
   }
   const Mx = spr(t, [[0, 800], [cT(18, 2), 880, 2.4, .35], [S(19) - .1, 1350, 1.4, .5], [S(27) - .25, 260, 1.4, .5]]), My = spr(t, [[0, 860], [S(27) - .25, 1000, 1.4, .5]]);
   if (t > S(18) - .1 && t < S(19) + .4) blob(Mx, My, 120, 120, { col: MECOL, sq: wob(t - cT(18, 2), .5) });
@@ -221,14 +223,15 @@ function C1(t) {
   if (t > S(22) - .1 && t < S(26)) {
     const k = seg(t, S(22), .1);
     const sun = spr(t, [[0, 0], [S(22), 300, 1.8, .33], [S(25) - .1, 180, 1.6, .5]]);
-    disc(CX, 700, sun, YEL); blob(260 + 30 * Math.sin(t), 1650, 900 * k, 520 * k, { col: TEAL, round: .7, wob: .15, ph: t * 2 });
-    if (t < S(23) + .2) { layered(t, [.1, .05, 0], [MECOL, YEL, WHITE], (tt, col) => cap(tt, 22, 0, 3, CX, 1250, { size: 230, w: 900, col, al: 'center', rev: 'grow' })); cap(t, 22, 3, null, CX, 1370, { size: 56, w: 500, col: WHITE, al: 'center' }) }
+    disc(CX, 700, sun, YEL); const pc = spr(t, [[0, 0], [S(22) + .1, 1, 2, .36], [S(23) + .3, .55, 1.6, .5]]), pcy = spr(t, [[0, 820], [S(23) + .3, 560, 1.6, .5]]);
+    if (pc > .01 && t < S(25)) { g.save(); g.translate(CX, pcy); g.scale(pc, pc); g.rotate(-.04); blob(0, 10, 640, 800, { col: 'rgba(0,0,0,.14)', round: .08 }); blob(0, 0, 640, 800, { col: WHITE, round: .08 }); photo('you_crowd', 0, -40, 580, 640, { fx: .5, fy: .3, r: 20 }); heart(-240, 340, 50, { col: MECOL }); txt('99,999', -196, 356, { size: 40, w: 800, fam: EN, col: INK, upper: false }); g.restore() } blob(260 + 30 * Math.sin(t), 1650, 900 * k, 520 * k, { col: TEAL, round: .7, wob: .15, ph: t * 2 });
+    if (t < S(23) + .2) { layered(t, [.1, .05, 0], [MECOL, YEL, WHITE], (tt, col) => cap(tt, 22, 0, 3, CX, 1420, { size: 200, w: 900, col, al: 'center', rev: 'grow' })); cap(t, 22, 3, null, CX, 1530, { size: 56, w: 500, col: WHITE, al: 'center' }) }
   }
   // L23-24 ME's post: a small tile slides in with a heart and 0; it is brought to the centre and wobbles
   if (t > S(23) - .3 && t < S(26) - .1) {
     const sc = spr(t, [[0, 1], [S(24) - .1, 2.1, 1.6, .45], [S(25) - .1, 1.25, 1.6, .5]]), cx = spr(t, [[0, 1300], [S(23) - .2, 830, 2, .4], [S(24) - .1, CX, 1.6, .45]]), cy = spr(t, [[0, 1560], [S(24) - .1, 900, 1.6, .45], [S(25) - .1, 760, 1.6, .5]]);
     g.save(); g.translate(cx, cy); g.scale(sc, sc);
-    blob(0, 6, 340, 440, { col: 'rgba(0,0,0,.12)', round: .12 }); blob(0, 0, 340, 440, { col: WHITE, round: .12 }); blob(0, -60, 300, 240, { col: '#DCD6E3', round: .12 });
+    blob(0, 6, 340, 440, { col: 'rgba(0,0,0,.12)', round: .12 }); blob(0, 0, 340, 440, { col: WHITE, round: .12 }); photo('me_smile', 0, -60, 300, 240, { fx: .5, fy: .3, zoom: 1, r: 18, bg: '#E7E2EC', filter: 'grayscale(.35)' });
     heart(-120, 110, 44, { stroke: INK, lw: 5 }); txt('0', -84, 124, { size: 40, w: 800, fam: EN, col: MECOL, upper: false });
     cap(t, 23, 0, null, -140, 170, { size: 20, w: 500, fam: EN, col: INK, hide: S(24) - .05 }); if (t > S(24) - .05) cap(t, 24, 0, null, -140, 170, { size: 20, w: 600, fam: EN, col: MECOL });
     g.restore();
