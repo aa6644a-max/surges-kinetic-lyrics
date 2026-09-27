@@ -58,7 +58,7 @@ function FC(t) {
   const stickerP = (id, x, y, w, h, t0, rot, o = {}) => { const s = spr(t, [[0, 0], [t0, 1, 2.6, .33]]); if (s < .01) return; g.save(); g.translate(x, y); g.rotate(rot * (2 - s)); g.scale(s, s); blob(0, 8, w + 30, h + 30, { col: 'rgba(0,0,0,.2)', round: .08 }); blob(0, 0, w + 30, h + 30, { col: WHITE, round: .08 }); photo(id, 0, 0, w, h, { r: 16, fx: o.fx ?? .5, fy: o.fy ?? .3, bg: '#EDE7F2' }); g.restore() };
   if (k === 0) { stickerP('me_run', 740, 1380, 380, 500, S(60) + .2, .12); g.save(); g.translate(CX, 760); g.rotate(-.12); layered(t, [.08, .04, 0], [YEL, INK, WHITE], (tt, col) => { big(60, 0, 4, -470, -60, 230, col, { fam: EN, upper: true }); big(60, 4, null, -470, 160, 230, col, { fam: EN, upper: true }) }); g.restore() }
   if (k === 1) { const hit = eOutQ(seg(t, cT(61, 2), .3)), bump = wob(t - cT(61, 2) - .3, .3);
-    stickerP('you_front', lerp(-300, 290, hit), 960, 420, 560, S(61), -.05); stickerP('me_smile', lerp(1400, 790, hit), 960, 420, 560, S(61), .05);
+    stickerP('you_front', lerp(-300, 290, hit), 960, 420, 560, S(61), -.05); stickerP('me_smile', lerp(1400, 790, hit), 960, 420, 560, S(61), .05, { fy: .4 });
     big(61, 0, 2, 290, 1390, 120, WHITE, { al: 'center' }); big(61, 2, null, 790, 1390, 120, WHITE, { al: 'center' }) }
   if (k === 2) { for (let j = 0; j < 5; j++) { const a = t - onBeat(Math.floor(beatN(S(62))) + j); if (a > 0 && a < 1.2) ring(CX, 900, 200 + a * 700, 14 * (1 - a / 1.2) + 2, YEL, 1 - a / 1.2) }
     stickerP('you_stage', CX, 900, 320, 400, S(62), -.06, { fy: .3 }); big(62, 0, 8, CX, 330, 80, WHITE, { al: 'center', w: 800 }); big(62, 8, null, CX, 1420, 260, YEL, { al: 'center' }) }
@@ -66,7 +66,7 @@ function FC(t) {
     for (let j = 0; j < 24; j++) { const side = j % 2, x = (side ? 780 : 300) + ((j >> 1) % 4 - 1.5) * 90, row = Math.floor(j / 8), t0 = S(63) + j * .04, land = t0 + .5, y = fall(t, t0, land, -100, 1300 - row * 100); if (t > t0) heart(x, y, 100, { col: [MECOL, PINK, YEL, WHITE][j % 4], sq: wob(t - land, .45), rot: (R(j, 3) - .5) * .5 }) }
     big(63, 0, null, CX, 1600, 150, WHITE, { al: 'center' }) }
   if (k === 4) { g.save(); g.translate(CX, CY); g.rotate(.14); big(64, 0, 3, 0, -80, 260, WHITE, { al: 'center' }); big(64, 3, null, 0, 200, 260, INK, { al: 'center' }); g.restore() }
-  if (k === 5) { stickerP('you_crowd', 330, 760, 420, 540, S(65), -.07); stickerP('me_smile', 760, 900, 420, 540, S(65) + .25, .06); big(65, 0, 3, CX, 1500, 250, WHITE, { al: 'center' }); big(65, 3, null, CX, 1640, 90, INK, { al: 'center' }) }
+  if (k === 5) { stickerP('you_crowd', 330, 760, 420, 540, S(65), -.07); stickerP('me_smile', 760, 900, 420, 540, S(65) + .25, .06, { fy: .4 }); big(65, 0, 3, CX, 1500, 250, WHITE, { al: 'center' }); big(65, 3, null, CX, 1640, 90, INK, { al: 'center' }) }
   if (k === 6) { const run = (t - S(66)) / (E(66) - S(66) + .3); big(66, 0, null, 200 - run * 3400, 1100, 420, WHITE, { fam: EN, upper: true, rev: 'type' }); rect(0, 1160, W, 14, INK) }
   if (k === 7) { // LOSER, with ME's dot as the O; the dot swells and fills the page
     const sz = 380, sw = eIn(seg(t, E(67) - .5, .7)); font(900, sz, EN); setTrack(0); const wL = g.measureText('L').width, wS = g.measureText('SER').width, wO = sz * .78, x0 = CX - (wL + wO + wS) / 2;

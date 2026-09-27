@@ -125,7 +125,7 @@ const STORIES = () => [
 function storyFrame(id, who, cx, s, t, extra) {
   g.save(); g.translate(cx, CY); g.scale(s, s);
   const bg = who === 'me' ? '#CFC9D8' : '#222';
-  photo(id, 0, 0, 1000, 1780, { r: 44, fx: .5, fy: who === 'me' ? .3 : .45, bg, filter: who === 'me' ? 'grayscale(.45) brightness(.95)' : '' });
+  photo(id, 0, 0, 1000, 1780, { r: 44, fx: .5, fy: who === 'me' ? .4 : .45, bg, filter: who === 'me' ? 'grayscale(.45) brightness(.95)' : '' });
   const gr = g.createLinearGradient(0, -890, 0, -600); gr.addColorStop(0, 'rgba(0,0,0,.45)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.beginPath(); g.roundRect(-500, -890, 1000, 290, [44, 44, 0, 0]); g.fill();
   avatar(who === 'me' ? 'me_profile' : 'you_front', -400, -770, 40); txt(who === 'me' ? '나' : '주인공', -340, -756, { size: 36, w: 700, col: WHITE });
   if (extra) extra();

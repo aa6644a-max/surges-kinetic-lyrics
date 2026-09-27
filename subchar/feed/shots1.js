@@ -136,7 +136,7 @@ function P1(t) {
       const n = r * 7 + c, me = r === 5 && c === 1, gx = CX + (c - 3) * 120, gy = 1010 + (r - 3) * 120, d = Math.hypot(c - 3, r - 3);
       const s = spr(t, [[0, 0], [S(11) + d * .07, 1, 2.6, .35]]) * (1 - gather) * (me ? 1 + .5 * pulse(t) * (t > cT(11, 5)) : 1);
       const x = lerp(gx, CX, gather), y = lerp(gy, chipY, gather);
-      if (s > .01) { if (me) blob(x, y, 60 * s, 60 * s, { col: MECOL }); else { g.save(); g.translate(x, y); g.scale(s, s); disc(0, 0, 32, WHITE); photoCrop('mem_photo', 0, 0, 29, ...CROWD[(n * 7) % CROWD.length], 9); g.restore() } }   // other people's faces; ME is the coral dot
+      if (s > .01) { if (me) blob(x, y, 60 * s, 60 * s, { col: MECOL }); else { g.save(); g.translate(x, y); g.scale(s, s); disc(0, 0, 32, WHITE); photoCrop('mem_photo', 0, 0, 29, ...CROWD[(n * 5) % CROWD.length], 11); g.restore() } }   // other people's faces; ME is the coral dot
     }
     const ls = spr(t, [[0, 0], [cT(11, 5), 1, 2.6, .35]]) * (1 - gather); if (ls > .01) { g.save(); g.translate(CX, 1560); g.scale(ls, ls); blob(0, 0, 380, 96, { col: WHITE, round: 1 }); pillText(0, 3, '외 1,203명', { size: 40, w: 600, col: INK }); g.restore() }
     cap(t, 11, 0, 5, CX - 60, 1720, { size: 40, w: 400, tr: .1, col: WHITE, al: 'center', hide: S(12) - .1 });
@@ -231,7 +231,7 @@ function C1(t) {
   if (t > S(23) - .3 && t < S(26) - .1) {
     const sc = spr(t, [[0, 1], [S(24) - .1, 2.1, 1.6, .45], [S(25) - .1, 1.25, 1.6, .5]]), cx = spr(t, [[0, 1300], [S(23) - .2, 830, 2, .4], [S(24) - .1, CX, 1.6, .45]]), cy = spr(t, [[0, 1560], [S(24) - .1, 900, 1.6, .45], [S(25) - .1, 760, 1.6, .5]]);
     g.save(); g.translate(cx, cy); g.scale(sc, sc);
-    blob(0, 6, 340, 440, { col: 'rgba(0,0,0,.12)', round: .12 }); blob(0, 0, 340, 440, { col: WHITE, round: .12 }); photo('me_smile', 0, -60, 300, 240, { fx: .5, fy: .3, zoom: 1, r: 18, bg: '#E7E2EC', filter: 'grayscale(.35)' });
+    blob(0, 6, 340, 440, { col: 'rgba(0,0,0,.12)', round: .12 }); blob(0, 0, 340, 440, { col: WHITE, round: .12 }); photo('me_smile', 0, -60, 300, 240, { fx: .51, fy: .4, zoom: 1, r: 18, bg: '#E7E2EC', filter: 'grayscale(.35)' });
     heart(-120, 110, 44, { stroke: INK, lw: 5 }); txt('0', -84, 124, { size: 40, w: 800, fam: EN, col: MECOL, upper: false });
     cap(t, 23, 0, null, -140, 170, { size: 20, w: 500, fam: EN, col: INK, hide: S(24) - .05 }); if (t > S(24) - .05) cap(t, 24, 0, null, -140, 170, { size: 20, w: 600, fam: EN, col: MECOL });
     g.restore();

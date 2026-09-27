@@ -69,9 +69,9 @@ const ART = {}, ARTS = ['mem_class', 'mem_sunset', 'mem_festival', 'mem_award', 
   'you_front', 'you_stage', 'you_crowd', 'you_sit', 'you_hand', 'hands_hold', 'me_profile', 'me_smile', 'me_mirror', 'me_envy', 'me_cry', 'me_angry', 'me_run', 'me_reach'];
 const loadArt = () => Promise.all(ARTS.map(id => new Promise(r => { const im = new Image(); im.onload = () => { ART[id] = im; r() }; im.onerror = () => r(); im.src = `../art/${id}.png` })));
 // faces for avatars: focus point (0..1) and how many avatar-widths the whole picture spans
-const FACE = { you_front: [.44, .2, 1.8], you_stage: [.46, .27, 1.9], me_profile: [.52, .26, 2.0], me_smile: [.5, .27, 1.6] };   // [focus x, focus y, picture width in avatar diameters]
+const FACE = { you_front: [.45, .30, 1.9], you_stage: [.52, .31, 2.0], me_profile: [.58, .33, 1.55], me_smile: [.51, .40, 1.75] };   // measured on a grid: [face centre x, y (0..1), picture width in avatar diameters]
 // faces in the class photo (mem_photo), for the likes crowd
-const CROWD = [[.15, .14], [.32, .13], [.53, .16], [.62, .15], [.78, .14], [.12, .33], [.26, .35], [.39, .31], [.69, .32], [.81, .34], [.95, .29], [.18, .47], [.3, .49], [.5, .44], [.65, .47], [.8, .5]];
+const CROWD = [[.19, .13], [.315, .16], [.52, .16], [.64, .15], [.78, .16], [.13, .31], [.26, .30], [.39, .31], [.71, .35], [.84, .33], [.19, .49], [.31, .50], [.64, .52], [.80, .53]];   // measured; YOU (.51,.44) and ME (.97,.33) left out
 // a picture inside a rounded rect, cover-fit around a focus point
 function photo(id, cx, cy, w, h, o = {}) {
   const im = ART[id]; if (!im || w < 2 || h < 2) return;
