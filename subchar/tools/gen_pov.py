@@ -29,7 +29,7 @@ POV = [
  ("me_portrait", "1024x1024", "PORTRAIT: The profile picture of the girl ME: front-facing, head and shoulders, centred, looking at the camera with a small shy smile, soft window light, plain pale background. Simple and clean, suitable for a round avatar."),
  # the outro: ME trying things for herself (her own photos now, candid, taken by a friend or on a timer)
  ("me_guitar", "1024x1536", "PORTRAIT: ME practicing an acoustic guitar alone in an after-school music room, warm sunlight through the window, concentrating on the chords, a small proud smile. Candid photo."),
- ("me_paint", "1024x1536", "PORTRAIT: ME painting a big canvas in the school art room, a smear of coral paint on her cheek, laughing, brushes in hand, warm afternoon light. Candid photo."),
+ ("me_paint", "1024x1536", "PORTRAIT: ME painting a big canvas in the school art room, a smear of coral paint on her cheek, laughing, brushes in hand, warm afternoon light. She is ALONE in the room: no other person, no boy anywhere. Candid photo."),
  ("me_speech", "1024x1536", "PORTRAIT: ME standing at the front of a classroom giving a presentation, holding note cards, a little nervous but brave, the backs of a few listening classmates' heads in the lower foreground. Candid photo."),
  ("me_dance", "1024x1536", "PORTRAIT: ME dancing alone in an empty dance practice room with a wall mirror, mid-spin, her long hair flying, golden evening light, joyful. Candid photo."),
  ("me_friend", "1024x1536", "PORTRAIT: ME laughing with a new girl friend (short brown bob hair, same uniform) while sharing snacks on a bench in the schoolyard, candid and warm, both happy. Candid photo."),

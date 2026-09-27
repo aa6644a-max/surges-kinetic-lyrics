@@ -57,7 +57,7 @@ function V2(t) {
     const topY = 120 + topH / 2 + 40, botY = 120 + topH + 80 + botH / 2 + 40;
     if (topH > 4 && t >= S(31) + .15) { photo('pov_window', CX, topY, 900, topH, { fx: .5, fy: .55, r: 36, bg: '#E7E2EC' }); blob(260, topY - topH / 2 + 60, 220, 70, { col: WHITE, round: 1 }); pillText(260, topY - topH / 2 + 63, 'ME', { size: 30, w: 700, fam: EN, col: MECOL }) }
     if (botH > 4) { photo('mem_rain', CX, botY, 900, botH, { fx: .52, fy: .45, r: 36 }); blob(260, botY - botH / 2 + 60, 220, 70, { col: WHITE, round: 1 }); pillText(260, botY - botH / 2 + 63, 'YOU', { size: 30, w: 700, fam: EN, col: YOUCOL }) }
-    const lbl = (i, y, sz = 52) => cap(t, i, 0, null, CX, y, { size: sz, w: 700, col: WHITE, al: 'center', hide: S(i + 1) - .1 });
+    const lbl = (i, y, sz = 52) => { const a = seg(t, S(i) - .15, .2) * (1 - seg(t, S(i + 1) - .15, .1)); if (a > 0) blob(CX, y - sz * .34, layout(i, 0, chars(i).length, { size: sz, w: 700 }).width + 90, sz * 1.7, { col: 'rgba(18,19,31,.72)', round: 1, alpha: a }); cap(t, i, 0, null, CX, y, { size: sz, w: 700, col: WHITE, al: 'center', hide: S(i + 1) - .1 }) };
     if (t < S(32)) lbl(31, topY + topH / 2 - 40); else if (t < S(33)) lbl(32, botY + botH / 2 - 50);
     else if (t < S(34)) lbl(33, topY + topH / 2 - 40); else if (t < S(35)) lbl(34, botY + botH / 2 - 50);
     // L35 ME's own pictures fly into the bin

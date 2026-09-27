@@ -106,7 +106,7 @@ function OW(t) {
     g.save(); g.translate(CX, lerp(900, 900, end)); g.scale(s * (1 - end), s * (1 - end));
     blob(0, 10, 900, 1180, { col: 'rgba(0,0,0,.12)', round: .08 }); blob(0, 0, 900, 1180, { col: WHITE, round: .08 });
     avatar('me_portrait', -370, -520, 42); ring(-370, -520, 52, 6, MECOL); txt('나', -300, -506, { size: 40, w: 800, col: INK });
-    carousel(0, -80, 840, 760, { r: 24 });
+    photo(PICK[0], 0, -80, 840, 760, { r: 24, fx: .5, fy: .35, bg: '#EDE7F2' }); for (let k = 0; k < 6; k++) disc(-75 + k * 30, 334, 8, k ? GREY : MECOL);
     heart(-370, 380, 80 * (1 + wob(t - cT(81, 2), .5)), { col: liked ? MECOL : null, stroke: liked ? null : INK, lw: 6 });
     avatar('you_front', -250, 385, 28, { alpha: liked }); txt('좋아요 1 · 주인공님이 좋아합니다', -205, 398, { size: 32, w: 600, col: INK, alpha: liked });
     cap(t, 81, 0, null, -410, 490, { size: 48, w: 700, col: INK });
@@ -114,14 +114,32 @@ function OW(t) {
   }
 }
 
-// ================= END 204.2 - 214.4: the title. Its period is the dot from the first second. =================
+// ================= END 204.2 - 214.4: the coral dot (ME, from the first second) builds the title itself. On every beat it
+// jumps onto the next slot; the letter springs up under it and lifts it; the last jump lands on the baseline as the period.
+// Then "sub" goes quiet and grey, and "character." stays lit.
 function EN2(t) {
   fill(CREAM); disc(CX, 900, eOut(seg(t, 204.5, .8)) * 2400, INK);
-  const a = seg(t, 205.4, .6), s = spr(t, [[0, 0], [205.4, 1, 1.8, .45]]);
-  if (s > .01) { g.save(); g.translate(CX, 980); g.scale(s, s); txt('서브캐릭터', -30, 0, { size: 170, w: 800, col: WHITE, al: 'center', alpha: a }); g.restore() }
-  font(800, 170, KR); setTrack(0); const tw = g.measureText('서브캐릭터').width, px = CX - 30 + tw / 2 + 40 * s;
-  const dy = fall(t, 206.6, 207.1, -200, 980 - 12), sq = wob(t - 207.1, .5);
-  if (t > 206.6) blob(px, dy, 44, 44, { col: MECOL, sq });                                          // the dot lands as the period
-  txt('sub character  ·  YOUNHA', CX, 1100, { size: 26, w: 400, fam: EN, tr: .3, col: WHITE, al: 'center', alpha: .7 * seg(t, 208, .8), upper: false });
-  rect(0, 0, W, H, INK, eIn(seg(t, 213.2, 1.1)) * .9);
+  const word = 'sub character', SZ = 150, base = 1010, r = 22, T0 = onBeat(Math.ceil(beatN(205.4))), tl = k => T0 + k * BEAT;
+  font(800, SZ, EN); setTrack(0);
+  const ws = [...word].map(c => g.measureText(c).width), tw = ws.reduce((a, b) => a + b, 0) + 50;
+  let xx = CX - tw / 2; const xs = ws.map(w => { const c = xx + w / 2; xx += w; return c }), n = word.length, px = xx + 38;
+  const hOf = c => c === ' ' ? 0 : 'bht'.includes(c) ? .74 * SZ : .54 * SZ, lift = k => spr(t, [[0, 0], [tl(k), 1, 2.6, .34]]);
+  const quiet = eIO(seg(t, tl(n) + 2 * BEAT, .8)), jolt = wob(t - tl(n) - BEAT, .35);                  // after the period: one shared bounce, then "sub" dims
+  [...word].forEach((c, k) => { if (c === ' ') return; const s = lift(k); if (s < .01) return;
+    g.save(); g.translate(xs[k], base); g.scale(1 + .12 * wob(t - tl(k), .4), s * (1 - .12 * jolt));
+    txt(c, 0, 0, { size: SZ, w: 800, fam: EN, col: k < 3 ? lerpCol(WHITE, '#5B5A70', quiet) : WHITE, al: 'center', upper: false }); g.restore() });
+  // where the dot rests on slot k (on top of the letter, riding it up), and where it lands on the period
+  const rest = k => k >= n ? [px, base - r] : [xs[k], base - hOf(word[k]) * lift(k) * (1 - .12 * jolt) - r];
+  let x, y, vx = 0, vy = 0, sq = 0;
+  if (t < tl(0) - BEAT * .8) { x = xs[0] - 170; y = fall(t, 204.9, tl(0) - BEAT * .8, -60, base - r); sq = wob(t - tl(0) + BEAT * .8, .5) }
+  else {
+    let k = 0; while (k < n && t >= tl(k + 1) - BEAT * .8) k++;                                          // the next landing slot is k (or the period)
+    const from = k === 0 ? [xs[0] - 170, base - r] : rest(k - 1), to = k >= n ? [px, base - r] : [xs[k], base - r];
+    const h0 = tl(k) - BEAT * .8, p = clamp((t - h0) / (BEAT * .8));
+    if (p < 1) { x = lerp(from[0], to[0], p); y = lerp(from[1], to[1], p) - 170 * 4 * p * (1 - p); vx = 1200; vy = 1600 * (p - .5) }   // the hop
+    else { [x, y] = rest(k); sq = wob(t - tl(k), .5) }
+  }
+  if (t > 204.9) blob(x, y, r * 2, r * 2, { col: MECOL, vx, vy, sq });
+  txt('Younha  ·  Sub character', CX, 1160, { size: 30, w: 500, fam: EN, tr: .25, col: WHITE, al: 'center', alpha: .7 * seg(t, tl(n) + 1.2, .8), upper: false });
+  rect(0, 0, W, H, INK, eIn(seg(t, 213.4, .95)));
 }

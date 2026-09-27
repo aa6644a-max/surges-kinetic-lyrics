@@ -116,8 +116,8 @@ function V1(t) {
     blob(kx, kIn, kr * 2 + 12, kr * 2 + 12, { col: WHITE, sq: wob(t - S(7) + .05, .4) }); blob(kx, kIn, kr * 2, kr * 2, { col: kc, vx: sprV(t, [[0, 190], ...chars(8).map((G, k) => [G.t, 190 + (k + 1) * 130, 2.6, .35])]) * .4 });
     cap(t, 7, 0, null, CX, 820, { size: 64, w: 500, col: INK, al: 'center' });
     cap(t, 8, 0, null, CX, 1330, { size: 64, w: 600, col: INK, al: 'center', fx: G => ({ al: 1 - .5 * seg(t, G.t + .2, .6) }) });
-    if (t > S(9) - .1) cap(t, 9, 0, null, CX, 1480, { size: 52, w: 400, tr: .08, col: '#6A7390', al: 'center' });
-    disc(kx, ky, eIn(seg(t, 30.25, .72)) * 2400, DEEP);                                                              // the cooled knob floods the page
+    const flood = eIn(seg(t, 30.25, .72)); disc(kx, ky, flood * 2400, DEEP);                                          // the cooled knob floods the page
+    if (t > S(9) - .1) cap(t, 9, 0, null, CX, 1480, { size: 52, w: 400, tr: .08, col: lerpCol('#6A7390', WHITE, flood), al: 'center' });
   }
 }
 function lerpCol(a, b, x) { const p = [1, 3, 5].map(i => parseInt(a.slice(i, i + 2), 16)), q = [1, 3, 5].map(i => parseInt(b.slice(i, i + 2), 16)); return `rgb(${p.map((v, i) => Math.round(lerp(v, q[i], clamp(x)))).join(',')})` }
@@ -125,6 +125,7 @@ function lerpCol(a, b, x) { const p = [1, 3, 5].map(i => parseInt(a.slice(i, i +
 // ================= PRE-CHORUS 31.0 - 48.4: tags, the likes list, a badge, a heart pressed and taken back, a comment deleted, a spinner holding on =================
 function P1(t) {
   fill(DEEP); blurBg('mem_festival', DEEP, .8);
+  if (t < 31.5) cap(t, 9, 0, null, CX, 1480, { size: 52, w: 400, tr: .08, col: WHITE, al: 'center', alpha: 1 - seg(t, 31.05, .4) });
   // L10 "@주인공" pops; ME's "@나" appears on 난 and deflates on 아니야
   const chipS = spr(t, [[0, 0], [S(10), 1, 2.4, .35], [S(11) - .1, .72, 1.8, .5], [S(12) - .1, 1.1, 2, .4], [S(13) - .1, 0, 2.6, .6]]);
   const chipY = spr(t, [[0, 900], [S(11) - .1, 470, 1.6, .5], [S(12) - .1, 880, 1.6, .5]]);
@@ -144,8 +145,7 @@ function P1(t) {
       if (s > .01) { if (me) blob(x, y, 60 * s, 60 * s, { col: MECOL }); else { g.save(); g.translate(x, y); g.scale(s, s); disc(0, 0, 32, WHITE); photoCrop('mem_photo', 0, 0, 29, ...CROWD[(n * 5) % CROWD.length], 11); g.restore() } }   // other people's faces; ME is the coral dot
     }
     const ls = spr(t, [[0, 0], [cT(11, 5), 1, 2.6, .35]]) * (1 - gather); if (ls > .01) { g.save(); g.translate(CX, 1560); g.scale(ls, ls); blob(0, 0, 380, 96, { col: WHITE, round: 1 }); pillText(0, 3, '외 1,203명', { size: 40, w: 600, col: INK }); g.restore() }
-    cap(t, 11, 0, 5, CX - 60, 1720, { size: 40, w: 400, tr: .1, col: WHITE, al: 'center', hide: S(12) - .1 });
-    cap(t, 11, 5, 10, CX + 220, 1720, { size: 36, w: 500, fam: EN, tr: .2, col: MECOL, hide: S(12) - .1 });
+    cap(t, 11, 0, null, CX, 300, { size: 64, w: 700, col: G => (G.k >= 5 ? MECOL : WHITE), al: 'center', hide: S(12) - .1 });
   }
   // L12 a verified badge pops on the chip and a check draws itself
   if (t > S(12) - .1 && t < S(13) + .3) {
