@@ -28,7 +28,7 @@ function I2(t) {
 // ================= VERSE 2 82.3 - 107.85: the selfie camera is a mirror; then split screen, the bin, the DM, the tangle =================
 const FILTERS = ['none', 'grayscale(1)', 'sepia(.85)', 'hue-rotate(150deg) saturate(1.4)', 'contrast(1.5) saturate(0)', 'brightness(.6) saturate(.4)', 'blur(3px) grayscale(.6)'];
 function V2(t) {
-  fill(INK); blurBg('me_mirror', INK, .72);
+  fill(INK); blurBg('pov_night', INK, .72);
   // L28-30 the front camera: a round frame opening from the dot; every syllable of 싫어져만 갔어 swaps the filter, the frame wobbles
   if (t < S(31) + .1) {
     const nf = t < S(29) ? 0 : chars(29).filter(G => t >= G.t).length, lastT = nf ? chars(29)[nf - 1].t : 0;
@@ -36,7 +36,7 @@ function V2(t) {
     const w = spr(t, [[0, 0], [82.3, 800, 1.8, .36], [S(30) - .1, 540, 1.8, .45], [S(31) - .15, 900, 2, .45]]), h = spr(t, [[0, 0], [82.3, 800, 1.8, .36], [S(30) - .1, 540, 1.8, .45], [S(31) - .15, 620, 2, .45]]);
     const rd = t < S(31) - .15 ? 1 : lerp(1, .1, seg(t, S(31) - .15, .3)), wb = wob(t - lastT, .12);
     g.save(); g.beginPath(); g.roundRect(CX - w / 2, cy - h / 2, w, h, rd * Math.min(w, h) / 2); g.clip(); g.filter = FILTERS[nf % FILTERS.length];
-    const im = ART.me_mirror; if (im) { const s = Math.max(w / im.width, h / im.height) * 1.25 * (1 + wb), iw = im.width * s, ih = im.height * s; g.fillStyle = '#E9E3EE'; g.fillRect(CX - w / 2, cy - h / 2, w, h); g.drawImage(im, CX - iw * .5, cy - ih * .3, iw, ih) }
+    const im = ART.pov_selfie; if (im) { const s = Math.max(w / im.width, h / im.height) * 1.25 * (1 + wb), iw = im.width * s, ih = im.height * s; g.fillStyle = '#E9E3EE'; g.fillRect(CX - w / 2, cy - h / 2, w, h); g.drawImage(im, CX - iw * .5, cy - ih * .3, iw, ih) }
     g.filter = 'none'; g.restore();
     g.save(); g.strokeStyle = WHITE; g.lineWidth = 8; g.beginPath(); g.roundRect(CX - w / 2, cy - h / 2, w, h, rd * Math.min(w, h) / 2); g.stroke(); g.restore();
     // shutter and filter chips
@@ -51,7 +51,7 @@ function V2(t) {
   if (t > S(31) - .2 && t < S(36) + .2) {
     const topH = spr(t, [[0, 620], [cT(32, 3), 420, 2.2, .38], [S(34) - .1, 620, 2, .4], [S(35) + .2, 0, 2.2, .6]]), botH = spr(t, [[0, 0], [S(32) - .1, 620, 2.2, .36], [cT(32, 3), 900, 2.2, .38], [S(34) - .1, 620, 2, .4], [S(36) - .2, 0, 2.2, .6]]);
     const topY = 120 + topH / 2 + 40, botY = 120 + topH + 80 + botH / 2 + 40;
-    if (topH > 4) { photo('me_envy', CX, topY, 900, topH, { fx: .5, fy: .3, r: 36, bg: '#E7E2EC' }); blob(260, topY - topH / 2 + 60, 220, 70, { col: WHITE, round: 1 }); pillText(260, topY - topH / 2 + 63, 'ME', { size: 30, w: 700, fam: EN, col: MECOL }) }
+    if (topH > 4) { photo('pov_window', CX, topY, 900, topH, { fx: .5, fy: .55, r: 36, bg: '#E7E2EC' }); blob(260, topY - topH / 2 + 60, 220, 70, { col: WHITE, round: 1 }); pillText(260, topY - topH / 2 + 63, 'ME', { size: 30, w: 700, fam: EN, col: MECOL }) }
     if (botH > 4) { photo('mem_rain', CX, botY, 900, botH, { fx: .52, fy: .45, r: 36 }); blob(260, botY - botH / 2 + 60, 220, 70, { col: WHITE, round: 1 }); pillText(260, botY - botH / 2 + 63, 'YOU', { size: 30, w: 700, fam: EN, col: YOUCOL }) }
     const lbl = (i, y, sz = 52) => cap(t, i, 0, null, CX, y, { size: sz, w: 700, col: WHITE, al: 'center', hide: S(i + 1) - .1 });
     if (t < S(32)) lbl(31, topY + topH / 2 - 40); else if (t < S(33)) lbl(32, botY + botH / 2 - 50);
@@ -59,9 +59,9 @@ function V2(t) {
     // L35 ME's own pictures fly into the bin
     if (t > S(35) - .2) {
       const bx = 880, by = 1700, bs = spr(t, [[0, 0], [S(35) - .1, 1, 2.6, .35], [S(36) - .1, 0, 2.4, .6]]);
-      ['me_cry', 'me_angry', 'me_envy'].forEach((id, k) => { const t0 = S(35) + .3 + k * .45, p = eIn(seg(t, t0, .55)); if (p >= 1 || t < t0 - .4) return;
+      ['pov_backrow', 'pov_hallway', 'pov_stage'].forEach((id, k) => { const t0 = S(35) + .3 + k * .45, p = eIn(seg(t, t0, .55)); if (p >= 1 || t < t0 - .4) return;
         const x = lerp(260 + k * 280, bx, p), y = lerp(1100, by, p) - Math.sin(p * Math.PI) * 300, s = 1 - .8 * p;
-        g.save(); g.translate(x, y); g.rotate(p * 2 * (k - 1)); g.scale(s, s); blob(0, 0, 240, 300, { col: WHITE, round: .1 }); photo(id, 0, -10, 220, 250, { fx: .5, fy: .28, r: 14, bg: '#E7E2EC', filter: 'grayscale(.6)' }); g.restore() });
+        g.save(); g.translate(x, y); g.rotate(p * 2 * (k - 1)); g.scale(s, s); blob(0, 0, 240, 300, { col: WHITE, round: .1 }); photo(id, 0, -10, 220, 250, { fx: .5, fy: .4, r: 14, bg: '#E7E2EC', filter: 'grayscale(.6)' }); g.restore() });
       const hit = [0, 1, 2].reduce((a, k) => a + wob(t - (S(35) + .85 + k * .45), .3), 0);
       g.save(); g.translate(bx, by); g.scale(bs, bs * (1 - hit)); blob(0, 30, 150, 170, { col: WHITE, round: .2 }); rect(-95, -80, 190, 20, WHITE); rect(-30, -104, 60, 20, WHITE); for (const x of [-35, 0, 35]) rect(x - 4, -10, 8, 110, GREY); g.restore();
       cap(t, 35, 0, null, CX, 1420, { size: 50, w: 600, col: WHITE, al: 'center', hide: S(36) - .1 });
@@ -82,7 +82,7 @@ function V2(t) {
   // L38-39 everything tangles: lines between faces knot and wriggle, then pull into one point
   if (t > S(38) - .2) {
     const pull = eIn(seg(t, E(39) - .5, .7)), a = seg(t, S(38) - .1, .6);
-    const ends = [['you_front', 200, 500], ['me_profile', 880, 560], ['you_stage', 220, 1500], ['me_smile', 860, 1420], [null, 540, 300], [null, 540, 1700]];
+    const ends = [['you_front', 200, 500], ['me_pin', 880, 560], ['you_stage', 220, 1500], ['me_pin', 860, 1420], [null, 540, 300], [null, 540, 1700]];
     for (let k = 0; k < 9; k++) { const A = ends[k % 6], B = ends[(k * 5 + 2) % 6], ph = t * (1.1 + .2 * k) + k;
       const ax = lerp(A[1], CX, pull), ay = lerp(A[2], 1000, pull), bx = lerp(B[1], CX, pull), by = lerp(B[2], 1000, pull);
       g.save(); g.strokeStyle = [MECOL, YEL, TEAL, YOUCOL, PEACH, WHITE][k % 6]; g.lineWidth = 8 + 4 * a; g.lineCap = 'round'; g.globalAlpha = a; g.beginPath(); g.moveTo(ax, ay);
@@ -121,13 +121,13 @@ function CR(t) {
 const STORIES = () => [
   [S(43) - .15, 'mem_entrance', 'you', 43], [S(44) - .1, 'mem_lunch', 'you', 44], [S(45) - .1, 'mem_library', 'you', 45], [S(46) - .1, 'mem_rain', 'you', 46],
   [cT(46, 6), 'mem_race', 'you', -1], [cT(46, 6) + BEAT, 'mem_award', 'you', -1], [cT(46, 6) + 2 * BEAT, 'mem_rooftop', 'you', -1], [cT(46, 6) + 3 * BEAT, 'mem_festival', 'you', -1],
-  [S(47) - .1, 'mem_sunset', 'you', 47], [S(48) - .15, 'me_smile', 'me', 48]];
+  [S(47) - .1, 'mem_sunset', 'you', 47], [S(48) - .15, 'pov_night', 'me', 48]];
 function storyFrame(id, who, cx, s, t, extra) {
   g.save(); g.translate(cx, CY); g.scale(s, s);
   const bg = who === 'me' ? '#CFC9D8' : '#222';
   photo(id, 0, 0, 1000, 1780, { r: 44, fx: .5, fy: who === 'me' ? .4 : .45, bg, filter: who === 'me' ? 'grayscale(.45) brightness(.95)' : '' });
   const gr = g.createLinearGradient(0, -890, 0, -600); gr.addColorStop(0, 'rgba(0,0,0,.45)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.beginPath(); g.roundRect(-500, -890, 1000, 290, [44, 44, 0, 0]); g.fill();
-  avatar(who === 'me' ? 'me_profile' : 'you_front', -400, -770, 40); txt(who === 'me' ? '나' : '주인공', -340, -756, { size: 36, w: 700, col: WHITE });
+  avatar(who === 'me' ? 'me_pin' : 'you_front', -400, -770, 40); txt(who === 'me' ? '나' : '주인공', -340, -756, { size: 36, w: 700, col: WHITE });
   if (extra) extra();
   g.restore();
 }

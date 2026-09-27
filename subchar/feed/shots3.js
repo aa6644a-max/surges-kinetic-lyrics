@@ -22,7 +22,7 @@ function BR(t) {
       g.fillStyle = WHITE; g.beginPath(); g.moveTo(0, 0); g.lineTo(-40, 90); g.lineTo(40, 90); g.fill();
       g.rotate(tilt); blob(0, 0, 760, 18, { col: WHITE, round: 1 });
       avatar('you_front', -360, -lerp(100, 80, light), lerp(100, 78, light), { filter: `grayscale(${light})` }); ring(-360, -lerp(100, 80, light), lerp(100, 78, light) + 8, 6, YOUCOL);
-      avatar('me_profile', 360, -80, 78); ring(360, -80, 86, 6, MECOL); g.restore() }
+      avatar('me_pin', 360, -80, 78); ring(360, -80, 86, 6, MECOL); g.restore() }
     cap(t, 54, 0, null, CX, 1560, { size: 46, w: 500, col: WHITE, al: 'center', hide: S(55) - .1 }); cap(t, 55, 0, null, CX, 1560, { size: 46, w: 500, col: WHITE, al: 'center', hide: S(56) - .1 });
   }
   // L56 a breath: the screen goes to sleep and slowly wakes; only the dot, breathing
@@ -31,7 +31,7 @@ function BR(t) {
   // L57-59 editing ME's profile: every save fails; the toasts pile up; then the dot swells and bursts
   if (t > S(57) - .3) {
     const cs = spr(t, [[0, 0], [S(57) - .2, 1, 2.2, .38]]) * (1 - eIn(seg(t, 155.9, .4))), burst = eOut(seg(t, 156.25, .35));
-    if (cs > .01) { g.save(); g.translate(CX, 900); g.scale(cs, cs); blob(0, 0, 900, 860, { col: WHITE, round: .08 }); avatar('me_profile', 0, -200, 150); txt('프로필 편집', 0, -400, { size: 36, w: 700, col: INK, al: 'center' });
+    if (cs > .01) { g.save(); g.translate(CX, 900); g.scale(cs, cs); blob(0, 0, 900, 860, { col: WHITE, round: .08 }); avatar('me_pin', 0, -200, 150); txt('프로필 편집', 0, -400, { size: 36, w: 700, col: INK, al: 'center' });
       blob(0, 40, 700, 90, { col: CREAM, round: 1 }); pillText(0, 43, '나', { size: 40, w: 600, col: INK }); blob(0, 170, 700, 90, { col: CREAM, round: 1 }); pillText(0, 173, 'sub character', { size: 36, w: 500, fam: EN, col: GREY });
       const tries = [S(57) + 1.2, S(58) + .2, S(58) + 1.7, S(59)], press = tries.reduce((a, x) => a + wob(t - x, .3), 0);
       g.save(); g.translate(0, 320); g.scale(1 + press * .4, 1 - press * .4); blob(0, 0, 360, 100, { col: MECOL, round: 1 }); pillText(0, 3, '저장', { size: 40, w: 700, col: WHITE }); g.restore();
@@ -93,7 +93,7 @@ function FC(t) {
 // ================= OWN LINE 179.2 - 204.2: ME makes her own post =================
 function OW(t) {
   fill(CREAM); blurBg('mem_rooftop', CREAM, .82);
-  const PICK = ['me_run', 'me_reach', 'me_smile', 'me_profile', 'me_mirror', 'me_envy'];
+  const PICK = ['me_run', 'pov_backrow', 'pov_hallway', 'pov_stage', 'pov_window', 'pov_rain'];   // her camera roll is all YOU; she picks the one of herself
   const pick = seg(t, cT(71, 4), .1), upT = cT(77, 10), up = eIn(seg(t, upT + .2, .6));
   // the new-post screen: a picker grid of ME's photos; one is chosen and becomes the preview
   if (t < upT + .9) {
@@ -130,7 +130,7 @@ function OW(t) {
     if (meS > .01) { g.save(); g.translate(lerp(640, CX, join), lerp(560, 760, join)); g.scale(meS, meS); blob(0, 0, 760, 150, { col: MECOL, round: 1 }); g.restore(); cap(t, 80, 0, null, lerp(290, 190, join), lerp(576, 776, join), { size: 50, w: 700, col: WHITE }) }
     const dots = seg(t, cT(80, 7), .2) * (1 - seg(t, cT(80, 10), .1)); if (dots > 0) { blob(250, 820, 200, 100, { col: WHITE, round: 1, alpha: dots }); for (let j = 0; j < 3; j++) disc(200 + j * 50, 820 - 14 * Math.max(0, Math.sin(t * 8 - j)), 14, GREY, dots) }
     const rs = spr(t, [[0, 0], [cT(80, 10), 1, 2.4, .35]]); if (rs > .01) { g.save(); g.translate(lerp(360, CX, join), lerp(1180, 1260, join)); g.scale(rs, rs); blob(0, 0, 560 + join * 300, 700 - join * 200, { col: WHITE, round: .12 });
-      photo(join > .5 ? 'hands_hold' : 'you_hand', 0, 0, 520 + join * 300, 660 - join * 200, { r: 26, fx: .5, fy: join > .5 ? .5 : .55, bg: '#EDE7F2' }); g.restore() }
+      photo(join > .5 ? 'pov_hands' : 'pov_turn', 0, 0, 520 + join * 300, 660 - join * 200, { r: 26, fx: .5, fy: join > .5 ? .5 : .55, bg: '#EDE7F2' }); g.restore() }
     g.globalAlpha = 1;
   }
   // L81 ME's post is in the feed: one like, from YOU

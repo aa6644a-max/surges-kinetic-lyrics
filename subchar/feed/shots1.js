@@ -81,7 +81,7 @@ function V1(t) {
       if (t < S(4) + .2) cap(t, 3, 0, null, 230, by + 14, { size: 42, w: 600, col: INK, alpha: 1 - seg(t, S(4), .2) });
       if (t > S(4) - .1 && bh > 300) {
         const a = seg(t, S(4) + .05, .3) * (1 - seg(t, S(5) - .2, .15));
-        avatar('me_profile', 250, bcy - bh / 2 + 150, 80 * a, { filter: 'grayscale(.75) brightness(1.05)' }); disc(300, bcy - bh / 2 + 100, 18 * a, MECOL);          // ME's avatar: grey, one coral dot
+        avatar('me_pin', 250, bcy - bh / 2 + 150, 80 * a, { filter: 'grayscale(.5)' }); disc(300, bcy - bh / 2 + 100, 18 * a, MECOL);          // ME's avatar: grey, one coral dot
         for (const [k, s, xx] of [[0, '게시물 0', 520], [1, '팔로워 38', 780]]) { blob(xx, bcy - bh / 2 + 150, 220, 80, { col: CREAM, round: 1, alpha: a }); txt(s, xx, bcy - bh / 2 + 150, { size: 34, w: 600, col: INK, al: 'center', base: 'middle', alpha: a }) }
         cap(t, 4, 0, null, 150, bcy - bh / 2 + 330, { size: 48, w: 500, col: INK, alpha: a });
       }
@@ -231,7 +231,7 @@ function C1(t) {
   if (t > S(23) - .3 && t < S(26) - .1) {
     const sc = spr(t, [[0, 1], [S(24) - .1, 2.1, 1.6, .45], [S(25) - .1, 1.25, 1.6, .5]]), cx = spr(t, [[0, 1300], [S(23) - .2, 830, 2, .4], [S(24) - .1, CX, 1.6, .45]]), cy = spr(t, [[0, 1560], [S(24) - .1, 900, 1.6, .45], [S(25) - .1, 760, 1.6, .5]]);
     g.save(); g.translate(cx, cy); g.scale(sc, sc);
-    blob(0, 6, 340, 440, { col: 'rgba(0,0,0,.12)', round: .12 }); blob(0, 0, 340, 440, { col: WHITE, round: .12 }); photo('me_smile', 0, -60, 300, 240, { fx: .51, fy: .4, zoom: 1, r: 18, bg: '#E7E2EC', filter: 'grayscale(.35)' });
+    blob(0, 6, 340, 440, { col: 'rgba(0,0,0,.12)', round: .12 }); blob(0, 0, 340, 440, { col: WHITE, round: .12 }); photo('pov_sky', 0, -60, 300, 240, { fx: .5, fy: .45, zoom: 1, r: 18, bg: '#E7E2EC', filter: 'grayscale(.35)' });
     heart(-120, 110, 44, { stroke: INK, lw: 5 }); txt('0', -84, 124, { size: 40, w: 800, fam: EN, col: MECOL, upper: false });
     cap(t, 23, 0, null, -140, 170, { size: 20, w: 500, fam: EN, col: INK, hide: S(24) - .05 }); if (t > S(24) - .05) cap(t, 24, 0, null, -140, 170, { size: 20, w: 600, fam: EN, col: MECOL });
     g.restore();
