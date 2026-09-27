@@ -80,18 +80,24 @@ function V2(t) {
     const ss = spr(t, [[0, 0], [S(37) + .4, 1, 2.2, .38]]); if (ss > .01) { g.save(); g.translate(360, 1260); g.scale(ss, ss); g.rotate(-.05); blob(0, 0, 440, 600, { col: WHITE, round: .1 }); photo('pov_you_alone', 0, -20, 400, 520, { fx: .5, fy: .45, r: 20, bg: '#DDE3EA', filter: 'saturate(.7)' }); pillText(0, 270, 'YOU · 스토리', { size: 28, w: 600, col: INK }); g.restore() }
     g.globalAlpha = 1;
   }
-  // L38-39 everything tangles: lines between faces knot and wriggle, then pull into one point
+  // L38-39 everything gets mixed up: his posts, her secret photos of him and her own selfies drop into one pile on each syllable;
+  // on 얽혀져 the pile swirls, each photo the other way, knots into a ball, and the ball is squeezed into the dot
   if (t > S(38) - .2) {
-    const pull = eIn(seg(t, E(39) - .5, .7)), a = seg(t, S(38) - .1, .6);
-    const ends = [['you_front', 200, 500], ['me_portrait', 880, 560], ['you_stage', 220, 1500], ['me_portrait', 860, 1420], [null, 540, 300], [null, 540, 1700]];
-    for (let k = 0; k < 9; k++) { const A = ends[k % 6], B = ends[(k * 5 + 2) % 6], ph = t * (1.1 + .2 * k) + k;
-      const ax = lerp(A[1], CX, pull), ay = lerp(A[2], 1000, pull), bx = lerp(B[1], CX, pull), by = lerp(B[2], 1000, pull);
-      g.save(); g.strokeStyle = [MECOL, YEL, TEAL, YOUCOL, PEACH, WHITE][k % 6]; g.lineWidth = 8 + 4 * a; g.lineCap = 'round'; g.globalAlpha = a; g.beginPath(); g.moveTo(ax, ay);
-      g.bezierCurveTo(CX + Math.sin(ph) * 420 * (1 - pull), 900 + Math.cos(ph * 1.3) * 500 * (1 - pull), CX + Math.cos(ph * .8) * 420 * (1 - pull), 1100 + Math.sin(ph * 1.1) * 500 * (1 - pull), bx, by); g.stroke(); g.restore() }
-    ends.forEach(([id, x, y], k) => { if (!id) return; const s = spr(t, [[0, 0], [S(38) + k * .12, 1, 2.6, .35]]) * (1 - pull); if (s > .01) avatar(id, lerp(x, CX, pull), lerp(y, 1000, pull), 70 * s) });
-    cap(t, 38, 0, null, CX, 900, { size: 54, w: 600, col: WHITE, al: 'center', hide: S(39) - .1 });
-    cap(t, 39, 0, null, CX, 1120, { size: 60, w: 700, col: WHITE, al: 'center', alpha: 1 - pull });
-    if (pull > .5) blob(CX, 1000, 40, 40, { col: MECOL });
+    const PILE = ['mem_class', 'pov_hallway', 'me_envy', 'you_crowd', 'pov_window', 'me_cry', 'mem_award', 'pov_stage', 'me_portrait', 'mem_sunset', 'pov_zoom', 'me_angry'];
+    const c38 = chars(38), c39 = chars(39), knot = eIO(seg(t, S(39), E(39) - S(39) - .3)), pull = eIn(seg(t, E(39) - .45, .6)), Py = 1000;
+    PILE.forEach((id, k) => {
+      const t0 = k < c38.length ? c38[k].t - .05 : c39[k - c38.length].t - .05; if (t < t0 - .4) return;
+      const hx = (R(k, 1) - .5) * 620, hy = (R(k, 2) - .5) * 820, r0 = Math.hypot(hx, hy), a0 = Math.atan2(hy, hx), dir = k % 2 ? 1 : -1;
+      const a = a0 + knot * dir * (1.6 + (k % 3) * .7), rr = r0 * (1 - .8 * knot) * (1 - pull), sc = (1 - .45 * knot) * (1 - pull);
+      const y = t < t0 + .35 ? fall(t, t0 - .4, t0 + .35, -1300, Py + hy) : Py + Math.sin(a) * rr, x = t < t0 + .35 ? CX + hx : CX + Math.cos(a) * rr;
+      if (sc < .02) return;
+      g.save(); g.translate(x, y); g.rotate((R(k, 3) - .5) * .8 + knot * dir * 2.4); g.scale(sc, sc * (1 - .3 * wob(t - t0 - .35, .4)));
+      blob(0, 8, 300, 380, { col: 'rgba(0,0,0,.3)', round: .1 }); blob(0, 0, 300, 380, { col: WHITE, round: .1 });
+      photo(id, 0, -14, 272, 324, { r: 14, fx: .5, fy: .35, bg: '#E7E2EC' }); g.restore();
+    });
+    cap(t, 38, 0, null, CX, 330, { size: 54, w: 600, col: WHITE, al: 'center', hide: S(39) - .1 });
+    cap(t, 39, 0, null, CX, 1700, { size: 60, w: 700, col: WHITE, al: 'center', alpha: 1 - pull });
+    if (pull > .5) blob(CX, Py, 40 + 30 * wob(t - E(39) + .1, .5), 40, { col: MECOL });
   }
 }
 
