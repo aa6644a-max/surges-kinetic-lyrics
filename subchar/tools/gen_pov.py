@@ -11,6 +11,7 @@ STYLE = ("Japanese anime illustration for a music video, clean cel shading with 
          "teenage girl with long straight black hair with a light-blue inner color, navy sailor uniform with a pink ribbon (as in the "
          "second reference). FIRST-PERSON POINT OF VIEW: the camera is ME's eyes. ME's face is never visible. YOU is the subject she "
          "is looking at. Tasteful, no text, no logo, no watermark.")
+PORTRAIT_STYLE = STYLE.split(" FIRST-PERSON")[0] + " Tasteful, no text, no logo, no watermark."   # for ME's own photos (her profile picture)
 POV = [
  ("pov_backrow", "1024x1536", "From the last seat at the back of a sunny classroom at break time: in the lower foreground ME's hands rest on an open notebook and a pencil on her desk; far ahead at the front of the room YOU sits on a desk laughing, surrounded by classmates who all look at him. Long depth, YOU small but clearly the centre of attention."),
  ("pov_hallway", "1024x1536", "Down a long school hallway in morning light: YOU walks away from the viewer with two friends, seen from behind, hands in his hoodie pocket. The viewer stands still far behind; the hallway feels long and the distance large."),
@@ -22,6 +23,10 @@ POV = [
  ("me_pin", "1024x1024", "A simple top-down photo of a small coral-pink hair pin lying on an open school notebook with faint pencil lines, soft window light, lots of calm empty space. No person."),
  ("pov_turn", "1024x1536", "On the school rooftop at sunset: YOU stands by the fence, turns back toward the viewer with a gentle kind smile and holds his open hand out toward the viewer, as if saying come here. Warm golden light, wind in his hair."),
  ("pov_hands", "1536x1024", "First-person close view at sunset: ME's hand (navy sailor sleeve) holds YOU's hand (white hoodie sleeve), fingers interlaced, reaching forward from the bottom of the frame into warm golden light over the city. Only hands and forearms."),
+ ("pov_zoom", "1024x1536", "First person in a busy school cafeteria at lunch: ME's two hands (navy sailor sleeves) hold up a smartphone in the foreground; the phone screen shows the camera zoomed in on YOU far across the room, laughing with friends at a table; beyond the phone the real room is soft and far. She is secretly looking at him."),
+ ("pov_you_alone", "1024x1536", "First person from the bottom of an empty school stairwell at dusk: YOU sits alone halfway up the stairs, head down, arms on his knees, his phone dark in his hand; cold blue shadows with one last orange light from a high window; no one else around. For the first time he looks lonely and hurt."),
+ ("pov_empty_stage", "1024x1536", "First person standing alone on the empty school festival stage after the show: looking down and out, one spotlight circle on the floor around her feet (navy pleated skirt hem and black school shoes visible at the bottom), rows of empty seats in the dark hall, confetti scattered on the stage floor. Quiet, bittersweet."),
+ ("me_portrait", "1024x1024", "PORTRAIT: The profile picture of the girl ME: front-facing, head and shoulders, centred, looking at the camera with a small shy smile, soft window light, plain pale background. Simple and clean, suitable for a round avatar."),
  ("pov_sky", "1024x1536", "A photo ME took herself: looking up at a wide clear evening sky from the rooftop, a few pink clouds, the top edge of the fence and a paper plane gliding across. Hopeful and open. No person."),
 ]
 def main():
@@ -36,7 +41,7 @@ def main():
                 "The attached images are the style and character references: keep the same drawing style and the same character designs "
                 "(the boy in the first image is YOU, the girl in the second is ME, the third shows the painted scene style).\n"
                 f"Save it as a PNG file at this exact path: {out}\nDo not create or modify any other file and do not run anything else. Reply DONE when the file exists.\n\n"
-                f"IMAGE PROMPT:\n{STYLE}\n{prompt}")
+                f"IMAGE PROMPT:\n{PORTRAIT_STYLE if prompt.startswith('PORTRAIT: ') else STYLE}\n{prompt.removeprefix('PORTRAIT: ')}")
         cmd = [codex, "exec"] + sum((["-i", r] for r in refs), []) + ["-s", "workspace-write", "--skip-git-repo-check", "-C", ART, "-"]
         print("->", aid, flush=True); t0 = time.time(); subprocess.run(cmd, input=text, text=True, encoding="utf-8", stdout=subprocess.DEVNULL)
         print("   ok" if os.path.exists(out) else "   FAILED", f"({time.time() - t0:.0f}s)", flush=True)

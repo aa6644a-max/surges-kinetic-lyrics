@@ -3,19 +3,20 @@
    The coral dot is still the thread: everything gathers into it and grows back out of it. */
 
 // ================= INTERLUDE 70.4 - 82.3: an explore grid of YOU's memories, tilted, drifting; then it all drains into one point =================
-const EXPLORE = ['mem_entrance', 'mem_class', 'mem_race', 'mem_festival', 'mem_rain', 'mem_library', 'mem_lunch', 'mem_sunset', 'mem_rooftop', 'mem_photo', 'mem_award', 'you_crowd'];
+const EXPLORE = ['mem_entrance', 'pov_backrow', 'mem_class', 'pov_hallway', 'mem_lunch', 'pov_zoom', 'pov_window', 'mem_race', 'mem_award', 'pov_rain', 'mem_rain', 'mem_library',
+  'pov_stage', 'mem_festival', 'you_stage', 'you_crowd', 'mem_photo', 'mem_rooftop', 'mem_sunset', 'you_front', 'pov_backrow', 'mem_class', 'pov_hallway', 'mem_entrance', 'pov_window', 'mem_lunch', 'pov_zoom', 'mem_race', 'pov_stage', 'mem_rain'];
 function I2(t) {
   fill(MECOL);
   const drain = eIn(seg(t, 80.9, 1.2)), drift = (t - 70.4) * 70;
   const deep = eOut(seg(t, 81.6, .6)); if (deep > 0) disc(CX, CY, deep * 2400, INK);
   g.save(); g.translate(CX, CY); g.rotate(-.32 * (1 - drain));
-  for (let k = 0; k < 24; k++) {
-    const col = k % 3, row = Math.floor(k / 3), x0 = (col - 1) * 340, y0 = (row - 3.5) * 340 - drift % 340 + 170 * (col % 2);
+  for (let k = 0; k < 30; k++) {
+    const col = k % 3, row = Math.floor(k / 3), x0 = (col - 1) * 340, y0 = (row - 3.5) * 340 - drift + 170 * (col % 2);
     const pop = spr(t, [[0, 0], [70.45 + k * .09, 1, 2.6, .34]]), x = lerp(x0, 0, drain), y = lerp(y0, 0, drain), s = pop * (1 - drain) * (1 + .05 * pulse(t - k * .02));
     if (s < .01) continue;
     g.save(); g.translate(x, y); g.scale(s, s); g.rotate(.32 * (1 - drain) * .0);
     blob(0, 8, 316, 316, { col: 'rgba(0,0,0,.14)', round: .14 }); blob(0, 0, 316, 316, { col: WHITE, round: .14 });
-    photo(EXPLORE[k % EXPLORE.length], 0, 0, 292, 292, { r: 22, fx: .45, fy: .4 });
+    photo(EXPLORE[k], 0, 0, 292, 292, { r: 22, fx: .5, fy: .45 });
     if (k % 4 === 1) heart(110, 110, 46, { col: MECOL, sq: wob(t - 70.6 - k * .09, .5) });
     g.restore();
   }
@@ -59,9 +60,9 @@ function V2(t) {
     // L35 ME's own pictures fly into the bin
     if (t > S(35) - .2) {
       const bx = 880, by = 1700, bs = spr(t, [[0, 0], [S(35) - .1, 1, 2.6, .35], [S(36) - .1, 0, 2.4, .6]]);
-      ['pov_backrow', 'pov_hallway', 'pov_stage'].forEach((id, k) => { const t0 = S(35) + .3 + k * .45, p = eIn(seg(t, t0, .55)); if (p >= 1 || t < t0 - .4) return;
+      ['me_cry', 'me_angry', 'me_envy'].forEach((id, k) => { const t0 = S(35) + .3 + k * .45, p = eIn(seg(t, t0, .55)); if (p >= 1 || t < t0 - .4) return;
         const x = lerp(260 + k * 280, bx, p), y = lerp(1100, by, p) - Math.sin(p * Math.PI) * 300, s = 1 - .8 * p;
-        g.save(); g.translate(x, y); g.rotate(p * 2 * (k - 1)); g.scale(s, s); blob(0, 0, 240, 300, { col: WHITE, round: .1 }); photo(id, 0, -10, 220, 250, { fx: .5, fy: .4, r: 14, bg: '#E7E2EC', filter: 'grayscale(.6)' }); g.restore() });
+        g.save(); g.translate(x, y); g.rotate(p * 2 * (k - 1)); g.scale(s, s); blob(0, 0, 240, 300, { col: WHITE, round: .1 }); photo(id, 0, -10, 220, 250, { fx: .5, fy: .3, r: 14, bg: '#E7E2EC', filter: 'grayscale(.6)' }); g.restore() });
       const hit = [0, 1, 2].reduce((a, k) => a + wob(t - (S(35) + .85 + k * .45), .3), 0);
       g.save(); g.translate(bx, by); g.scale(bs, bs * (1 - hit)); blob(0, 30, 150, 170, { col: WHITE, round: .2 }); rect(-95, -80, 190, 20, WHITE); rect(-30, -104, 60, 20, WHITE); for (const x of [-35, 0, 35]) rect(x - 4, -10, 8, 110, GREY); g.restore();
       cap(t, 35, 0, null, CX, 1420, { size: 50, w: 600, col: WHITE, al: 'center', hide: S(36) - .1 });
@@ -76,13 +77,13 @@ function V2(t) {
       g.save(); g.translate(1000 - bw / 2, y); g.scale(s, s); blob(0, 0, bw, 120, { col: MECOL, round: 1 }); g.restore(); cap(t, i, 0, null, 1000 - bw + 45, y + 16, { size: 46, w: 600, col: WHITE }) };
     bub(36, 560, S(36)); bub(37, 720, S(37));
     txt('읽지 않음', 980, 820, { size: 30, w: 500, col: GREY, al: 'right', alpha: seg(t, E(37) - .3, .4) });
-    const ss = spr(t, [[0, 0], [S(37) + .4, 1, 2.2, .38]]); if (ss > .01) { g.save(); g.translate(360, 1260); g.scale(ss, ss); g.rotate(-.05); blob(0, 0, 440, 600, { col: WHITE, round: .1 }); photo('you_sit', 0, -20, 400, 520, { fx: .5, fy: .4, r: 20, bg: '#DDE3EA', filter: 'saturate(.6)' }); pillText(0, 270, 'YOU · 스토리', { size: 28, w: 600, col: INK }); g.restore() }
+    const ss = spr(t, [[0, 0], [S(37) + .4, 1, 2.2, .38]]); if (ss > .01) { g.save(); g.translate(360, 1260); g.scale(ss, ss); g.rotate(-.05); blob(0, 0, 440, 600, { col: WHITE, round: .1 }); photo('pov_you_alone', 0, -20, 400, 520, { fx: .5, fy: .45, r: 20, bg: '#DDE3EA', filter: 'saturate(.7)' }); pillText(0, 270, 'YOU · 스토리', { size: 28, w: 600, col: INK }); g.restore() }
     g.globalAlpha = 1;
   }
   // L38-39 everything tangles: lines between faces knot and wriggle, then pull into one point
   if (t > S(38) - .2) {
     const pull = eIn(seg(t, E(39) - .5, .7)), a = seg(t, S(38) - .1, .6);
-    const ends = [['you_front', 200, 500], ['me_pin', 880, 560], ['you_stage', 220, 1500], ['me_pin', 860, 1420], [null, 540, 300], [null, 540, 1700]];
+    const ends = [['you_front', 200, 500], ['me_portrait', 880, 560], ['you_stage', 220, 1500], ['me_portrait', 860, 1420], [null, 540, 300], [null, 540, 1700]];
     for (let k = 0; k < 9; k++) { const A = ends[k % 6], B = ends[(k * 5 + 2) % 6], ph = t * (1.1 + .2 * k) + k;
       const ax = lerp(A[1], CX, pull), ay = lerp(A[2], 1000, pull), bx = lerp(B[1], CX, pull), by = lerp(B[2], 1000, pull);
       g.save(); g.strokeStyle = [MECOL, YEL, TEAL, YOUCOL, PEACH, WHITE][k % 6]; g.lineWidth = 8 + 4 * a; g.lineCap = 'round'; g.globalAlpha = a; g.beginPath(); g.moveTo(ax, ay);
@@ -96,7 +97,7 @@ function V2(t) {
 
 // ================= CORRECTION 107.85 - 115.3: the message box. Typed, backspaced, typed again, selected, deleted =================
 function CR(t) {
-  fill(WHITE); blurBg('mem_library', WHITE, .84);
+  fill(WHITE); blurBg('pov_night', WHITE, .8);
   const k40 = chars(40), del0 = E(40) - .25, nDel = Math.floor(clamp((t - del0) / .07, 0, 7));
   const L1 = (() => { let s = ''; for (let k = 0; k < k40.length; k++) { if (t < k40[k].t) break; if (k > 0 && k40[k].sp) s += ' '; s += k40[k].c } const keep = '미안해,'; if (t > del0) { const full = s; s = full.slice(0, Math.max(keep.length, full.length - nDel * 2)) } return s })();
   const typed = i => { let s = ''; for (const G of chars(i)) { if (t < G.t) break; if (s && G.sp) s += ' '; s += G.c } return s };
@@ -120,14 +121,14 @@ function CR(t) {
 // ================= CHORUS 2 115.3 - 137.5: stories. YOU's stories, a montage, the end; then ME's own story (0 views), undecided, timed out, thrown away =================
 const STORIES = () => [
   [S(43) - .15, 'mem_entrance', 'you', 43], [S(44) - .1, 'mem_lunch', 'you', 44], [S(45) - .1, 'mem_library', 'you', 45], [S(46) - .1, 'mem_rain', 'you', 46],
-  [cT(46, 6), 'mem_race', 'you', -1], [cT(46, 6) + BEAT, 'mem_award', 'you', -1], [cT(46, 6) + 2 * BEAT, 'mem_rooftop', 'you', -1], [cT(46, 6) + 3 * BEAT, 'mem_festival', 'you', -1],
+  [cT(46, 6), 'me_mirror', 'me', -1], [cT(46, 6) + BEAT, 'me_envy', 'me', -1], [cT(46, 6) + 2 * BEAT, 'me_cry', 'me', -1], [cT(46, 6) + 3 * BEAT, 'me_angry', 'me', -1],
   [S(47) - .1, 'mem_sunset', 'you', 47], [S(48) - .15, 'pov_night', 'me', 48]];
 function storyFrame(id, who, cx, s, t, extra) {
   g.save(); g.translate(cx, CY); g.scale(s, s);
   const bg = who === 'me' ? '#CFC9D8' : '#222';
   photo(id, 0, 0, 1000, 1780, { r: 44, fx: .5, fy: who === 'me' ? .4 : .45, bg, filter: who === 'me' ? 'grayscale(.45) brightness(.95)' : '' });
   const gr = g.createLinearGradient(0, -890, 0, -600); gr.addColorStop(0, 'rgba(0,0,0,.45)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.beginPath(); g.roundRect(-500, -890, 1000, 290, [44, 44, 0, 0]); g.fill();
-  avatar(who === 'me' ? 'me_pin' : 'you_front', -400, -770, 40); txt(who === 'me' ? '나' : '주인공', -340, -756, { size: 36, w: 700, col: WHITE });
+  avatar(who === 'me' ? 'me_portrait' : 'you_front', -400, -770, 40); txt(who === 'me' ? '나' : '주인공', -340, -756, { size: 36, w: 700, col: WHITE });
   if (extra) extra();
   g.restore();
 }
@@ -143,8 +144,8 @@ function C2(t) {
   // ME's story: indecision (left, right), a 24h timer, then dragged down into the bin
   const dither = t > S(50) && t < S(51) ? spr(t, [[0, 0], ...chars(50).map((G, j) => [G.t, (j % 2 ? -1 : 1) * 160, 3, .35]), [E(50), 0, 3, .4]]) : 0;
   const dropY = toss * 1300, sc = open * (1 - .75 * toss);
-  if (prev && slide < .999 && who === prev[2]) storyFrame(prev[1], prev[2], CX - (slide) * 1100, sc, t);
-  g.save(); g.translate(0, dropY); storyFrame(id, who, CX + (1 - slide) * 1100 * (prev && who === prev[2] ? 1 : 0) + dither, sc, t, () => {
+  if (prev && slide < .999) storyFrame(prev[1], prev[2], CX - (slide) * 1100, sc, t);
+  g.save(); g.translate(0, dropY); storyFrame(id, who, CX + (1 - slide) * 1100 * (prev ? 1 : 0) + dither, sc, t, () => {
     if (li === 43 || li === 44) sticker(0, 520, 780, 150, S(li), t, li === 43 ? -.04 : .04, () => cap(t, li, 0, null, 0, 16, { size: 52, w: li === 43 ? 700 : 600, fam: li === 43 ? EN : KR, col: INK, al: 'center', upper: false }));
     if (li === 45) sticker(0, 420, 820, 300, S(45), t, -.03, () => { g.fillStyle = YOUCOL; g.beginPath(); g.roundRect(-410, -150, 820, 90, [44, 44, 0, 0]); g.fill(); txt('질문', 0, -92, { size: 36, w: 700, col: WHITE, al: 'center' }); cap(t, 45, 0, null, 0, 50, { size: 44, w: 600, col: INK, al: 'center' }) });
     if (li === 46) sticker(0, 560, 760, 150, S(46), t, .03, () => cap(t, 46, 0, 6, 0, 16, { size: 56, w: 700, col: INK, al: 'center' }));
@@ -157,7 +158,7 @@ function C2(t) {
       if (t > S(51) - .1) { const tp = seg(t, S(51), E(52) - S(51)); g.save(); g.lineCap = 'round'; ring(390, -760, 48, 10, 'rgba(255,255,255,.35)'); g.strokeStyle = MECOL; g.lineWidth = 10; g.beginPath(); g.arc(390, -760, 48, -Math.PI / 2, -Math.PI / 2 + (1 - tp) * 6.28); g.stroke(); g.restore(); txt('24h', 390, -748, { size: 26, w: 700, fam: EN, col: WHITE, al: 'center', upper: false }) }
     }
   }); g.restore();
-  if (who === 'you' || t < S(48)) bars(9, Math.min(k, 8), p); else bars(1, 0, seg(t, S(48), E(52) - S(48)));
+  if (t < S(48) - .15) bars(9, Math.min(k, 8), p); else bars(1, 0, seg(t, S(48), E(52) - S(48)));
   // the bin the story falls into
   if (t > cT(52, 2)) { const bs = spr(t, [[0, 0], [cT(52, 2), 1, 2.6, .35]]) * (1 - eIn(seg(t, 137.1, .3))); const hit = wob(t - (cT(52, 4) + .75), .35); g.save(); g.translate(CX, 1720); g.scale(bs * 1.3, bs * 1.3 * (1 - hit)); blob(0, 30, 150, 170, { col: WHITE, round: .2 }); rect(-95, -80, 190, 20, WHITE); rect(-30, -104, 60, 20, WHITE); for (const x of [-35, 0, 35]) rect(x - 4, -10, 8, 110, GREY); g.restore() }
   if (t > cT(52, 4)) cap(t, 52, 0, null, CX, 1480, { size: 60, w: 700, col: WHITE, al: 'center' });

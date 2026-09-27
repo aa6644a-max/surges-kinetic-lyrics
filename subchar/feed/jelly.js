@@ -67,10 +67,10 @@ function pillText(x, y, s, o) { txt(s, x, y, { size: o.size, w: o.w ?? 600, fam:
 // ---------- anime art (restored subculture illustrations in subchar/art) ----------
 const ART = {}, ARTS = ['mem_class', 'mem_sunset', 'mem_festival', 'mem_award', 'mem_race', 'mem_rooftop', 'mem_photo', 'mem_entrance', 'mem_lunch', 'mem_library', 'mem_rain',
   'you_front', 'you_stage', 'you_crowd', 'you_sit', 'you_hand', 'hands_hold', 'me_profile', 'me_smile', 'me_mirror', 'me_envy', 'me_cry', 'me_angry', 'me_run', 'me_reach',
-  'pov_backrow', 'pov_hallway', 'pov_window', 'pov_stage', 'pov_rain', 'pov_selfie', 'pov_night', 'me_pin', 'pov_turn', 'pov_hands', 'pov_sky'];
+  'pov_backrow', 'pov_hallway', 'pov_window', 'pov_stage', 'pov_rain', 'pov_selfie', 'pov_night', 'me_pin', 'pov_turn', 'pov_hands', 'pov_sky', 'pov_zoom', 'pov_you_alone', 'pov_empty_stage', 'me_portrait'];
 const loadArt = () => Promise.all(ARTS.map(id => new Promise(r => { const im = new Image(); im.onload = () => { ART[id] = im; r() }; im.onerror = () => r(); im.src = `../art/${id}.png` })));
 // faces for avatars: focus point (0..1) and how many avatar-widths the whole picture spans
-const FACE = { you_front: [.45, .30, 1.9], you_stage: [.52, .31, 2.0], me_profile: [.58, .33, 1.55], me_smile: [.51, .40, 1.75], me_pin: [.52, .50, 3.2] };   // measured on a grid: [face centre x, y (0..1), picture width in avatar diameters]
+const FACE = { you_front: [.45, .30, 1.9], you_stage: [.52, .31, 2.0], me_profile: [.58, .33, 1.55], me_smile: [.51, .40, 1.75], me_pin: [.52, .50, 3.2], me_portrait: [.5, .42, 1.6] };   // measured on a grid: [face centre x, y (0..1), picture width in avatar diameters]
 // faces in the class photo (mem_photo), for the likes crowd
 const CROWD = [[.19, .13], [.315, .16], [.52, .16], [.64, .15], [.78, .16], [.13, .31], [.26, .30], [.39, .31], [.71, .35], [.84, .33], [.19, .49], [.31, .50], [.64, .52], [.80, .53]];   // measured; YOU (.51,.44) and ME (.97,.33) left out
 // a picture inside a rounded rect, cover-fit around a focus point

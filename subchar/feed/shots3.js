@@ -22,7 +22,7 @@ function BR(t) {
       g.fillStyle = WHITE; g.beginPath(); g.moveTo(0, 0); g.lineTo(-40, 90); g.lineTo(40, 90); g.fill();
       g.rotate(tilt); blob(0, 0, 760, 18, { col: WHITE, round: 1 });
       avatar('you_front', -360, -lerp(100, 80, light), lerp(100, 78, light), { filter: `grayscale(${light})` }); ring(-360, -lerp(100, 80, light), lerp(100, 78, light) + 8, 6, YOUCOL);
-      avatar('me_pin', 360, -80, 78); ring(360, -80, 86, 6, MECOL); g.restore() }
+      avatar('me_portrait', 360, -80, 78); ring(360, -80, 86, 6, MECOL); g.restore() }
     cap(t, 54, 0, null, CX, 1560, { size: 46, w: 500, col: WHITE, al: 'center', hide: S(55) - .1 }); cap(t, 55, 0, null, CX, 1560, { size: 46, w: 500, col: WHITE, al: 'center', hide: S(56) - .1 });
   }
   // L56 a breath: the screen goes to sleep and slowly wakes; only the dot, breathing
@@ -31,7 +31,7 @@ function BR(t) {
   // L57-59 editing ME's profile: every save fails; the toasts pile up; then the dot swells and bursts
   if (t > S(57) - .3) {
     const cs = spr(t, [[0, 0], [S(57) - .2, 1, 2.2, .38]]) * (1 - eIn(seg(t, 155.9, .4))), burst = eOut(seg(t, 156.25, .35));
-    if (cs > .01) { g.save(); g.translate(CX, 900); g.scale(cs, cs); blob(0, 0, 900, 860, { col: WHITE, round: .08 }); avatar('me_pin', 0, -200, 150); txt('프로필 편집', 0, -400, { size: 36, w: 700, col: INK, al: 'center' });
+    if (cs > .01) { g.save(); g.translate(CX, 900); g.scale(cs, cs); blob(0, 0, 900, 860, { col: WHITE, round: .08 }); avatar('me_portrait', 0, -200, 150); txt('프로필 편집', 0, -400, { size: 36, w: 700, col: INK, al: 'center' });
       blob(0, 40, 700, 90, { col: CREAM, round: 1 }); pillText(0, 43, '나', { size: 40, w: 600, col: INK }); blob(0, 170, 700, 90, { col: CREAM, round: 1 }); pillText(0, 173, 'sub character', { size: 36, w: 500, fam: EN, col: GREY });
       const tries = [S(57) + 1.2, S(58) + .2, S(58) + 1.7, S(59)], press = tries.reduce((a, x) => a + wob(t - x, .3), 0);
       g.save(); g.translate(0, 320); g.scale(1 + press * .4, 1 - press * .4); blob(0, 0, 360, 100, { col: MECOL, round: 1 }); pillText(0, 3, '저장', { size: 40, w: 700, col: WHITE }); g.restore();
@@ -42,53 +42,12 @@ function BR(t) {
     cap(t, 57, 0, null, CX, 300, { size: 50, w: 500, col: WHITE, al: 'center', hide: 155.8 }); cap(t, 58, 0, null, CX, 390, { size: 50, w: 500, col: WHITE, al: 'center', hide: 155.8 });
     cap(t, 59, 0, null, CX, 1820, { size: 80, w: 800, col: WHITE, al: 'center', hide: 156.2 });
     const sw = eIn(seg(t, 155.9, .4)); if (sw > 0) blob(CX, 700, 60 + sw * 200, 60 + sw * 200, { col: MECOL, wob: sw * .25, ph: t * 20 });
-    if (burst > 0) disc(CX, 700, burst * 2400, MECOL);
+    if (burst > 0) disc(CX, 700, burst * 2400, VIOLET);                                                              // the same violet page chorus 1 opened on
   }
 }
 
-// ================= FINAL CHORUS 156.6 - 179.2: the UI breaks; the type is huge; ME's type is as big as YOU's =================
-function FC(t) {
-  const sec = [S(60), S(61), S(62), S(63), S(64), S(65), S(66), S(67), S(68), S(69), S(70)];
-  let k = 0; for (let j = 0; j < sec.length; j++) if (t >= sec[j] - .1) k = j;
-  const BG = [MECOL, YOUCOL, YOUCOL, INK, TEAL, PEACH, PEACH, INK, MECOL, TEAL, INK];
-  const prev = k ? BG[k - 1] : MECOL, wipe = eOut(seg(t, sec[k] - .1, .35));
-  fill(prev); if (BG[k] !== prev) { g.save(); g.translate(CX, CY); g.rotate(-.3); rect(-1500, -1500 + (1 - wipe) * 3000, 3000, 3000, BG[k]); g.restore() }
-  const tk = sec[k], big = (i, a, b, x, y, sz, col, o = {}) => cap(t, i, a, b, x, y, { size: sz, w: 900, col, rev: 'grow', ...o });
-  // photo stickers that tumble in
-  const stickerP = (id, x, y, w, h, t0, rot, o = {}) => { const s = spr(t, [[0, 0], [t0, 1, 2.6, .33]]); if (s < .01) return; g.save(); g.translate(x, y); g.rotate(rot * (2 - s)); g.scale(s, s); blob(0, 8, w + 30, h + 30, { col: 'rgba(0,0,0,.2)', round: .08 }); blob(0, 0, w + 30, h + 30, { col: WHITE, round: .08 }); photo(id, 0, 0, w, h, { r: 16, fx: o.fx ?? .5, fy: o.fy ?? .3, bg: '#EDE7F2' }); g.restore() };
-  if (k === 0) { stickerP('me_run', 740, 1380, 380, 500, S(60) + .2, .12); g.save(); g.translate(CX, 760); g.rotate(-.12); layered(t, [.08, .04, 0], [YEL, INK, WHITE], (tt, col) => { big(60, 0, 4, -470, -60, 230, col, { fam: EN, upper: true }); big(60, 4, null, -470, 160, 230, col, { fam: EN, upper: true }) }); g.restore() }
-  if (k === 1) { const hit = eOutQ(seg(t, cT(61, 2), .3)), bump = wob(t - cT(61, 2) - .3, .3);
-    stickerP('you_front', lerp(-300, 290, hit), 960, 420, 560, S(61), -.05); stickerP('me_smile', lerp(1400, 790, hit), 960, 420, 560, S(61), .05, { fy: .4 });
-    big(61, 0, 2, 290, 1390, 120, WHITE, { al: 'center' }); big(61, 2, null, 790, 1390, 120, WHITE, { al: 'center' }) }
-  if (k === 2) { for (let j = 0; j < 5; j++) { const a = t - onBeat(Math.floor(beatN(S(62))) + j); if (a > 0 && a < 1.2) ring(CX, 900, 200 + a * 700, 14 * (1 - a / 1.2) + 2, YEL, 1 - a / 1.2) }
-    stickerP('you_stage', CX, 900, 320, 400, S(62), -.06, { fy: .3 }); big(62, 0, 8, CX, 330, 80, WHITE, { al: 'center', w: 800 }); big(62, 8, null, CX, 1420, 260, YEL, { al: 'center' }) }
-  if (k === 3) { avatar('you_front', 300, 700, 170); ring(300, 700, 182, 10, YOUCOL); avatar('me_smile', 780, 700, 170); ring(780, 700, 182, 10, MECOL);
-    for (let j = 0; j < 24; j++) { const side = j % 2, x = (side ? 780 : 300) + ((j >> 1) % 4 - 1.5) * 90, row = Math.floor(j / 8), t0 = S(63) + j * .04, land = t0 + .5, y = fall(t, t0, land, -100, 1300 - row * 100); if (t > t0) heart(x, y, 100, { col: [MECOL, PINK, YEL, WHITE][j % 4], sq: wob(t - land, .45), rot: (R(j, 3) - .5) * .5 }) }
-    big(63, 0, null, CX, 1600, 150, WHITE, { al: 'center' }) }
-  if (k === 4) { g.save(); g.translate(CX, CY); g.rotate(.14); big(64, 0, 3, 0, -80, 260, WHITE, { al: 'center' }); big(64, 3, null, 0, 200, 260, INK, { al: 'center' }); g.restore() }
-  if (k === 5) { stickerP('you_crowd', 330, 760, 420, 540, S(65), -.07); stickerP('me_smile', 760, 900, 420, 540, S(65) + .25, .06, { fy: .4 }); big(65, 0, 3, CX, 1500, 250, WHITE, { al: 'center' }); big(65, 3, null, CX, 1640, 90, INK, { al: 'center' }) }
-  if (k === 6) { const run = (t - S(66)) / (E(66) - S(66) + .3); big(66, 0, null, 200 - run * 3400, 1100, 420, WHITE, { fam: EN, upper: true, rev: 'type' }); rect(0, 1160, W, 14, INK) }
-  if (k === 7) { // LOSER, with ME's dot as the O; the dot swells and fills the page
-    const sz = 380, sw = eIn(seg(t, E(67) - .5, .7)); font(900, sz, EN); setTrack(0); const wL = g.measureText('L').width, wS = g.measureText('SER').width, wO = sz * .78, x0 = CX - (wL + wO + wS) / 2;
-    big(67, 0, 11, CX, 700, 80, WHITE, { fam: EN, upper: true, al: 'center', tr: .15 });
-    if (t > cT(67, 11)) { txt('L', x0, 1180, { size: sz, w: 900, fam: EN, col: WHITE }); txt('SER', x0 + wL + wO, 1180, { size: sz, w: 900, fam: EN, col: WHITE, alpha: 1 - sw }) }
-    if (t > cT(67, 12)) blob(x0 + wL + wO / 2, 1180 - sz * .36, wO * .9 + sw * 2600, wO * .9 + sw * 2600, { col: MECOL, sq: wob(t - cT(67, 12), .4) }) }
-  if (k === 8) { const f = eIO(seg(t, S(68), E(68) - S(68))), pop = eOut(seg(t, E(68) - .15, .7));
-    if (pop < 1) { blob(CX, 1000, 860, 150, { col: WHITE, round: 1, alpha: 1 - pop }); if (f > .02) blob(115 + 830 * f / 2, 1000, 830 * f, 126, { col: YEL, round: 1, wob: .15, ph: t * 9, alpha: 1 - pop }) }
-    for (let j = 0; j < 22; j++) { if (pop <= 0) break; const a = j / 22 * 6.28, d = pop * (300 + 500 * R(j, 2)); blob(CX + Math.cos(a) * d, 1000 + Math.sin(a) * d + pop * pop * 300, 90 * (1 - pop * .6), 90 * (1 - pop * .6), { col: [YEL, WHITE, PINK][j % 3], wob: .3, ph: j }) }
-    big(68, 0, null, CX, 760, 190, WHITE, { al: 'center' }) }
-  if (k === 9) { const sy = fall(t, S(69) - .1, S(69) + .3, -200, 420);
-    blob(CX, sy, 920, 140, { col: WHITE, round: 1, sq: wob(t - S(69) - .3, .3) }); ring(120, sy - 6, 24, 7, INK); line(138, sy + 12, 156, sy + 30, 7, INK, 1, 1);
-    if (t < cT(69, 6)) cap(t, 69, 0, 6, 190, sy + 16, { size: 44, w: 400, fam: EN, col: GREY, upper: false }); else cap(t, 69, 6, null, 190, sy + 16, { size: 44, w: 600, col: INK });
-    const rs = spr(t, [[0, 0], [E(69) - 1.2, 1, 2.4, .36]]); if (rs > .01) { g.save(); g.translate(CX, 820); g.scale(rs, rs); blob(0, 0, 900, 180, { col: WHITE, round: .3 }); avatar('me_smile', -340, 0, 60); txt('나', -250, 16, { size: 46, w: 800, col: INK }); txt('게시물 1 · 팔로워 38', -250, 60, { size: 30, w: 500, col: GREY }); g.restore() }   // the search finds ME
-    big(69, 0, 6, CX, 1300, 200, WHITE, { fam: EN, al: 'center', upper: true }); big(69, 6, null, CX, 1480, 110, WHITE, { al: 'center', w: 850 }) }
-  if (k === 10) { // I wanna be you: this time the two circles are the same size, and nothing snaps
-    const s = spr(t, [[0, 0], [S(70) - .1, 1, 2.2, .38]]);
-    avatar('you_front', 300, 900, 170 * s); ring(300, 900, 182 * s, 10, YOUCOL); avatar('me_smile', 780, 900, 170 * s); ring(780, 900, 182 * s, 10, MECOL);
-    blob(CX, 900, 140 * s, 30, { col: WHITE, round: 1, wob: wob(t - S(70) - .3, .3) });
-    big(70, 0, null, CX, 1350, 120, WHITE, { fam: EN, upper: true, al: 'center', w: 900 });
-    disc(780, 900, eIn(seg(t, 178.6, .6)) * 2400, CREAM) }
-}
+// ================= FINAL CHORUS 156.6 - 179.2: chorus 1 again (same objects, same grammar), with small changes: ME has a face, her post has colour, the search finds her, and I wanna be you opens onto the empty stage =================
+function FC(t) { C1(t, 43) }
 
 // ================= OWN LINE 179.2 - 204.2: ME makes her own post =================
 function OW(t) {
@@ -138,7 +97,7 @@ function OW(t) {
     const s = spr(t, [[0, 0], [S(81) - .2, 1, 2.2, .38]]), liked = seg(t, cT(81, 2), .1), end = eIn(seg(t, 204.4, .7));
     g.save(); g.translate(CX, lerp(900, 900, end)); g.scale(s * (1 - end), s * (1 - end));
     blob(0, 10, 900, 1180, { col: 'rgba(0,0,0,.12)', round: .08 }); blob(0, 0, 900, 1180, { col: WHITE, round: .08 });
-    avatar('me_smile', -370, -520, 42); ring(-370, -520, 52, 6, MECOL); txt('나', -300, -506, { size: 40, w: 800, col: INK });
+    avatar('me_portrait', -370, -520, 42); ring(-370, -520, 52, 6, MECOL); txt('나', -300, -506, { size: 40, w: 800, col: INK });
     photo('me_run', 0, -80, 840, 760, { r: 24, fx: .5, fy: .4, bg: '#1d1d2b' });
     heart(-370, 380, 80 * (1 + wob(t - cT(81, 2), .5)), { col: liked ? MECOL : null, stroke: liked ? null : INK, lw: 6 });
     avatar('you_front', -250, 385, 28, { alpha: liked }); txt('좋아요 1 · 주인공님이 좋아합니다', -205, 398, { size: 32, w: 600, col: INK, alpha: liked });
