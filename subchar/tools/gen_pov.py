@@ -27,6 +27,12 @@ POV = [
  ("pov_you_alone", "1024x1536", "First person from the bottom of an empty school stairwell at dusk: YOU sits alone halfway up the stairs, head down, arms on his knees, his phone dark in his hand; cold blue shadows with one last orange light from a high window; no one else around. For the first time he looks lonely and hurt."),
  ("pov_empty_stage", "1024x1536", "First person standing alone on the empty school festival stage after the show: looking down and out, one spotlight circle on the floor around her feet (navy pleated skirt hem and black school shoes visible at the bottom), rows of empty seats in the dark hall, confetti scattered on the stage floor. Quiet, bittersweet. NO PEOPLE at all: the hall and every seat are completely empty, nobody in the audience, nobody looking back."),
  ("me_portrait", "1024x1024", "PORTRAIT: The profile picture of the girl ME: front-facing, head and shoulders, centred, looking at the camera with a small shy smile, soft window light, plain pale background. Simple and clean, suitable for a round avatar."),
+ # the outro: ME trying things for herself (her own photos now, candid, taken by a friend or on a timer)
+ ("me_guitar", "1024x1536", "PORTRAIT: ME practicing an acoustic guitar alone in an after-school music room, warm sunlight through the window, concentrating on the chords, a small proud smile. Candid photo."),
+ ("me_paint", "1024x1536", "PORTRAIT: ME painting a big canvas in the school art room, a smear of coral paint on her cheek, laughing, brushes in hand, warm afternoon light. Candid photo."),
+ ("me_speech", "1024x1536", "PORTRAIT: ME standing at the front of a classroom giving a presentation, holding note cards, a little nervous but brave, the backs of a few listening classmates' heads in the lower foreground. Candid photo."),
+ ("me_dance", "1024x1536", "PORTRAIT: ME dancing alone in an empty dance practice room with a wall mirror, mid-spin, her long hair flying, golden evening light, joyful. Candid photo."),
+ ("me_friend", "1024x1536", "PORTRAIT: ME laughing with a new girl friend (short brown bob hair, same uniform) while sharing snacks on a bench in the schoolyard, candid and warm, both happy. Candid photo."),
  ("pov_sky", "1024x1536", "A photo ME took herself: looking up at a wide clear evening sky from the rooftop, a few pink clouds, the top edge of the fence and a paper plane gliding across. Hopeful and open. No person."),
 ]
 def main():

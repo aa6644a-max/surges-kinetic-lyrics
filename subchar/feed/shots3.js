@@ -31,7 +31,7 @@ function BR(t) {
   // L57-59 editing ME's profile: every save fails; the toasts pile up; then the dot swells and bursts
   if (t > S(57) - .3) {
     const cs = spr(t, [[0, 0], [S(57) - .2, 1, 2.2, .38]]) * (1 - eIn(seg(t, 155.9, .4))), burst = eOut(seg(t, 156.25, .35));
-    if (cs > .01) { g.save(); g.translate(CX, 900); g.scale(cs, cs); blob(0, 0, 900, 860, { col: WHITE, round: .08 }); avatar('me_portrait', 0, -200, 150); txt('프로필 편집', 0, -400, { size: 36, w: 700, col: INK, al: 'center' });
+    if (cs > .01) { g.save(); g.translate(CX, 900); g.scale(cs, cs); blob(0, -20, 900, 940, { col: WHITE, round: .08 }); avatar('me_portrait', 0, -190, 150); txt('프로필 편집', 0, -400, { size: 36, w: 700, col: INK, al: 'center' });
       blob(0, 40, 700, 90, { col: CREAM, round: 1 }); pillText(0, 43, '나', { size: 40, w: 600, col: INK }); blob(0, 170, 700, 90, { col: CREAM, round: 1 }); pillText(0, 173, 'sub character', { size: 36, w: 500, fam: EN, col: GREY });
       const tries = [S(57) + 1.2, S(58) + .2, S(58) + 1.7, S(59)], press = tries.reduce((a, x) => a + wob(t - x, .3), 0);
       g.save(); g.translate(0, 320); g.scale(1 + press * .4, 1 - press * .4); blob(0, 0, 360, 100, { col: MECOL, round: 1 }); pillText(0, 3, '저장', { size: 40, w: 700, col: WHITE }); g.restore();
@@ -52,16 +52,24 @@ function FC(t) { C1(t, 43) }
 // ================= OWN LINE 179.2 - 204.2: ME makes her own post =================
 function OW(t) {
   fill(CREAM); blurBg('mem_rooftop', CREAM, .82);
-  const PICK = ['me_run', 'pov_backrow', 'pov_hallway', 'pov_stage', 'pov_window', 'pov_rain'];   // her camera roll is all YOU; she picks the one of herself
-  const pick = seg(t, cT(71, 4), .1), upT = cT(77, 10), up = eIn(seg(t, upT + .2, .6));
-  // the new-post screen: a picker grid of ME's photos; one is chosen and becomes the preview
+  const PICK = ['me_run', 'me_guitar', 'me_paint', 'me_speech', 'me_dance', 'me_friend'];   // her camera roll is her own now: the things she tried
+  const C71 = chars(71), selT = j => C71[Math.min(j, C71.length - 1)].t, gatherT = selT(5) + .35, gather = eIO(seg(t, gatherT, .6)), upT = cT(77, 10), up = eIn(seg(t, upT + .2, .6));
+  // a carousel: once picked, the six photos slide by one after another (hold, then a jelly slide)
+  const carousel = (x, y, w, h, o = {}) => { const f = Math.max(0, (t - gatherT - .7) / 1.9), i = Math.floor(f), fr = eIO(clamp((f - i - .72) / .28));
+    g.save(); g.beginPath(); g.roundRect(x - w / 2, y - h / 2, w, h, o.r ?? 22); g.clip();
+    for (const k of [0, 1]) photo(PICK[(i + k) % 6], x + (k - fr) * w, y, w, h, { r: 0, fx: .5, fy: .35, bg: '#EDE7F2' });
+    g.restore(); for (let k = 0; k < 6; k++) disc(x - 75 + k * 30, y + h / 2 + 34, 8, k === (i + (fr > .5 ? 1 : 0)) % 6 ? MECOL : GREY, o.alpha ?? 1) };
+  // the new-post screen: a grid of her photos; each is ticked on a syllable (1-6), then they gather into one post
   if (t < upT + .9) {
     blob(CX, 150, 940, 110, { col: WHITE, round: 1, alpha: 1 - up }); pillText(CX, 153, '새 게시물', { size: 40, w: 700, col: INK, alpha: 1 - up });
-    PICK.forEach((id, j) => { const c = j % 3, r = Math.floor(j / 3), s = spr(t, [[0, 0], [179.4 + j * .08, 1, 2.6, .35]]);
-      const chosen = j === 0, gone = eIn(seg(t, cT(71, 4), .5)), px = chosen ? lerp(210 + c * 330, CX, eOutQ(pick)) : 210 + c * 330, py = chosen ? lerp(420 + r * 330, 640, eOutQ(pick)) : 420 + r * 330 + gone * 1800;   // the others drop away
-      const pw = chosen ? lerp(300, 820, eOutQ(pick)) : 300, ph = chosen ? lerp(300, 720, eOutQ(pick)) : 300, us = 1 - up * .9, uy = up * -520;
-      if (s > .01 && (chosen || gone < 1)) { g.save(); g.translate(px, py + uy); g.scale(s * (chosen ? us : 1 - gone), s * (chosen ? us : 1 - gone)); photo(id, 0, 0, pw, ph, { r: 22, fx: .5, fy: .3, bg: '#EDE7F2' }); if (chosen && pick > 0) { disc(pw / 2 - 40, -ph / 2 + 40, 30 * pick, MECOL); drawPath([[pw / 2 - 54, -ph / 2 + 40], [pw / 2 - 42, -ph / 2 + 52], [pw / 2 - 24, -ph / 2 + 28]], seg(t, cT(71, 4) + .1, .3), 7, WHITE) } g.restore() }
-    });
+    const us = 1 - up * .9, uy = up * -520;
+    if (gather < 1) for (let j = 5; j >= 0; j--) { const c = j % 3, r = Math.floor(j / 3), s = spr(t, [[0, 0], [179.4 + j * .08, 1, 2.6, .35]]); if (s < .01) continue;
+      const px = lerp(210 + c * 330, CX, gather), py = lerp(420 + r * 330, 640, gather), pw = lerp(300, 820, gather), ph = lerp(300, 720, gather), sel = spr(t, [[0, 0], [selT(j), 1, 2.8, .32]]);
+      g.save(); g.translate(px, py); g.rotate((j - 2.5) * .06 * Math.sin(gather * Math.PI)); g.scale(s, s * (1 + .08 * wob(t - selT(j), .3)));
+      photo(PICK[j], 0, 0, pw, ph, { r: 22, fx: .5, fy: .35, bg: '#EDE7F2' });
+      if (sel > .01) { disc(pw / 2 - 40, -ph / 2 + 40, 30 * sel, MECOL); txt(String(j + 1), pw / 2 - 40, -ph / 2 + 52, { size: 32 * sel, w: 800, fam: EN, col: WHITE, al: 'center', upper: false }) }
+      g.restore() }
+    else carousel(CX, 640 + uy, 820 * us, 720 * us, { alpha: 1 - up });
     // the caption box: 내 이야기는 결국 / I'm a sub character / and the lines after it, newest at the bottom
     if (t > S(71) - .2) {
       const cs = spr(t, [[0, 0], [S(71) - .1, 1, 2.4, .36]]) * (1 - up), lines = [[71], [72], [73], [74], [75], [76]].map(([i]) => i).filter(i => t > S(i) - .1).slice(-3);
@@ -98,7 +106,7 @@ function OW(t) {
     g.save(); g.translate(CX, lerp(900, 900, end)); g.scale(s * (1 - end), s * (1 - end));
     blob(0, 10, 900, 1180, { col: 'rgba(0,0,0,.12)', round: .08 }); blob(0, 0, 900, 1180, { col: WHITE, round: .08 });
     avatar('me_portrait', -370, -520, 42); ring(-370, -520, 52, 6, MECOL); txt('나', -300, -506, { size: 40, w: 800, col: INK });
-    photo('me_run', 0, -80, 840, 760, { r: 24, fx: .5, fy: .4, bg: '#1d1d2b' });
+    carousel(0, -80, 840, 760, { r: 24 });
     heart(-370, 380, 80 * (1 + wob(t - cT(81, 2), .5)), { col: liked ? MECOL : null, stroke: liked ? null : INK, lw: 6 });
     avatar('you_front', -250, 385, 28, { alpha: liked }); txt('좋아요 1 · 주인공님이 좋아합니다', -205, 398, { size: 32, w: 600, col: INK, alpha: liked });
     cap(t, 81, 0, null, -410, 490, { size: 48, w: 700, col: INK });

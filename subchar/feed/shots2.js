@@ -31,15 +31,18 @@ const FILTERS = ['none', 'grayscale(1)', 'sepia(.85)', 'hue-rotate(150deg) satur
 function V2(t) {
   fill(INK); blurBg('pov_night', INK, .72);
   // L28-30 the front camera: a round frame opening from the dot; every syllable of 싫어져만 갔어 swaps the filter, the frame wobbles
-  if (t < S(31) + .1) {
+  if (t < S(31) + .15) {
     const nf = t < S(29) ? 0 : chars(29).filter(G => t >= G.t).length, lastT = nf ? chars(29)[nf - 1].t : 0;
-    const R0 = spr(t, [[0, 0], [82.3, 400, 1.8, .36], [S(30) - .1, 270, 1.8, .45]]), cy = spr(t, [[0, 860], [S(30) - .1, 640, 1.8, .45]]);
-    const w = spr(t, [[0, 0], [82.3, 800, 1.8, .36], [S(30) - .1, 540, 1.8, .45], [S(31) - .15, 900, 2, .45]]), h = spr(t, [[0, 0], [82.3, 800, 1.8, .36], [S(30) - .1, 540, 1.8, .45], [S(31) - .15, 620, 2, .45]]);
-    const rd = t < S(31) - .15 ? 1 : lerp(1, .1, seg(t, S(31) - .15, .3)), wb = wob(t - lastT, .12);
-    g.save(); g.beginPath(); g.roundRect(CX - w / 2, cy - h / 2, w, h, rd * Math.min(w, h) / 2); g.clip(); g.filter = FILTERS[nf % FILTERS.length];
-    const im = ART.pov_selfie; if (im) { const s = Math.max(w / im.width, h / im.height) * 1.25 * (1 + wb), iw = im.width * s, ih = im.height * s; g.fillStyle = '#E9E3EE'; g.fillRect(CX - w / 2, cy - h / 2, w, h); g.drawImage(im, CX - iw * .5, cy - ih * .3, iw, ih) }
+    const R0 = spr(t, [[0, 0], [82.3, 400, 1.8, .36], [S(30) - .1, 270, 1.8, .45]]), cy = spr(t, [[0, 860], [S(30) - .1, 640, 1.8, .45], [S(31) - .55, 470, 2, .45]]);
+    const w = spr(t, [[0, 0], [82.3, 800, 1.8, .36], [S(30) - .1, 540, 1.8, .45], [S(31) - .55, 900, 2, .45]]), h = spr(t, [[0, 0], [82.3, 800, 1.8, .36], [S(30) - .1, 540, 1.8, .45], [S(31) - .55, 620, 2, .45]]);
+    const rd = t < S(31) - .55 ? 1 : lerp(1, .116, seg(t, S(31) - .55, .3)), wb = wob(t - lastT, .12);
+    // 문득 든 생각: the camera flips from the front to the back: the frame folds shut and opens on what she sees (YOU, through the window)
+    const fp = seg(t, S(31) - .3, .42), fsx = Math.max(.02, Math.abs(Math.cos(fp * Math.PI))), back = fp > .5;
+    g.save(); g.translate(CX, cy); g.scale(fsx, 1 + .06 * Math.sin(fp * Math.PI)); g.translate(-CX, -cy);
+    g.save(); g.beginPath(); g.roundRect(CX - w / 2, cy - h / 2, w, h, rd * Math.min(w, h) / 2); g.clip(); g.filter = back ? 'none' : FILTERS[nf % FILTERS.length];
+    const im = ART.pov_selfie; if (back) photo('pov_window', CX, cy, w, h, { fx: .5, fy: .55, r: 0 }); else if (im) { const s = Math.max(w / im.width, h / im.height) * 1.25 * (1 + wb), iw = im.width * s, ih = im.height * s; g.fillStyle = '#E9E3EE'; g.fillRect(CX - w / 2, cy - h / 2, w, h); g.drawImage(im, CX - iw * .5, cy - ih * .3, iw, ih) }
     g.filter = 'none'; g.restore();
-    g.save(); g.strokeStyle = WHITE; g.lineWidth = 8; g.beginPath(); g.roundRect(CX - w / 2, cy - h / 2, w, h, rd * Math.min(w, h) / 2); g.stroke(); g.restore();
+    g.save(); g.strokeStyle = WHITE; g.lineWidth = 8 * (1 - fp * (fp > .5)); g.beginPath(); g.roundRect(CX - w / 2, cy - h / 2, w, h, rd * Math.min(w, h) / 2); g.stroke(); g.restore(); g.restore();
     // shutter and filter chips
     const ua = seg(t, 82.6, .4) * (1 - seg(t, S(30) - .2, .3));
     ring(CX, 1560, 78, 10, WHITE, ua); disc(CX, 1560, 60 * (1 - .15 * wob(t - lastT, 1)), WHITE, ua);
@@ -52,7 +55,7 @@ function V2(t) {
   if (t > S(31) - .2 && t < S(36) + .2) {
     const topH = spr(t, [[0, 620], [cT(32, 3), 420, 2.2, .38], [S(34) - .1, 620, 2, .4], [S(35) + .2, 0, 2.2, .6]]), botH = spr(t, [[0, 0], [S(32) - .1, 620, 2.2, .36], [cT(32, 3), 900, 2.2, .38], [S(34) - .1, 620, 2, .4], [S(36) - .2, 0, 2.2, .6]]);
     const topY = 120 + topH / 2 + 40, botY = 120 + topH + 80 + botH / 2 + 40;
-    if (topH > 4) { photo('pov_window', CX, topY, 900, topH, { fx: .5, fy: .55, r: 36, bg: '#E7E2EC' }); blob(260, topY - topH / 2 + 60, 220, 70, { col: WHITE, round: 1 }); pillText(260, topY - topH / 2 + 63, 'ME', { size: 30, w: 700, fam: EN, col: MECOL }) }
+    if (topH > 4 && t >= S(31) + .15) { photo('pov_window', CX, topY, 900, topH, { fx: .5, fy: .55, r: 36, bg: '#E7E2EC' }); blob(260, topY - topH / 2 + 60, 220, 70, { col: WHITE, round: 1 }); pillText(260, topY - topH / 2 + 63, 'ME', { size: 30, w: 700, fam: EN, col: MECOL }) }
     if (botH > 4) { photo('mem_rain', CX, botY, 900, botH, { fx: .52, fy: .45, r: 36 }); blob(260, botY - botH / 2 + 60, 220, 70, { col: WHITE, round: 1 }); pillText(260, botY - botH / 2 + 63, 'YOU', { size: 30, w: 700, fam: EN, col: YOUCOL }) }
     const lbl = (i, y, sz = 52) => cap(t, i, 0, null, CX, y, { size: sz, w: 700, col: WHITE, al: 'center', hide: S(i + 1) - .1 });
     if (t < S(32)) lbl(31, topY + topH / 2 - 40); else if (t < S(33)) lbl(32, botY + botH / 2 - 50);
