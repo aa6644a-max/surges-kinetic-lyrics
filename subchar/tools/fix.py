@@ -17,7 +17,9 @@ ST = {17: {0: 48.55, 1: 48.95, 2: 49.1, 3: 49.45},          # chorus 1 "I'm a su
       52: {0: 135.2},
       68: {3: 171.2, 4: 171.45, 5: 171.74},
       69: {0: 172.56, 1: 172.95, 2: 173.82, 3: 174.1, 4: 174.4, 5: 174.84, 6: 175.15, 7: 175.66, 8: 175.92},   # "Tell me" = voiced 172.56-173.46
-      70: {0: 176.5, 1: 176.78}}                  # "I don't care" starts right after the dip at 192.85
+      70: {0: 176.5, 1: 176.78},
+      38: {9: 104.84},                                        # "어" was pushed onto the next pickup; voiced 104.84-105.15
+      39: {0: 105.5}}                                         # "복" = onset 105.52                  # "I don't care" starts right after the dip at 192.85
 for i, m in ST.items():
     u = L[i]["u"]
     for k, s0 in m.items(): u[k][1] = s0
