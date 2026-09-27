@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sub Character Puretype</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- YOUNHA "Sub character": pure kinetic typography. Build: python subchar/puretype/build.py -> index_built.html
+     ?debug=1 shows time / section / lyric; ?render is used by work/render.mjs. -->
+<canvas id="cv" width="1080" height="1920"></canvas>
+<div id="bar" hidden><button id="play">▶</button><input id="rng" type="range"><span id="lab"></span></div>
+<script>window.D=/*DATA*/null;if(location.search.includes('render'))document.body.className='render'</script>
+<script src="engine.js"></script>
+<script src="act1.js"></script>
+<script src="act2.js"></script>
+<script src="act3.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
