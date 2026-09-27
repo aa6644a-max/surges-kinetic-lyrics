@@ -15,21 +15,21 @@ const fsize = font => +font.match(/(\d+(?:\.\d+)?)px/)[1];
 function runs(t, i, segs, x, y, o = {}) {
   const C = lineChars(i), items = []; let w = 0;
   for (const s of segs) {
-    g.font = s.font;
-    for (let k = s.a; k < s.b; k++) { if (k > segs[0].a && C[k].sp) w += fsize(s.font) * .32; const cw = g.measureText(C[k].c).width; items.push({ ch: C[k], x: w, s }); w += cw + (s.track || 0) }
+    setFont(s.font); const up = isLabel(s.font);                     // labels are set in capitals; tracking comes from the role (style.js)
+    for (let k = s.a; k < s.b; k++) { if (k > segs[0].a && C[k].sp) w += fsize(s.font) * .32; const c = up ? C[k].c.toUpperCase() : C[k].c, cw = g.measureText(c).width; items.push({ ch: C[k], c, x: w, s }); w += cw }
   }
   const x0 = o.al === 'left' ? x : o.al === 'right' ? x - w : x - w / 2, E = Ln[i].e, keep = o.keep ?? .45;
   const fade = 1 - (1 - keep) * clamp((t - E - 1.4) / 1.2);
   g.textAlign = 'left'; g.textBaseline = o.base || 'alphabetic';
   for (const it of items) {
     const a = clamp((t - it.ch.t + .06) / .22); if (a <= 0) continue;
-    g.font = it.s.font; g.globalAlpha = a * fade * (o.alpha ?? 1) * (it.s.alpha ?? 1);
-    g.fillStyle = it.s.col; g.fillText(it.ch.c, x0 + it.x, y + (it.s.dy || 0) + (1 - eOut(a)) * fsize(it.s.font) * (o.rise ?? .25));
+    setFont(it.s.font); g.globalAlpha = a * fade * (o.alpha ?? 1) * (it.s.alpha ?? 1);
+    g.fillStyle = it.s.col; g.fillText(it.c, x0 + it.x, y + (it.s.dy || 0) + (1 - eOut(a)) * fsize(it.s.font) * (o.rise ?? .25));
   }
   g.globalAlpha = 1; return w;
 }
 const all = i => lineChars(i).length;
-function lyric(layer, x, y, i, draw, o = {}) { obj(layer, x, y, t => { if (Ln[i] && t > Ln[i].s - .3) draw(t) }, { rad: o.rad ?? 1200, name: `L${i}` }) }
+function lyric(layer, x, y, i, draw, o = {}) { obj(layer, x, y, t => { if (Ln[i] && t > Ln[i].s - .3 && t < (o.until ?? 1e9)) draw(t) }, { rad: o.rad ?? 1200, name: `L${i}`, world: o.world }) }
 
 // ================= light: the follow spot is the bridge between YOU and ME =================
 function poolPath(cx, cy, rx) { g.beginPath(); g.ellipse(cx, cy, rx, rx * circleAspect(), 0, 0, 7) }
@@ -74,8 +74,8 @@ obj('SUBJECT', CIRCLE.x, CIRCLE.y, t => {
 }, { rad: 900, name: 'pool / film' });
 
 // ================= lyrics =================
-// L14 a pencil note in the margin of the cast board, next to 행인 7
-lyric('SUBJECT', 6500, 5450, 14, t => { g.rotate(-.035); runs(t, 14, [{ a: 0, b: all(14), font: `italic 300 30px "Noto Sans KR"`, col: '#4A4860' }], -300, 585, { al: 'left', keep: .9 }) });
+// L14 a note in the margin of the cast board, next to 행인 7 (ME, act 1: light and wide)
+lyric('SUBJECT', 6500, 5450, 14, t => { g.rotate(-.035); runs(t, 14, [{ a: 0, b: all(14), font: ME_T(1, 28), col: '#4A4860' }], -300, 585, { al: 'left', keep: .9 }) });
 // L15 written on the floor inside the light that leaks from the gap
 lyric('SUBJECT', 6900, 6205, 15, t => { g.scale(1, .45); runs(t, 15, [{ a: 0, b: all(15), font: MK(74, 500), col: PAL.spot }], 0, 0, { keep: .55 }) });
 // L16 "애써 [버티고] 있어": 버티고 are the braces (MID_FG); the small words sit at their feet
@@ -92,11 +92,9 @@ lyric('SUBJECT', YOU.x, 5520, 19, t => {
   runs(t, 19, [{ a: 0, b: 3, font: MK(92, 800), col: PAL.title }, { a: 3, b: 4, font: TK(150), col: PAL.title }, { a: 4, b: 8, font: MK(92, 800), col: PAL.title }, { a: 8, b: 12, font: TK(170), col: '#FFE45C' }], 0, 0, { al: 'left', keep: .5 });
 }, { rad: 2200 });
 // L20 over the seats: 널 is title-sized, the room is made of 좋아해
-lyric('SUBJECT', 9980, 5760, 20, t => { runs(t, 20, [{ a: 0, b: 2, font: MK(96, 800), col: PAL.title }, { a: 2, b: 3, font: TK(250), col: PAL.title }, { a: 3, b: 6, font: MK(96, 800), col: PAL.title }], 0, 0, { keep: .45 }) });
+lyric('SUBJECT', 9980, 5760, 20, t => { runs(t, 20, [{ a: 0, b: 2, font: AMB(96), col: PAL.title, alpha: .8 }, { a: 2, b: 3, font: TK(250), col: PAL.title }, { a: 3, b: 6, font: AMB(96), col: PAL.title, alpha: .8 }], 0, 0, { keep: .22 }) });
 // L21 the rows stand up (in the seats object); the words float above them
-lyric('SUBJECT', 10430, 5330, 21, t => { runs(t, 21, [{ a: 0, b: all(21), font: MK(84, 800), col: PAL.title }], 0, 0, { keep: .45 }) });
-// booth glass: L22 the reflection of the stage, then ME's own lines (credit type, growing a little)
-lyric('SUBJECT', 10760, 4290, 22, t => { runs(t, 22, [{ a: 0, b: all(22), font: CK(56, 500), col: '#FFE9C8' }], -380, -240, { al: 'left', keep: .35 }) });
+lyric('SUBJECT', 10430, 5330, 21, t => { runs(t, 21, [{ a: 0, b: all(21), font: AMB(84), col: PAL.title }], 0, 0, { keep: .22 }) });
 function lampLabel(t) {                  // called inside the lamp's transform (world.js): the label plate on the lamp body
   if (!Ln[23] || t < Ln[23].s - .3) return;
   g.save(); g.translate(80, 0); g.rotate(Math.PI); g.fillStyle = '#C9CCD6'; g.fillRect(-92, -22, 184, 44);
@@ -106,27 +104,36 @@ function boothWall(t) {                  // called before ME is drawn (world.js)
   txt('LIGHT OP.  ·········', 150, -250, CE(22 * meGrow(t), 400), 'rgba(150,160,180,.55)', 'left');
   if (Ln[24] && t > Ln[24].s - .3) runs(t, 24, [{ a: 0, b: all(24), font: CE(24 * meGrow(t), 500), col: 'rgba(143,211,255,.8)' }], 150, -212, { al: 'left', keep: .8, rise: .1 });
 }
-lyric('SUBJECT', 10760, 4290, 25, t => {                              // the glass fills up with the line
-  g.save(); g.beginPath(); g.rect(-400, -330, 800, 580); g.clip();
-  const s = Ln[25].s, d = Ln[25].e - s + .4, f = CK(42 * meGrow(t), 400);
-  for (let r = 1; r < 11; r++) { const a = clamp((t - s - (r / 11) * d) / .3); if (a <= 0) continue; g.globalAlpha = .2 * a; txt('열등감으로 찬   열등감으로 찬   열등감으로 찬', -390 + (r % 2) * 60, -300 + r * 50, f, PAL.me, 'left') }
-  g.globalAlpha = 1; runs(t, 25, [{ a: 0, b: all(25), font: CK(46 * meGrow(t), 500), col: PAL.me }], -380, -300, { al: 'left', keep: .6 }); g.restore();
-});
-// L26 "Tell me" on the glass, then 내가 나쁜 맘일까 written on the floor and read only where the moving spot lights it
-lyric('SUBJECT', 10760, 4290, 26, t => {  // grease pencil on the glass, only seen where the swinging lamp light sweeps across it
-  const bx = lerp(-520, 520, clamp((t - 64.05) / .95)), seen = clamp((t - 64.05) / .95);
-  g.save(); g.beginPath(); g.rect(-400, -330, 800, 580); g.clip();
-  const sw = g.createLinearGradient(bx - 220, 0, bx + 220, 0); sw.addColorStop(0, 'rgba(255,240,210,0)'); sw.addColorStop(.5, 'rgba(255,240,210,.22)'); sw.addColorStop(1, 'rgba(255,240,210,0)');
-  g.globalCompositeOperation = 'lighter'; g.fillStyle = sw; g.fillRect(bx - 220, -330, 440, 580); g.globalCompositeOperation = 'source-over';
-  g.beginPath(); g.rect(-400, -330, bx + 400 + 60, 580); g.clip();                                      // written only where the light has passed
-  runs(t, 26, [{ a: 0, b: 6, font: `italic 500 ${Math.round(66 * meGrow(t))}px "IBM Plex Mono"`, col: 'rgba(230,238,255,.85)' }], -360, 200, { al: 'left', keep: .5, alpha: .35 + .65 * seen });
-  g.restore();
-});
+// the booth glass is a real plane (tilted: its top edge is nearer than its bottom), so everything on it skews with the camera:
+// the stage's reflection (L22), ME's line filling it (L25), and "Tell me" found where the swinging lamp light sweeps it (L26)
+obj('SUBJECT', 10760, 4290, t => {
+  const c = planeCanvas('glass', 800, 580);
+  onCanvas(c, () => {
+    g.translate(400, 330);
+    g.fillStyle = 'rgba(150,180,230,.07)'; g.fillRect(-400, -330, 800, 580);
+    g.strokeStyle = 'rgba(200,220,255,.12)'; g.lineWidth = 3; for (const x of [-250, 60]) { g.beginPath(); g.moveTo(x, -330); g.lineTo(x + 180, 250); g.stroke() }
+    if (Ln[22] && t > Ln[22].s - .3) runs(t, 22, [{ a: 0, b: all(22), font: AMB(54, 520), col: '#FFE9C8', alpha: .7 }], -380, -240, { al: 'left', keep: .3 });
+    if (Ln[25] && t > Ln[25].s - .3) {
+      const s0 = Ln[25].s, d = Ln[25].e - s0 + .4, f = ME_T(1, 40 * meGrow(t));
+      for (let r = 1; r < 11; r++) { const a = clamp((t - s0 - (r / 11) * d) / .3); if (a <= 0) continue; g.globalAlpha = .18 * a; txt('열등감으로 찬   열등감으로 찬   열등감으로 찬', -390 + (r % 2) * 60, -300 + r * 50, f, PAL.me, 'left') }
+      g.globalAlpha = 1; runs(t, 25, [{ a: 0, b: all(25), font: ME_T(1, 46 * meGrow(t)), col: PAL.me }], -380, -300, { al: 'left', keep: .6 });
+    }
+    if (Ln[26] && t > 64.0) {
+      const bx = lerp(-520, 520, clamp((t - 64.05) / .95)), seen = clamp((t - 64.05) / .95);
+      const sw = g.createLinearGradient(bx - 220, 0, bx + 220, 0); sw.addColorStop(0, 'rgba(255,240,210,0)'); sw.addColorStop(.5, 'rgba(255,240,210,.22)'); sw.addColorStop(1, 'rgba(255,240,210,0)');
+      g.globalCompositeOperation = 'lighter'; g.fillStyle = sw; g.fillRect(bx - 220, -330, 440, 580); g.globalCompositeOperation = 'source-over';
+      g.save(); g.beginPath(); g.rect(-400, -330, bx + 460, 580); g.clip();                            // only where the light has passed
+      runs(t, 26, [{ a: 0, b: 6, font: F(400, 68 * meGrow(t), EN_CASE), col: 'rgba(230,238,255,.9)' }], -360, 200, { al: 'left', keep: .5, alpha: .35 + .65 * seen });
+      g.restore();
+    }
+  });
+  drawPlane(c, [10360, 3960, 1.1], [11160, 3960, 1.1], [10360, 4540, 1.02], [11160, 4540, 1.02], 40);
+}, { rad: 1200, name: 'booth glass (plane)' });
 function floorText(t, i, segs, x, o = {}) {
   const px = spotX(t) - x, asp = circleAspect(); g.save(); g.beginPath(); g.ellipse(px, 0, 396, 396 * asp, 0, 0, 7); g.clip();
   g.scale(1, Math.min(1, asp * 1.5)); runs(t, i, segs, 0, o.dy || 0, { keep: .9, rise: 0, al: o.al }); g.restore();
 }
 lyric('SUBJECT', CIRCLE.x, CIRCLE.y, 26, t => floorText(t, 26, [{ a: 6, b: all(26), font: MK(92, 800), col: '#2A1C22' }], CIRCLE.x, { dy: 118 }), { rad: 1400 });
 // L27 "I wanna be" inside the circle (credit type, ME's colour), "you" left outside in the dark, title-sized, next to YOU
-lyric('SUBJECT', CIRCLE.x, CIRCLE.y, 27, t => floorText(t, 27, [{ a: 0, b: 8, font: CE(84, 500), col: '#1E3A52' }], CIRCLE.x, { dy: -70 }), { rad: 1400 });
-lyric('SUBJECT', YOU.x - 40, 4960, 27, t => { runs(t, 27, [{ a: 8, b: all(27), font: TE(170), col: PAL.title }], 0, 0, { alpha: .75 }) });
+lyric('SUBJECT', CIRCLE.x, CIRCLE.y, 27, t => floorText(t, 27, [{ a: 0, b: 8, font: ME_T(1, 84), col: '#1E3A52' }], CIRCLE.x, { dy: -70 }), { rad: 1400 });
+lyric('SUBJECT', YOU.x - 40, 4960, 27, t => { runs(t, 27, [{ a: 8, b: all(27), font: YOU_T(190), col: PAL.title }], 0, 0, { alpha: .75 }) });

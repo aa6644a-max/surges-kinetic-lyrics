@@ -39,6 +39,7 @@ ART = [
  ("you_hand", "1024x1536", "YOU, upper body facing the viewer, a gentle warm smile, holding his open hand out toward the camera as if offering to take the viewer's hand."),
  ("me_smile", "1024x1536", "ME, close-up of the face and shoulders facing the viewer, smiling brightly with tears still in her eyes, relieved and hopeful, soft golden light."),
  ("you_sing_side", "1024x1536", "YOU, full body in exact side view facing RIGHT, standing on a stage and singing into a handheld microphone held at his mouth with his right hand, the other arm relaxed, eyes closed, calm and confident posture, feet visible, lit from the upper right by a warm spotlight."),
+ ("you_walk_side", "1024x1536", "YOU, full body in exact side view walking to the RIGHT at a relaxed pace, mid-stride, one hand in his hoodie pocket, the other arm swinging slightly, head level looking ahead, a light easy expression, feet visible."),
  ("mem_entrance", "1536x1024", "MEM: school entrance ceremony under falling cherry blossoms, YOU laughing with new friends in the middle, ME standing alone at the side holding her bag, seeing him for the first time."),
  ("mem_class", "1536x1024", "MEM: a sunny classroom at break time, YOU sitting on a desk surrounded by laughing classmates, ME at the back seat by the window watching over her book."),
  ("mem_race", "1536x1024", "MEM: sports day relay race, YOU breaking the finish tape with arms raised while the crowd cheers, ME small among the spectators behind the rope."),

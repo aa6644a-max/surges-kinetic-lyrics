@@ -11,30 +11,28 @@
 const W = 1080, H = 1920, CX = 540, CY = 960;
 const LAYERS = [['BG', .25], ['MID_BG', .6], ['SUBJECT', 1], ['MID_FG', 1.12], ['FG', 1.35], ['LENS', 1.9]];
 const PF = Object.fromEntries(LAYERS);
-const ZONES = [['BACKSTAGE', -1e9, 7250], ['STAGE', 7250, 9700], ['HOUSE / BOOTH', 9700, 1e9]];
+const ZONES = [['A · PHOTO BOARD', -1e9, -7850], ['A · HALLWAY', -7850, -2950], ['B · CLASSROOM', -2950, 3000], ['C · BACKSTAGE', 3000, 7250], ['C · STAGE', 7250, 9700], ['C · HOUSE / BOOTH', 9700, 1e9]];
 const zoneAt = x => ZONES.find(z => x >= z[1] && x < z[2])[0];
 const PAL = {
   void: '#07060D', bs: '#0E0B18', wall: '#18142A', wood: '#2E2436', paper: '#E4DAC6', ink: '#1A1420', title: '#F3EAD8',
   credit: '#8E8AA6', me: '#8FD3FF', spot: '#FFE7B0', warm: '#FFB86B', wine: '#4A2140', velvet: '#34163E', seat: '#3B3158', night: '#0B0912'
 };
-// type system: TITLE = the main character's world, CREDIT = the extras
-const TK = s => `${s}px "Black Han Sans"`, TE = s => `${s}px "Dela Gothic One"`;
-const CK = (s, w = 300) => `${w} ${s}px "Noto Sans KR"`, CE = (s, w = 400) => `${w} ${s}px "IBM Plex Mono"`, MK = (s, w = 700) => `${w} ${s}px "Noto Sans KR"`;
-
+// type: see style.js (two families only)
 let g = null;                                   // the 2d context
 const IMG = {};
 const OBJ = [];
-function obj(layer, x, y, draw, o = {}) { OBJ.push({ layer, p: o.p ?? PF[layer], x, y, draw, rad: o.rad ?? 2600, name: o.name || '', blur: o.blur || 0 }) }
+function obj(layer, x, y, draw, o = {}) {   // x, y: world anchor (a number, or a function of t for things that move)
+  OBJ.push({ layer, p: o.p ?? PF[layer], x, y, draw, rad: o.rad ?? 2600, name: o.name || '', blur: o.blur || 0, world: !!o.world }) }
 
 function proj(p, x, y) { const k = Math.pow(CAM.s, p); return { x: CX + p * k * (x - CAM.x), y: CY + p * k * (y - CAM.y), k } }
-function place(o, m = 1) {                      // m: extra magnification about the screen centre (an object the camera is passing through)
-  const q = proj(o.p, o.x, o.y), k = q.k * m, x = CX + (q.x - CX) * m, y = CY + (q.y - CY) * m;
+function place(o, m = 1, t = 0) {              // m: extra magnification about the screen centre (an object the camera is passing through)
+  const q = proj(o.p, typeof o.x === 'function' ? o.x(t) : o.x, typeof o.y === 'function' ? o.y(t) : o.y), k = q.k * m, x = CX + (q.x - CX) * m, y = CY + (q.y - CY) * m;
   if (Math.abs(x - CX) - o.rad * k > 1500 || Math.abs(y - CY) - o.rad * k > 2100) return false;   // off screen
-  g.setTransform(1, 0, 0, 1, CX, CY); g.rotate(CAM.r * Math.PI / 180 * Math.min(1, o.p)); g.translate(x - CX, y - CY); g.scale(k, k);
+  g.setTransform(1, 0, 0, 1, CX, CY); g.rotate(CAM.r * Math.PI / 180 * Math.min(1, o.p)); g.translate(x - CX, y - CY); const kk = o.world ? k * o.p : k; g.scale(kk, kk);   // world: local units are world units at this depth
   return true;
 }
 function drawWorld(t) {
-  for (const [L] of LAYERS) for (const o of OBJ) if (o.layer === L && place(o, o.mag ? o.mag(t) : 1)) {
+  for (const [L] of LAYERS) for (const o of OBJ) if (o.layer === L && place(o, o.mag ? o.mag(t) : 1, t)) {
     g.save(); if (o.blur) g.filter = `blur(${o.blur}px)`; o.draw(t); g.restore();
   }
   g.setTransform(1, 0, 0, 1, 0, 0);
@@ -59,14 +57,14 @@ const bump = (t, a, b) => eSm(clamp((t - a) / .5)) * (1 - eSm(clamp((t - b) / .8
 const heroPillar = t => bump(t, 48.6, 50.4), heroPerfect = t => bump(t, 50.2, 52.4), heroArch = t => bump(t, 51.9, 54.3);
 
 // ---------- small drawing helpers (local coordinates = world px) ----------
-function txt(s, x, y, font, col, al = 'center', base = 'alphabetic') { g.font = font; g.fillStyle = col; g.textAlign = al; g.textBaseline = base; g.fillText(s, x, y) }
+function txt(s, x, y, font, col, al = 'center', base = 'alphabetic') { setFont(font); g.fillStyle = col; g.textAlign = al; g.textBaseline = base; g.fillText(isLabel(font) ? s.toUpperCase() : s, x, y) }
 function rgba(h, a) { const n = parseInt(h.slice(1), 16); return `rgba(${n >> 16},${n >> 8 & 255},${n & 255},${a})` }
 function drawImg(id, cx, bottom, h, flip = false, filter = '') {
   const im = IMG[id]; if (!im) return; const w = im.width * h / im.height;
   g.save(); if (filter) g.filter = filter; g.translate(cx, bottom); if (flip) g.scale(-1, 1); g.drawImage(im, -w / 2, -h, w, h); g.restore();
 }
 function extruded(c, font, face, side, dx, dy, n) {  // a glyph with depth: n copies stepped toward the vanishing direction, then the face
-  g.font = font; g.textAlign = 'center'; g.textBaseline = 'middle';
+  setFont(font); g.textAlign = 'center'; g.textBaseline = 'middle';
   for (let i = n; i > 0; i--) { g.fillStyle = side; g.fillText(c, dx * i, dy * i) }
   g.fillStyle = face; g.fillText(c, 0, 0);
 }
@@ -88,12 +86,12 @@ obj('BG', 8600, 5300, t => {                                         // haze whe
 // ================= MID_BG (.6): backstage wall, the backdrop =================
 obj('MID_BG', 6350, 4750, t => {                                     // backstage: the wall behind the board is lettered 주인공, almost lost in the dark
   g.globalAlpha = 1 - clamp((CAM.x - 6900) / 450); if (g.globalAlpha <= 0) return;   // it belongs to backstage: gone once the camera is past the curtains
-  g.font = TK(1050); g.textAlign = 'center'; g.textBaseline = 'middle';
+  setFont(TK(1050)); g.textAlign = 'center'; g.textBaseline = 'middle';
   const gr = g.createLinearGradient(0, -600, 0, 600); gr.addColorStop(0, '#1A1830'); gr.addColorStop(1, '#0C0B18');
   g.fillStyle = gr; g.fillText('주인공', 0, 0); g.strokeStyle = 'rgba(170,180,255,.06)'; g.lineWidth = 6; g.strokeText('주인공', 0, 0);
 }, { rad: 1800 });
 obj('MID_BG', 8350, 5150, t => {                                     // upstage: the set is the word 완벽해, readable only inside the light around YOU
-  g.font = TK(560); g.textAlign = 'center'; g.textBaseline = 'middle';
+  setFont(TK(560)); g.textAlign = 'center'; g.textBaseline = 'middle';
   g.fillStyle = 'rgba(60,40,48,.14)'; g.fillText('완벽해', 0, 0);
   const h = heroPerfect(t), base = .1 * stageOn(t); if (h + base <= 0) return;
   const m = g.createRadialGradient(0, 380, 60, 0, 380, 1000), A = base + .75 * h;    // the text is filled with the light itself: bright near YOU, gone at the edges
@@ -130,7 +128,7 @@ obj('SUBJECT', 6500, 5450, t => {
     if (k === 'T') { txt(role, -300, y, TK(s), PAL.ink, 'left'); txt('너', 300, y, TK(s * .62), PAL.ink, 'right') }
     else {
       txt(role, -300, y, CK(s, k === 'm' ? 400 : 500), k === 'm' ? '#58799A' : '#4E4A5E', 'left');
-      g.font = CE(Math.max(14, s * .6)); g.fillStyle = 'rgba(78,74,94,.55)'; g.textAlign = 'right'; g.fillText(k === 'm' ? '·········  extra' : '—', 300, y);
+      setFont(CE(Math.max(14, s * .6))); g.fillStyle = 'rgba(78,74,94,.55)'; g.textAlign = 'right'; g.fillText(k === 'm' ? '·········  extra' : '—', 300, y);
     }
   }
   g.strokeStyle = 'rgba(40,30,40,.25)'; g.lineWidth = 2; g.beginPath(); g.moveTo(-300, -249); g.lineTo(300, -249); g.stroke();
@@ -153,9 +151,9 @@ obj('SUBJECT', 6720, 6150, t => { g.save(); g.scale(1, .45); txt('× 행인 7', 
 obj('SUBJECT', 8250, 4050, t => {
   const hp = heroPillar(t), ha = heroArch(t), L = stageOn(t);
   g.fillStyle = '#1E0D1B'; g.fillRect(-1250, -150, 2500, 260);
-  g.font = TE(128); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = `rgba(${Math.round(70 + 170 * ha)},${Math.round(34 + 150 * ha)},${Math.round(60 + 110 * ha)},${.45 + .55 * ha})`;
+  setFont(TE(128)); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = `rgba(${Math.round(70 + 170 * ha)},${Math.round(34 + 150 * ha)},${Math.round(60 + 110 * ha)},${.45 + .55 * ha})`;
   g.fillText('MAIN CHARACTER', 0, -20);
-  g.font = TK(360);
+  setFont(TK(360));
   ['주', '인', '공'].forEach((c, i) => { const y = 400 + i * 390;
     g.fillStyle = `rgb(${Math.round(52 + 180 * hp)},${Math.round(24 + 170 * hp)},${Math.round(46 + 130 * hp)})`; g.fillText(c, -1000, y);
     g.strokeStyle = `rgba(255,214,170,${.08 + .5 * hp})`; g.lineWidth = 4; g.strokeText(c, -1000, y) });
@@ -181,7 +179,7 @@ for (let k = ROW_Y.length - 1; k >= 0; k--) {
     g.textAlign = 'right'; g.textBaseline = 'alphabetic';
     let x = 1500, n = 0;
     while (x > xs) {
-      const d = (x - xs) / (1500 - xs), sc = .5 + .5 * d, f = size * sc; g.font = MK(f, 800);
+      const d = (x - xs) / (1500 - xs), sc = .5 + .5 * d, f = size * sc; setFont(MK(f, 800));
       const w = g.measureText('좋아해').width, j = up * f * (.2 + .12 * R(k, n));
       const warm = .35 + .5 * up; g.fillStyle = `rgba(${Math.round(150 + 90 * up)},${Math.round(92 + 110 * up)},${Math.round(80 + 90 * up)},${warm})`;
       g.fillText('좋아해', x, -j); x -= w + f * .35; n++;
@@ -205,8 +203,6 @@ obj('SUBJECT', 10760, 4290, t => {
   g.restore();
   g.fillStyle = '#12131B'; g.fillRect(-410, 250, 820, 90);                                               // the booth's lower wall
   g.fillStyle = 'rgba(160,170,190,.12)'; for (let x = -380; x < 400; x += 95) g.fillRect(x, 262, 2, 66);
-  g.fillStyle = 'rgba(150,180,230,.07)'; g.fillRect(-400, -330, 800, 580);                              // glass
-  g.strokeStyle = 'rgba(200,220,255,.12)'; g.lineWidth = 3; for (const x of [-250, 60]) { g.beginPath(); g.moveTo(x, -330); g.lineTo(x + 180, 250); g.stroke() }
   g.strokeStyle = '#26283A'; g.lineWidth = 12; g.strokeRect(-410, -340, 820, 680);
   txt('FOLLOW SPOT 2', 380, -300, CE(20, 500), 'rgba(143,150,170,.7)', 'right');
 }, { rad: 1200, name: 'booth' });
@@ -238,7 +234,7 @@ obj('FG', 6250, 6420, t => {
   txt('ROAD CASE · SL', -340, -80, CE(26, 500), 'rgba(140,140,170,.35)', 'left');
 }, { rad: 700 });
 for (const [x, w] of [[5820, 16], [6080, 10]]) obj('FG', x, 4700, t => { g.fillStyle = '#05040A'; g.fillRect(-w / 2, -1900, w, 3200) }, { rad: 1600 });
-obj('FG', 10150, 6800, t => { g.font = TK(300); g.textAlign = 'center'; g.fillStyle = '#060304'; g.fillText('좋아해  좋아해  좋아해', 0, 0) }, { rad: 1800, name: 'audience heads' });
+obj('FG', 10150, 6800, t => { setFont(TK(300)); g.textAlign = 'center'; g.fillStyle = '#060304'; g.fillText('좋아해  좋아해  좋아해', 0, 0) }, { rad: 1800, name: 'audience heads' });
 
 // the curtains: two panels at different depths with a slit that never closes. The camera passes between them:
 // from 48.45 they swell past the lens (magnified about the screen centre) and are gone by 49.0.

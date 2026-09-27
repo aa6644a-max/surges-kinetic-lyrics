@@ -1,5 +1,6 @@
-// Render kinetic.html to a 1080x1920 30fps MP4 with the song muxed in.
-// usage: node work/render.mjs [out.mp4] [--page kinetic.html] [--audio song.m4a] [--from s] [--to s] [--workers n] [--stills t1,t2,... --dir d]
+// Render kinetic.html to a 1080x1920 MP4 with the song muxed in.
+// usage: node work/render.mjs [out.mp4] [--page kinetic.html] [--audio song.m4a] [--from s] [--to s] [--workers n]
+//        [--fps n] [--crf n] [--preset name] [--pix-fmt name] [--png] [--stills t1,t2,... --dir d]
 import { chromium } from 'playwright';
 import { spawn, execSync } from 'node:child_process';
 import { readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
@@ -9,7 +10,11 @@ import { tmpdir } from 'node:os';
 const args = process.argv.slice(2);
 const opt = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : d; };
 const out = args[0] && !args[0].startsWith('--') ? args[0] : 'surges_reels.mp4';
-const FPS = 30;
+const FPS = +opt('--fps', 30);
+const CRF = opt('--crf', '17');
+const PRESET = opt('--preset', 'medium');
+const PIX_FMT = opt('--pix-fmt', 'yuv420p');
+const PNG_FRAMES = args.includes('--png');
 const PAGE = opt('--page', 'kinetic.html'), AUDIO = opt('--audio', 'song.m4a');
 const which = cmd => { try { return execSync(cmd, { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim().split(/\r?\n/)[0]; } catch { return ''; } };
 // $FFMPEG, else ffmpeg on PATH, else the imageio-ffmpeg binary (python3 on Windows can exit non-zero, so try python too)
@@ -26,7 +31,7 @@ async function openPage() {
   // serve local files through routing (the outbound proxy only tunnels HTTPS)
   await page.route('http://local.test/**', r => {
     const path = decodeURIComponent(new URL(r.request().url()).pathname), ext = path.split('.').pop().toLowerCase();
-    const type = { html: 'text/html', js: 'text/javascript', mjs: 'text/javascript', css: 'text/css', json: 'application/json', webp: 'image/webp', png: 'image/png', jpg: 'image/jpeg', svg: 'image/svg+xml' }[ext];   // ES modules need a JS MIME type
+    const type = { html: 'text/html', js: 'text/javascript', mjs: 'text/javascript', css: 'text/css', json: 'application/json', webp: 'image/webp', png: 'image/png', jpg: 'image/jpeg', svg: 'image/svg+xml', woff2: 'font/woff2', ttf: 'font/ttf', mp3: 'audio/mpeg' }[ext];   // ES modules need a JS MIME type
     try { r.fulfill({ body: readFileSync(root + path), headers: type ? { 'content-type': type } : {} }); } catch { r.fulfill({ status: 404 }); }
   });
   // Google Fonts go through curl (it trusts the proxy CA; Chromium does not)
@@ -63,11 +68,13 @@ if (stills) {
     if (f0 >= f1) return;
     const { browser, page } = await openPage();
     const file = join(tmp, `seg${w}.mp4`); segs[w] = file;
-    const ff = spawn(ffmpeg, ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-',
-      '-c:v', 'libx264', '-preset', 'medium', '-crf', '17', '-pix_fmt', 'yuv420p', '-threads', '2', file], { stdio: ['pipe', 'ignore', 'inherit'] });
+    const ff = spawn(ffmpeg, ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', PNG_FRAMES ? 'png' : 'mjpeg', '-i', '-',
+      '-c:v', 'libx264', '-preset', PRESET, '-crf', CRF, '-pix_fmt', PIX_FMT, '-threads', '2', file], { stdio: ['pipe', 'ignore', 'inherit'] });
     for (let f = f0; f < f1; f++) {
       await page.evaluate(t => window.renderAt(t), from + f / FPS);
-      const buf = await page.screenshot({ type: 'jpeg', quality: 92 });
+      const buf = PNG_FRAMES
+        ? await page.screenshot({ type: 'png' })
+        : await page.screenshot({ type: 'jpeg', quality: 92 });
       if (!ff.stdin.write(buf)) await new Promise(r => ff.stdin.once('drain', r));
       if ((f - f0) % 300 === 0) console.log(`worker ${w}: ${f - f0}/${f1 - f0}`);
     }

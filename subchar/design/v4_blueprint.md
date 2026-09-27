@@ -1,8 +1,85 @@
-# Sub character v4: production blueprint (설계안, 구현 전)
+# Sub character v4: production blueprint (v4.2: STYLE SYSTEM 확정, zone별 구현 중)
 
 표기: 카메라 = `(x, y, s, r°)`. x/y는 뷰포트 중심의 월드 좌표, s는 배율, r은 회전(도).
 s=1이면 월드 1080×1920 px가 화면 하나. s가 크면 가까이 들어간 것.
 타이포 역할: **A** 표면 · **B** 건축 · **C** 카메라 경로 · **D** 모프 · **E** 캐릭터 상호작용.
+
+---
+
+## ★ STYLE SYSTEM (v4.2, 모든 구간의 절대 규칙)
+
+v4.1 승인 이후 확정. 구현은 `subchar/proto/style.js`. 아래 표와 코드가 어긋나면 이 문서가 기준이다.
+
+### S1. 폰트: 2개 family만
+| 역할 | family | weight | tracking | 비고 |
+|---|---|---|---|---|
+| YOU / MAIN CHARACTER | Pretendard Variable | 800–900 (코드 880) | −0.055 ~ −0.025em (코드 −0.045) | line-height 0.82–0.95. 벽·기둥·무대 구조물 |
+| ME 1막 | Pretendard Variable | 300–400 (코드 340) | +0.06 ~ +0.16em (코드 +0.10) | 28–48px 체감. credit / footnote / margin |
+| ME 2막 | Pretendard Variable | 450–650 (코드 540) | 줄어듦 (코드 +0.02) | 70–160px 체감 |
+| ME 3막 | Pretendard Variable | 700–900 (코드 820) | −0.03 ~ 0 | 220–420px 체감. 260px 이상 허용 |
+| 중립 가사 / ambient | Pretendard Variable | 600–700 | −0.02em | |
+| 제작 라벨 · 장비 · 크레딧 영문 | Inter Tight Variable | 400–750 | 작은 라벨 +0.08 ~ +0.16em (코드 +0.12), 큰 건축 영문 −0.03 ~ 0 | 대문자. MAIN CHARACTER, EXTRA, CAST, SUB CHARACTER 등 |
+| 감정 가사의 영문 (Tell me 등) | Inter Tight (대소문자 유지) 또는 Pretendard | 역할 문법을 따름 | | |
+
+- ME는 새 폰트를 얻지 않는다. **같은 Pretendard 안에서 주인공의 활자 문법(무게·자간·크기)을 점점 획득**한다. 이것이 이 영상의 서사적 타이포그래피 핵심이다.
+- **금지:** serif, script, handwriting, decorative display, 임의 condensed, italic, 장면마다 다른 family.
+- 감정은 폰트로 만들지 않는다. **CAMERA / SIZE / POSITION / TRACKING / LIGHT**로 만든다.
+- **로딩:**
+  - 폰트는 로컬 파일로 싣는다(`subchar/fonts/`, 둘 다 OFL).
+  - `document.fonts.ready`와 실제 글리프 측정 검사를 통과해야 READY가 resolve된다.
+  - 실패하면 READY를 보류하고 `console.warn`을 남긴다(대체 폰트로 렌더되는 일 없음).
+
+### S2. FRAME TYPOGRAPHY BUDGET
+- 한 프레임에 **HERO PHRASE 최대 1개**, **SUPPORT 1–2개**, **AMBIENT는 여러 개 가능하되 낮은 대비**.
+- 불린 가사는 월드에 남되 keep 0.2–0.5로 가라앉는다. 새 hero가 오면 이전 것은 ambient가 된다.
+- 무대처럼 거대 활자가 많은 곳은 **한 번에 하나만 빛을 받는다**(v4.1의 heroPillar / heroPerfect / heroArch 방식).
+
+### S3. 카메라 문법 (v4.1에서 검증)
+- 모든 이동: **OLD LANDMARK + CURRENT TARGET + NEXT CLUE**가 잠시 한 화면에 공존한다.
+- 모든 전환: **SEE → NOTICE → FOLLOW → ARRIVE.**
+- **속도 3단:**
+  - **OBSERVE:** 느린 drift / push, 0–150 px/s
+  - **FOLLOW:** 일반 트래킹, 150–700 px/s
+  - **CHASE / RELEASE:** 짧고 빠름, 700–1300 px/s
+  - 빠른 이동은 강조 효과다. 늘 빠르면 cinematic하지 않다.
+- **overshoot:** 기본 0. 의미 있는 도착에만 1.5–2.2%(목표점이 지나쳤다가 0.5s에 안착).
+- **FOREGROUND PASS:** 중요한 공간 이동마다 **1개 정도**. 렌즈 앞(LENS 레이어 p 1.9–2.4, 흐림)을 지나는 물체는 장식이 아니라 카메라가 실제로 이동했다는 증거다.
+- **회전:** 기본 −2° ~ +2°. reveal 순간만 조금 더.
+- **박자:** 출발, 가속 시작, 단어 reveal, framing lock, 조명 켜짐, 방향 전환에만 쓴다. 박자마다 흔들기 금지.
+
+### S4. 캐릭터와 카메라 (가사보다 우선)
+- **1막:** YOU가 프레이밍 우선권. ME는 crop / edge / reflection / occlusion으로만.
+- **2막:** 카메라가 ME를 발견하는 횟수가 늘어난다.
+- **3막:** 카메라와 ME의 이동 방향이 일치한다.
+- 캐릭터가 나와도 얼굴을 center로 잡을 의무가 없다.
+
+### S5. 제작 순서
+A → B → C(v4.1 기준 구현) → D → E → F.
+- 각 zone은 **다음 zone과 이어지는 3–5초까지 함께** 렌더해서 리셋 여부를 검사한다.
+- 전체 214초를 한 번에 렌더하지 않는다.
+
+### S6. 아직 금지 (finishing 단계 전까지)
+- film grain
+- 과도한 motion blur
+- chromatic aberration
+- glow 남발
+
+### S7. 구조 변경 기록 (v4.2)
+- **1절 동선 변경:** 복도 → 교실 (Zone B). 원래 블루프린트의 "복도 바닥이 꺼져 무대 아래로 추락"을 대체한다.
+  - 교실 이후 백스테이지로 가는 연결(L10–L13, 31.1–40.8)은 다음 작업에서 설계한다. 현재 카메라에는 임시 이동만 있다.
+- **A/B 좌표 재배치:** Zone C 좌표(6000–11600)는 v4.1 그대로 두고, A/B를 왼쪽(음수 x)에 붙였다.
+  - 게시판·단체사진: (−9000, 5450). 사진 1300×867.
+  - 복도: x −7850 ~ −2950. 먼 벽의 깊이 p 0.6, 바닥 앞 가장자리 p 1.35.
+    - 창: −7350 / −6300 / −5150. ME의 반사는 −5150 창.
+    - "너처럼" 벽: (−3820, 5420)
+  - 교실: x −2950 ~ 1200.
+    - 칠판 (−2300, 5250)
+    - 창 −1450 / −650 / 150
+    - 기둥 −1760 (MID_FG)
+    - ME 책상 −2250
+    - YOU 창가 −1400
+- **Zone A/B의 벽·창·기둥은 `world: true`:** 크기와 간격이 둘 다 자기 깊이로 줄어든다(원근이 맞는 배치).
+- **바닥·천장:** 먼 벽(p 0.6)과 앞 가장자리(p 1.35) 사이 평면으로 그린다. 이음새가 소실점으로 모인다.
 
 ---
 
@@ -12,7 +89,7 @@ s=1이면 월드 1080×1920 px가 화면 하나. s가 크면 가까이 들어간
 
 | | TITLE 활자 (YOU의 세계) | CREDIT 활자 (ME의 세계) |
 |---|---|---|
-| 서체 | Black Han Sans / Dela Gothic One | 가는 고딕 300 / IBM Plex Mono (엔딩 크레딧 스타일, 점선 리더 `······`) |
+| 서체 | Pretendard 800–900 (영문 건축은 Inter Tight) | Pretendard 300–400 (라벨은 Inter Tight 대문자). ★ S1 참고 |
 | 크기 | 월드 260–1400 px: 벽, 기둥, 무대 크기 | 1막 34–60 px → 2막 90–160 px → 3막 260 px 이상 |
 | 위치 | 화면 중심, 조명 안, 건축물 자체 | 여백, 가장자리, 각주, 괄호, 배역표 맨 아래 |
 | 색 | 크림 화이트 + 핀조명 노랑 | 회남색. 2막부터 ME의 라이트블루(머리 안쪽 색)가 번짐 |
