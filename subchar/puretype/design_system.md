@@ -50,21 +50,21 @@ Type, simple geometry (disc, ring, rectangle), line, solid colour. Nothing else.
 
 ME never gets a different font. She takes the main character's grammar (weight 900, tight tracking, title size) inside the same face.
 
-## Motion grammar (the shared language; entrance animations are not repeated per line)
+## Motion (v2: the line performer)
 
-| motion | where it is used |
-|---|---|
-| TYPE REFLOW | MARGIN main column; CHORUS 2 whole-canvas flow; OWN LINE stack (lines push each other in and out) |
-| TRACKING EXPANSION | 주인공 flies apart (14 s); I'M A SUB CHARACTER snaps together (48.5 s); 빛나는지 (53 s); 한숨 (145 s); I WANNA BE YOU closes (178 s) |
-| WEIGHT MORPH | 오염되어 가 (thin → black); 나쁜 (100 → 900); 버티고 strains; the bridge's weight slowly rises; 내 이야기는 결국 (300 → 860); 서브 (320 → 800) |
-| MASK / OCCLUSION | ME's line readable only between the strokes of 널 (39 s); the eraser (113 s) |
-| COUNTER PORTAL | into the O of YOU (69.2 s) → interlude; into the O of LOSER (169.8 s) → 열등감으로 찬 |
-| BASELINE TRAVEL | the gaze hairline (18 s); crossing rails (102–107 s); I'M A SUB CHARACTER at 560 px running past (167 s) |
-| CROP / OVERSCAN | 너처럼, 주인공 (vertical), 넌, LOSER, 빛나는지 (vertical), 행복해, 패배자 |
-| LAYOUT COLLISION | 주인공 shoves the footnote (8 s); 완벽해 shoved by 널; 우린 / 안 비슷해; 행복해 pushes ME into the corner; 내 손을 / 잡아 줘 meet |
-
-- **Beat:** used for arrivals, the montage cuts, and the interlude pieces' steps. There is no shake, glitch, particles or glow anywhere.
-- **Camera:** used only for the two counter portals and the scroll of the flows. Everything else moves on the page.
+v1 laid lyrics out as pages that kept accumulating. v2 performs them the way SURGES and ashita do:
+- **One line at a time.** Each syllable lands on its sung time and the line leaves when the next one starts.
+- **Every line is a scene** with one of eight layouts: cam, spiral, stack, zoom, scatter, bounce, tate, shout (see sequence_map.md).
+- **Letter entrances:** pop, slam, far, fly, drop (with bounce), slide, flip.
+- **Exits:** the camera spins out, or the letters explode, fall or shutter away.
+- **Beat:** a wave runs through the landed letters; the current chunk bounces the most. No screen shake.
+- **The emphasised chunk:** accent colour, weight 900, slam entrance, plus a ring and a burst of simple shapes (square, triangle, dot) in the palette.
+- **The page:** section colour, slow rays and a few drifting outline shapes. A new section opens as a disc from the centre.
+- **Hierarchy across the song:**
+  - Early, the emphasis is mostly YOU's word (주인공, 넌, 널, 완벽해, 행복해).
+  - Later it is more and more ME's (내 자신이, 나도, 안 되더라, 내 이야기는, 내 손을).
+  - ME's non-emphasised letters get heavier act by act: 640 → 760 → 860.
+- **Kept from v1:** the opening footnote pushed aside by 주인공, the interlude that takes letters apart into strokes, the counter portals (into the O of YOU and of LOSER), and the end card where 서브 and 캐릭터 become one size.
 
 ## Rendering
 

@@ -1,85 +1,127 @@
-# Sub character: PURETYPE sequence map
+# Sub character: PURETYPE v2 sequence map (line performer)
 
-- Times are song seconds; lyric starts are from `subchar/lines.json`.
-- **ME** = the narrator's type (act 1 / 2 / 3 weights, see design_system.md). **YOU** = the main character's type (900, tight).
-- The last column is how each section hands over to the next.
+- Every sung line is one kinetic scene. Its syllables land on their sung times (`lines.json`), and it exits when the next line starts.
+- The **bold** chunk is the emphasis: accent colour, weight 900, slam entrance, plus a ring and a burst of shapes when it lands.
+- Non-lyric frames: opening 0–15.2 (the footnote and 주인공), interlude 70.4–82.3 (letters come apart and settle on rules), end 204.2–214.4 (서브캐릭터 equalises; a period stays).
 
-| section | time | page | idea | hand-over |
-|---|---|---|---|---|
-| S0 OPENING | 0–15.2 | navy | one footnote (¹ 나) alone; at 7.98 주인공 (900, 330 px) arrives and shoves it into the margin | 주인공's tracking flies apart; the footnote's dot grows into an ivory page |
-| S1 MARGIN | 15.2–31.0 | ivory | an editorial page: YOU words own the column, ME lives in numbered margin notes | a navy disc spreads from the last line |
-| S2 ROLE | 31.0–48.4 | navy | a vertical rank: 주인공 down the right side, a ladder of rules, ME pressed between strokes | the strained floor gives; a violet page rises |
-| S3 CHORUS 1 | 48.4–70.4 | violet / coral / navy / acid | collision: sentences shove each other | counter portal into the O of YOU |
-| S4 INTERLUDE | 70.4–82.3 | navy | letters come apart into strokes, dots and rings, then settle on new rules | the rules are the next page |
-| S5 COPY / MIRROR | 82.3–107.8 | navy | filled / outline / ghost copies that never line up; 너 mirrored becomes 나 | crossing rails pull taut and widen into ivory |
-| S6 CORRECTION | 107.8–115.3 | ivory | strikethrough, caret, brackets; ME's line goes on top for the first time | the eraser keeps going: a coral page |
-| S7 CHORUS 2 | 115.3–137.5 | coral | the canvas is a typesetting engine: every line pushes the rest; ME ≥ 100 px | the whole coral page falls away |
-| S8 BRIDGE | 137.5–156.6 | ivory | almost nothing; one small line; weight rises 300 → 620 | brackets open into a grid |
-| S9 FINAL CHORUS | 156.6–179.2 | acid / violet / coral / navy / ivory | break the grid; ME at act-3 size; counter portal into the O of LOSER | I WANNA BE YOU's tracking closes to nothing |
-| S10 OWN LINE | 179.2–204.2 | navy → ivory | the footnote sets title-size lines; 내 손을 / 잡아 줘 meet on one baseline | the lines slide out, aligned |
-| S11 END | 204.2–214.4 | ivory → navy | 서브 (small) and 캐릭터 (big) become one size and weight; a coral period stays | fade |
+## Layouts
 
-## Line by line
+| layout | what it does |
+|---|---|
+| cam | chunks turn 90°; camera follows the newest one and rotates so it reads upright |
+| spiral | like cam, always turning the same way |
+| stack | poster rows of equal width, odd rows outlined |
+| zoom | one chunk at a time; the old one flies past the lens |
+| scatter | letters fly in from everywhere |
+| bounce | letters drop and bounce, then fall away |
+| tate | vertical columns, right to left |
+| shout | one giant word, the rest small above / below |
 
-| L | time | lyric | treatment |
+## Sections (page / ink / accent)
+
+| from | section |
+|---|---|
+| 15 | VERSE 1 · ivory/navy/coral |
+| 30.9 | PRE-CHORUS · navy/ivory/acid |
+| 48.3 | CHORUS 1 · violet/ivory/acid |
+| 82 | VERSE 2 · navy/ivory/coral |
+| 107.6 | CORRECTION · ivory/navy/coral |
+| 115.1 | CHORUS 2 · coral/navy/ivory |
+| 137.4 | BRIDGE · navy/ivory/coral |
+| 156.4 | FINAL CHORUS · violet/ivory/acid |
+| 179 | OWN LINE · navy/ivory/acid |
+| 192.6 | OWN LINE · ivory/navy/coral |
+
+## Lines
+
+| L | time | layout | chunks |
 |---|---|---|---|
-| — | 0.6 | (intro) | footnote ¹ 나, 40 px ME, centre of an empty navy page |
-| — | 7.98 | (intro) | 주인공 900 / 330 px slides in; footnote pushed to the margin (collision); ¹ reference mark on 주인공 |
-| — | 10–13.6 | (intro) | SUB CHARACTER / YOUNHA labels; a 12-column grid draws in |
-| 0 | 15.36 | 언제나처럼 | margin note ¹ |
-| 1 | 16.83 | 네 뒷모습만 | 네 뒷모습 YOU 165 px in the column; 만 as a superscript |
-| 2 | 17.92 | 뚫어지게 쳐다보다 | margin note ²; a coral hairline (the gaze) runs to the big word |
-| 3 | 20.58 | 갑자기 온 생각 | ME line inserted above: the column reflows down |
-| 4 | 21.92 | 내가 뭘 해도 | margin note ³ |
-| 5 | 23.05 | 너처럼 될 순 있을까 | 너처럼 340 px runs off the page; (될 순 있을까) in the margin |
-| 6 | 25.32 | 또다시 열등감에 빠져 | 빠져 falls through the baseline |
-| 7 | 27.30 | 마음은 점점 | margin note ⁵ |
-| 8 | 28.59 | 오염되어 가 | weight morph thin → black; every line on the page thickens |
-| 9 | 29.69 | 빠르게 식어 가 | a navy disc spreads from it (the page cools) |
-| 10 | 31.12 | 알고 있어, 난 아니야 주인공 | 주인공 down the right, 580 px per glyph, cropped; ME squeezed at the left |
-| 11 | 33.37 | 그저 한 명의 extra일 뿐 | a ladder of shrinking rules; EXTRA on the last rung |
-| 12 | 35.82 | Oh, 그저 네가 완벽해 보여서 | 완벽해 acid 290 px crosses the vertical stack |
-| 13 | 38.07 | 아무 이유 없이 널 미워했어 | 널 lands and shoves 완벽해 off; 미워했어 readable only between its strokes |
-| 14 | 40.84 | 미안해, but 어쩔 수 없었어 | a coral aside in parentheses |
-| 15–16 | 43.45–47.60 | 사실 지금도 / 애써 버티고 있어 | the giant words bear down on ME's line; it strains (weight 320 → 760) |
-| 17 | 48.55 | I'm a sub character | letters spread across the width snap together (tracking) |
-| 18 | 50.41 | 우린 안 비슷해 | two words on different baselines, pushed apart |
-| 19 | 51.85 | 부러워 넌 어찌 그리 빛나는지 | 넌 acid overscan; 빛나는지 tracking + hairlines |
-| 20–21 | 54.38–55.71 | 모두 널 좋아해 / 모두의 인정받고 | a crowd of 좋아해 reflows into a pyramid under 널 |
-| 22–23 | 57.15–58.80 | 행복해 보여 / I'm a sub character | coral wipe; 행복해 330 px pushes ME's line into the corner |
-| 24 | 60.93 | Just another loser | LOSER outlined 520 px, cropped |
-| 25 | 61.93 | 열등감으로 찬 | a frame fills with the line row by row |
-| 26 | 64.18 | Tell me 내가 나쁜 맘일까 | acid page; 나쁜 100 → 900 |
-| 27 | 68.04 | I wanna be you | YOU 460 px; camera into the O's counter |
-| — | 70.4–82.3 | (interlude) | 84 pieces burst from the centre, step on the beat, settle into 11 rules |
-| 28–29 | 82.46–85.39 | 언젠가부터 내 자신이 점점 / 싫어져만 갔어 | 내 자신이: filled + outline + ghost; they drift apart and the fill drains |
-| 30–31 | 87.57–89.07 | 문득 든 생각 / 이건 누구 탓이지 | 탓 with its reflection under a line |
-| 32–33 | 90.53–93.11 | 아마도 너일 거야 / 알아 나도 | 너 and its mirror; the mirror becomes 나 |
-| 34 | 94.39 | 넌 잘못 없어 | 넌 loses its fill (outline) |
-| 35 | 95.63 | 그저 내가 이런 나라서 그랬어 | 나 repeated inward, nine copies |
-| 36–37 | 98.40–100.70 | 어떤 기분이니, 주인공 / 혹시 너도 아프고 있니 | 주인공 and 너도 both hollow |
-| 38–39 | 102.39–105.69 | 이젠 난 아예 다 모르겠어 / 복잡하게 서로 얽혀져 있어 | text on four crossing rails; pulled taut |
-| 40 | 107.90 | 미안해, 미워하기만 해서 | 미워하기만 struck through; 미안해 inserted with a caret |
-| 41 | 110.52 | 그래도 어려워 | brackets close in |
-| 42 | 112.25 | 이 마음을 지우는 건 | ME's line (650, 118 px) on top while the eraser clears the rest |
-| 43–52 | 115.45–135.20 | chorus 2 | one flowing column: each line pushes the rest; 결말이 locked in a frame; 어디로 가야 할까 leaves in four directions; 패배자의 montage = 4 hard cuts on the beat; the page falls |
-| 53 | 137.70 | 아무도 아무 말도 하지 않아도 | a whisper inside closed brackets |
-| 54–55 | 140.33–142.60 | 자꾸만 혼자 너와 날 비교해 / 널 가능한 한 나쁘게… | a balance: heavy 너, light 날; the beam levels as 너 loses weight |
-| 56 | 145.36 | 안도의 한숨을 내쉬어 | tracking opens (exhale) |
-| 57–58 | 147.92–150.47 | 알아 나도, 진짜 별로지 나 / 몇 번이고 고치려 해도 | brackets shut and reopen on each try |
-| 59 | 154.31 | 안 되더라 | the brackets open wide; a grid draws in |
-| 60 | 156.80 | I'm a sub character | the grid falls; the line on a diagonal, 300 px |
-| 61 | 159.05 | 우린 안 비슷해 | both words at the same weight, colliding |
-| 62 | 160.29 | 부러워 넌 어찌 그리 빛나는지 | 빛나는지 vertical 520 px; ME at act-3 weight |
-| 63–65 | 162.78–165.47 | 모두 널 좋아해 / 모두의 인정받고 / 행복해 보여 | the 좋아해 crowd drops; a diagonal line; 행복해 cropped |
-| 66 | 167.20 | I'm a sub character | 560 px line running past (baseline travel) |
-| 67–68 | 169.24–170.33 | Just another loser / 열등감으로 찬 | camera into the O of LOSER; inside, the line fills the page |
-| 69 | 172.56 | Tell me 내가 나쁜 맘일까 | English and Korean at the same weight |
-| 70 | 176.50 | I wanna be you | one line, one size; the tracking closes |
-| 71–72 | 179.38–182.85 | 내 이야기는 결국 / I'm a sub character | title size, weight 300 → 860 as sung |
-| 73–76 | 184.73–191.19 | 전혀 안 중요해 … 정해져 있었어 | a stack of ME lines, each pushing the rest up |
-| 77–78 | 192.90–195.06 | I don't care 그래도 / 패배자여도 | page turns ivory; same size in both families |
-| 79 | 195.99 | 매달릴 순 있잖아 | each syllable hangs from a bar on a thread |
-| 80 | 198.34 | Help me, 내 손을 잡아 줘 | 내 손을 from the left, 잡아 줘 from the right, meeting on one baseline |
-| 81 | 202.31 | 넌 주인공이니까 | same size and weight as ME's line above it |
-| — | 204.2–214.4 | (outro) | 서브 / 캐릭터 equalise; a coral period stays; fade |
+| 0 | 15.36 | zoom | 언제나 / **처럼** |
+| 1 | 16.83 | cam | 네 / **뒷모습만** |
+| 2 | 17.92 | stack | 뚫어지게 / **쳐다보다** |
+| 3 | 20.58 | scatter | 갑자기 / 온 생각 |
+| 4 | 21.92 | tate | 내가 / 뭘 해도 |
+| 5 | 23.05 | shout | **너처럼** / 될 순 있을까 |
+| 6 | 25.32 | cam | 또다시 / 열등감에 / **빠져** |
+| 7 | 27.30 | bounce | 마음은 / 점점 |
+| 8 | 28.59 | zoom | **오염되어** / 가 |
+| 9 | 29.69 | stack | 빠르게 / **식어 가** |
+| 10 | 31.12 | cam | 알고 있어, / 난 아니야 / **주인공** |
+| 11 | 33.37 | stack | 그저 한 명의 / **extra** / 일 뿐 |
+| 12 | 35.82 | tate | Oh, 그저 / 네가 / **완벽해** / 보여서 |
+| 13 | 38.07 | shout | 아무 이유 없이 / **널** / 미워했어 |
+| 14 | 40.84 | scatter | 미안해, / but / 어쩔 수 없었어 |
+| 15 | 43.45 | bounce | 사실 / **지금도** |
+| 16 | 45.12 | stack | 애써 / **버티고** / 있어 |
+| 17 | 48.55 | cam | I'm a / **sub character** |
+| 18 | 50.41 | zoom | 우린 / **안 비슷해** |
+| 19 | 51.85 | shout | 부러워 / **넌** / 어찌 그리 / 빛나는지 |
+| 20 | 54.38 | stack | 모두 / **널** / 좋아해 |
+| 21 | 55.71 | scatter | 모두의 / **인정받고** |
+| 22 | 57.15 | shout | **행복해** / 보여 |
+| 23 | 58.80 | spiral | I'm a / sub / **character** |
+| 24 | 60.93 | stack | Just / another / **loser** |
+| 25 | 61.93 | zoom | **열등감으로** / 찬 |
+| 26 | 64.18 | cam | Tell me / 내가 / **나쁜** / 맘일까 |
+| 27 | 68.04 | shout | I wanna be / **you** |
+| 28 | 82.46 | stack | 언젠가부터 / **내 자신이** / 점점 |
+| 29 | 85.39 | bounce | **싫어져만** / 갔어 |
+| 30 | 87.57 | tate | 문득 / 든 생각 |
+| 31 | 89.07 | shout | 이건 누구 / **탓이지** |
+| 32 | 90.53 | cam | 아마도 / **너일** / 거야 |
+| 33 | 93.11 | zoom | 알아 / **나도** |
+| 34 | 94.39 | stack | **넌** / 잘못 없어 |
+| 35 | 95.63 | scatter | 그저 내가 / 이런 나라서 / **그랬어** |
+| 36 | 98.40 | cam | 어떤 기분이니, / **주인공** |
+| 37 | 100.70 | tate | 혹시 / **너도** / 아프고 있니 |
+| 38 | 102.39 | bounce | 이젠 난 / 아예 다 / **모르겠어** |
+| 39 | 105.69 | spiral | 복잡하게 / 서로 / **얽혀져** / 있어 |
+| 40 | 107.90 | stack | 미안해, / **미워하기만** / 해서 |
+| 41 | 110.52 | zoom | 그래도 / **어려워** |
+| 42 | 112.25 | cam | 이 마음을 / **지우는 건** |
+| 43 | 115.45 | shout | I'm a / **sub character** |
+| 44 | 117.30 | stack | 딱히 / **안 중요해** |
+| 45 | 118.95 | cam | 말해줘 / **넌** / 이 기분 / 알고 있니 |
+| 46 | 121.46 | scatter | 알아 난 추해, / 패배자의 / **montage** |
+| 47 | 124.04 | shout | **결말이** / 정해져 있는 |
+| 48 | 125.85 | spiral | I'm a / sub / **character** |
+| 49 | 127.78 | stack | Just / another / **loser** |
+| 50 | 129.07 | scatter | 어디로 / **가야 할까** |
+| 51 | 131.23 | cam | Tell me / 내 이야기는 / **결국** |
+| 52 | 135.20 | bounce | **버려지는** / 걸까 |
+| 53 | 137.70 | tate | 아무도 / 아무 말도 / 하지 않아도 |
+| 54 | 140.33 | stack | 자꾸만 혼자 / **너와 날** / 비교해 |
+| 55 | 142.60 | zoom | 널 가능한 한 / **나쁘게** / 생각한 뒤 |
+| 56 | 145.36 | tate | 안도의 / **한숨을** / 내쉬어 |
+| 57 | 147.92 | stack | 알아 나도, / 진짜 별로지 / **나** |
+| 58 | 150.47 | cam | 몇 번이고 / **고치려** / 해도 |
+| 59 | 154.31 | shout | **안 되더라** |
+| 60 | 156.80 | shout | I'm a / **sub character** |
+| 61 | 159.05 | zoom | 우린 / **안 비슷해** |
+| 62 | 160.29 | cam | 부러워 / **넌** / 어찌 그리 / 빛나는지 |
+| 63 | 162.78 | stack | 모두 / **널** / 좋아해 |
+| 64 | 164.07 | scatter | 모두의 / **인정받고** |
+| 65 | 165.47 | shout | **행복해** / 보여 |
+| 66 | 167.20 | spiral | I'm a / sub / **character** |
+| 67 | 169.24 | stack | Just / another / **loser** |
+| 68 | 170.33 | zoom | **열등감으로** / 찬 |
+| 69 | 172.56 | cam | Tell me / 내가 / **나쁜** / 맘일까 |
+| 70 | 176.50 | shout | I wanna / be / **you** |
+| 71 | 179.38 | stack | **내 이야기는** / 결국 |
+| 72 | 182.85 | cam | I'm a / **sub character** |
+| 73 | 184.73 | bounce | 전혀 / **안 중요해** |
+| 74 | 186.01 | tate | 말해줘 / 누군가는 / **아니라고** |
+| 75 | 188.58 | stack | 알아, / 더 이상 / **의미 없단 걸** |
+| 76 | 191.19 | zoom | **정해져** / 있었어 |
+| 77 | 192.90 | shout | **I don't care** / 그래도 |
+| 78 | 195.06 | shout | **패배자여도** |
+| 79 | 195.99 | bounce | **매달릴** / 순 있잖아 |
+| 80 | 198.34 | cam | Help me, / **내 손을** / 잡아 줘 |
+| 81 | 202.31 | stack | 넌 / **주인공이니까** |
+
+## Special moments
+
+- **69.45–70.35:** a navy disc opens from the counter of the O in **YOU** and becomes the interlude page.
+- **170.2–170.3:** an acid disc opens from the O in **LOSER**, flashes, and fades into 열등감으로 찬.
+- **Section changes:** the new page colour opens as a disc from the centre.
+- **204.35:** the last line explodes as the end card begins.
