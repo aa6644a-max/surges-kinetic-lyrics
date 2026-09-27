@@ -40,16 +40,24 @@
 | 61.9–68.0 | the storage bar fills with coral jelly until it bulges; a teal plane slides in; a search box: placeholder "Tell me", then 내가 나쁜 맘일까 typed; no results | 열등감으로 찬 / Tell me 내가 나쁜 맘일까 |
 | 68.0–70.4 | the dot stretches toward YOU like taffy, snaps back on "you", then rushes at the lens and fills the screen coral | I wanna be you |
 
-## Next (planned)
+## Built (acts 2 and 3, 70.4 – 214.4)
 
 | time | object chain | lyrics |
 |---|---|---|
-| 70.4–82.3 | interlude: inside the coral, every UI piece from act 1 comes apart into soft shapes and letters and forms a tilted pattern; they drift, then drain toward one point | (interlude) |
-| 82.3–93 | the selfie camera = a mirror: a round front-camera frame; each filter change makes the face shape wobble; split screen YOU / ME | 언젠가부터 내 자신이 점점 싫어져만 갔어 / 문득 든 생각 / 이건 누구 탓이지 / 아마도 너일 거야 |
-| 93–108 | the deleted-posts bin; a DM thread opens: 어떤 기분이니, 주인공 typed; no "read" mark; notification lines tangle | 알아 나도 … / 이젠 난 아예 다 모르겠어 / 복잡하게 서로 얽혀져 있어 |
-| 108–115 | the DM box: typed, backspaced, select-all, deleted | 미안해, 미워하기만 해서 / 그래도 어려워 / 이 마음을 지우는 건 |
-| 115–138 | stories: progress bars across the top; "montage" skips four stories on four beats; the last story ends; a 24-hour timer; the story is dragged to the bin | chorus 2 (I'm a sub character … 버려지는 걸까) |
-| 138–157 | airplane mode: everything goes quiet; "새 알림 없음"; two profiles on a scale; the screen sleeps (a breath); profile edits fail again and again (error toasts) | bridge |
-| 157–179 | the dot swells and bursts: the UI breaks and giant type fills the page for the first time; ME's type as big as YOU's (the second climax) | final chorus |
-| 179–204 | ME makes her own post: caption, upload bar (the words hang from it), DM sent to YOU, YOU's reply bubble joins it, they tag each other | 내 이야기는 결국 … 넌 주인공이니까 |
-| 204–214 | "좋아요 1 · YOU님이 좋아합니다"; the title 서브캐릭터; its period is the same coral dot from the first second | (outro) |
+| 70.4–82.3 | interlude: an explore grid of YOU's memories (the anime scenes), tilted and drifting over coral, hearts popping; soft shapes float; everything drains into one point: the dot | (interlude) |
+| 82.3–89.1 | the front camera, a round frame opening out of the dot: ME at the mirror; every syllable of 싫어져만 갔어 swaps the filter and the frame wobbles; shutter and filter chips below | 언젠가부터 내 자신이 점점 / 싫어져만 갔어 / 문득 든 생각 |
+| 89.1–98.4 | split screen: ME (peeking, envious) above, YOU (laughing under the umbrella) below; YOU's half grows on 너일, pushing ME's up; then equal; ME's own pictures (crying, angry, envious) fly into a bin that bounces | 이건 누구 탓이지 … 그저 내가 이런 나라서 그랬어 |
+| 98.4–102.4 | the DM to 주인공: two coral bubbles, "읽지 않음", and YOU's story: YOU sitting alone, hurting too | 어떤 기분이니, 주인공 / 혹시 너도 아프고 있니 |
+| 102.4–107.9 | lines between faces (YOU, ME) knot and wriggle, then pull into one point | 이젠 난 아예 다 모르겠어 / 복잡하게 서로 얽혀져 있어 |
+| 107.9–115.3 | the message box over a blurred library: typed, backspaced to 미안해, typed again, a second line; select all, delete; the box shrinks back into the dot | 미안해, 미워하기만 해서 / 그래도 어려워 / 이 마음을 지우는 건 |
+| 115.3–125.8 | stories: YOU's stories with progress bars and stickers (a question sticker, the montage: four stories on four beats, THE END) | chorus 2, first half |
+| 125.8–137.5 | ME's own story (her forced smile, greyed): 조회 0, it slides left and right (어디로), a 24h timer runs out, it is dragged down into the bin | I'm a sub character … 버려지는 걸까 |
+| 137.5–145.4 | the lock screen: 02:14, airplane mode, 새 알림 없음; YOU and ME on a scale: YOU heavy, then grey and lighter; the beam levels | 아무도 … / 자꾸만 혼자 너와 날 비교해 / 널 가능한 한 나쁘게 생각한 뒤 |
+| 145.4–147.9 | the screen sleeps: only the dot, breathing | 안도의 한숨을 내쉬어 |
+| 147.9–156.6 | profile edit: every tap on 저장 fails, the toasts pile up; the dot swells out of it and bursts coral | 알아 나도 … / 몇 번이고 고치려 해도 / 안 되더라 |
+| 156.6–179.2 | final chorus: a new colour for each line (diagonal wipes); giant type; photo stickers tumble in; YOU's and ME's photos the same size; hearts land on both; LOSER's O is ME's dot and it swells over the page; the storage bar bursts; the search now finds ME; two circles the same size, nothing snaps | final chorus |
+| 179.2–192.9 | ME's new post: a picker of her photos, one chosen (running); the caption fills with her lines | 내 이야기는 결국 … 정해져 있었어 |
+| 192.9–198.3 | 공유: the upload bar; her words hang from it on threads | I don't care 그래도 / 패배자여도 / 매달릴 순 있잖아 |
+| 198.3–202.3 | the DM: ME asks; YOU types … and sends a picture of his hand held out; the bubbles join into two hands holding | Help me, 내 손을 잡아 줘 |
+| 202.3–204.3 | ME's post in the feed: 좋아요 1 · 주인공님이 좋아합니다 | 넌 주인공이니까 |
+| 204.3–214.4 | the title 서브캐릭터; its period is the coral dot, landing with a squash | (outro) |

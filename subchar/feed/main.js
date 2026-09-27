@@ -1,6 +1,8 @@
 /* FEED: section table, render, debug HUD, preview player. One take: every section hands its last object to the next. */
-const SECTIONS = [[0, 'INTRO · the dot', I0], [15.2, 'VERSE 1 · the feed', V1], [31.0, 'PRE-CHORUS · tags / likes / heart', P1], [48.4, 'CHORUS 1 · hearts', C1]];
-const DUR = 70.4, DEBUG = /debug=1/.test(location.search), RENDER = /render/.test(location.search);
+const SECTIONS = [[0, 'INTRO · the dot', I0], [15.2, 'VERSE 1 · the feed', V1], [31.0, 'PRE-CHORUS · tags / likes / heart', P1], [48.4, 'CHORUS 1 · hearts', C1],
+  [70.4, 'INTERLUDE · explore', I2], [82.3, 'VERSE 2 · mirror / split / DM / tangle', V2], [107.85, 'CORRECTION · the message box', CR], [115.3, 'CHORUS 2 · stories', C2],
+  [137.5, 'BRIDGE · lock screen / scale / saves', BR], [156.6, 'FINAL CHORUS · the UI breaks', FC], [179.2, 'OWN LINE · ME posts', OW], [204.2, 'END · the period', EN2]];
+const DUR = 214.4, DEBUG = /debug=1/.test(location.search), RENDER = /render/.test(location.search);
 const sectionAt = t => { let s = SECTIONS[0]; for (const x of SECTIONS) if (t >= x[0]) s = x; return s };
 function renderAt(t) {
   t = clamp(t, 0, DUR); g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; setTrack(0);

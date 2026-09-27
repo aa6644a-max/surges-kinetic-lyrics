@@ -65,7 +65,8 @@ function drawPath(pts, p, lw, col) { if (p <= 0) return; let tot = 0; const L = 
 function pillText(x, y, s, o) { txt(s, x, y, { size: o.size, w: o.w ?? 600, fam: o.fam ?? KR, col: o.col, al: 'center', base: 'middle', alpha: o.alpha, tr: o.tr ?? 0, upper: false }) }
 
 // ---------- anime art (restored subculture illustrations in subchar/art) ----------
-const ART = {}, ARTS = ['mem_class', 'mem_sunset', 'mem_festival', 'mem_award', 'mem_race', 'mem_rooftop', 'mem_photo', 'you_front', 'you_stage', 'you_crowd', 'me_profile', 'me_smile'];
+const ART = {}, ARTS = ['mem_class', 'mem_sunset', 'mem_festival', 'mem_award', 'mem_race', 'mem_rooftop', 'mem_photo', 'mem_entrance', 'mem_lunch', 'mem_library', 'mem_rain',
+  'you_front', 'you_stage', 'you_crowd', 'you_sit', 'you_hand', 'hands_hold', 'me_profile', 'me_smile', 'me_mirror', 'me_envy', 'me_cry', 'me_angry', 'me_run', 'me_reach'];
 const loadArt = () => Promise.all(ARTS.map(id => new Promise(r => { const im = new Image(); im.onload = () => { ART[id] = im; r() }; im.onerror = () => r(); im.src = `../art/${id}.png` })));
 // faces for avatars: focus point (0..1) and how many avatar-widths the whole picture spans
 const FACE = { you_front: [.44, .2, 1.8], you_stage: [.46, .27, 1.9], me_profile: [.52, .26, 2.0], me_smile: [.5, .27, 1.6] };   // [focus x, focus y, picture width in avatar diameters]
