@@ -8,21 +8,25 @@ const qb = t => B0 + Math.round((t - B0) / BEAT) * BEAT;            // snap a ti
 const clamp = (x, a = 0, b = 1) => x < a ? a : x > b ? b : x, lerp = (a, b, x) => a + (b - a) * x;
 const eIO = x => x < .5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2, eOut = x => 1 - (1 - x) ** 3, eIn = x => x * x * x;
 const eSm = x => x * x * (3 - 2 * x), eBk = (x, c = 1.2) => { x = clamp(x) - 1; return 1 + (c + 1) * x * x * x + c * x * x };
-// ease-in-out that passes the destination by ~3% and comes back: the spring turns it into a soft overshoot + settle
-const eOS = x => eIO(x) + .032 * Math.sin(Math.PI * clamp((x - .5) / .5)) ** 2 * (x < 1 ? 1 : 0);
 const R = (i, s = 0) => { const x = Math.sin(i * 127.1 + s * 311.7 + .5) * 43758.5453; return x - Math.floor(x) };
 
 const CAM = { x: 0, y: 0, s: 1, r: 0, vx: 0, vy: 0 };                // the state used by the renderer (r in degrees)
 const CAMERA = { keys: [], buf: null, t0: 0, HZ: 120, W: 6.2, Z: .8 };
 
-// key: {at, dur, to:{x,y,s,r} | fn:t=>({x,y,s,r}), ease, name, w, z}
+// key: {at, dur, to:{x,y,s,r} | fn:t=>({x,y,s,r}), ease, os, name, w, z}
 // The target at time t is the chain of keys blended in order: a finished key contributes its full destination.
+// os (overshoot): the target travels past the destination by os of the move, then settles back over 0.5 s.
+const SETTLE = .5;
 function camTarget(t) {
   const K = CAMERA.keys; let cur = K[0].to, name = K[0].name, key = K[0];
+  const mixS = (a, b, p) => ({ x: lerp(a.x, b.x, p), y: lerp(a.y, b.y, p), s: Math.exp(lerp(Math.log(a.s), Math.log(b.s), p)), r: lerp(a.r, b.r, p) });
   for (let k = 1; k < K.length; k++) {
     const q = K[k]; if (t < q.at) break;
-    const dst = q.fn ? q.fn(t) : q.to, p = (q.ease || (q.fn ? eIO : eOS))(clamp((t - q.at) / q.dur));
-    cur = { x: lerp(cur.x, dst.x, p), y: lerp(cur.y, dst.y, p), s: Math.exp(lerp(Math.log(cur.s), Math.log(dst.s), p)), r: lerp(cur.r, dst.r, p) };
+    const dst = q.fn ? q.fn(t) : q.to, x = clamp((t - q.at) / q.dur);
+    if (q.os) {
+      const over = mixS(cur, dst, 1 + q.os);
+      cur = t < q.at + q.dur ? mixS(cur, over, eIO(x)) : mixS(over, dst, eSm(clamp((t - q.at - q.dur) / SETTLE)));
+    } else cur = mixS(cur, dst, (q.ease || eIO)(x));
     name = q.name; key = q;
   }
   return { ...cur, name, key };

@@ -49,20 +49,29 @@ obj('SUBJECT', LAMP.x, LAMP.y, t => {
   g.globalCompositeOperation = 'lighter'; g.fillStyle = lg; g.fillRect(-90, -90, 180, 180); g.globalCompositeOperation = 'source-over';
 }, { rad: 2800, name: 'follow spot' });
 
-// inside the circle on the empty floor, the next world is already flickering: film frames of old memories
+// the pool of light on the empty floor. Up close it shows, in order: the lit surface, the grain of the boards,
+// traces of film, and finally the memories (driven by how close the camera is, not by time).
 const MEM = ['mem_entrance', 'mem_class', 'mem_race', 'mem_festival', 'mem_rain', 'mem_library', 'mem_lunch', 'mem_sunset', 'mem_rooftop', 'mem_photo', 'mem_award'];
 obj('SUBJECT', CIRCLE.x, CIRCLE.y, t => {
-  const a = clamp((t - 66.4) / .6) * (.07 + .5 * eIn(clamp((t - 67.6) / 2.5))); if (a <= 0) return;
+  if (t < 65.4) return;
+  const near = CAM.s, tex = eSm(clamp((near - 1.25) / 1.2)), film = eSm(clamp((near - 1.8) / 1.8)), mem = eSm(clamp((near - 2.6) / 1.8));
+  if (tex <= 0) return;
   const rx = 392, ry = rx * circleAspect(), dx = spotX(t) - CIRCLE.x;
   g.save(); g.beginPath(); g.ellipse(dx, 0, rx, ry, 0, 0, 7); g.clip();
-  const im = IMG[MEM[Math.floor((t - B0) / (BEAT * 2)) % MEM.length]];
-  if (im) { const s = Math.max(2 * rx / im.width, 2 * ry / (im.height * .8)); g.globalAlpha = a; g.drawImage(im, dx - im.width * s / 2, -im.height * s / 2, im.width * s, im.height * s) }
-  g.globalAlpha = a * 1.2; g.fillStyle = '#0B0810'; const fh = ry * .16;                       // film edges with sprocket holes
-  g.fillRect(dx - rx, -ry, 2 * rx, fh); g.fillRect(dx - rx, ry - fh, 2 * rx, fh);
-  g.fillStyle = rgba(PAL.spot, .6 * a); const hw = rx / 9, off = ((t * 300) % (hw * 2));
-  for (let x = -rx - hw * 2 + off; x < rx; x += hw * 2) { g.fillRect(dx + x, -ry + fh * .3, hw * .9, fh * .4); g.fillRect(dx + x, ry - fh * .7, hw * .9, fh * .4) }
+  g.globalAlpha = .35 * tex; g.fillStyle = '#6B4A3A'; for (let k = -12; k <= 12; k++) g.fillRect(dx - rx, k * ry / 12, 2 * rx, 1.5);   // board seams
+  for (let i = 0; i < 90; i++) { g.fillStyle = i % 3 ? 'rgba(90,60,45,.5)' : 'rgba(255,245,220,.6)'; g.fillRect(dx + (R(i, 3) - .5) * 2 * rx, (R(i, 4) - .5) * 2 * ry, 3, 2) }   // grain in the light
+  if (film > 0) {
+    const im = IMG[MEM[Math.floor((t - B0) / (BEAT * 2)) % MEM.length]];
+    if (im) { const sc = Math.max(2 * rx / im.width, 2 * ry / (im.height * .8)); g.globalAlpha = .08 * film + .62 * mem; g.drawImage(im, dx - im.width * sc / 2, -im.height * sc / 2, im.width * sc, im.height * sc) }
+    g.globalAlpha = .7 * mem; g.fillStyle = '#0B0810'; const fh = ry * .14;                           // film edges, only at the very end
+    g.fillRect(dx - rx, -ry, 2 * rx, fh); g.fillRect(dx - rx, ry - fh, 2 * rx, fh);
+    g.fillStyle = rgba(PAL.spot, .6 * mem); const hw = rx / 9, off = ((t * 300) % (hw * 2));
+    for (let x = -rx - hw * 2 + off; x < rx; x += hw * 2) { g.fillRect(dx + x, -ry + fh * .3, hw * .9, fh * .4); g.fillRect(dx + x, ry - fh * .7, hw * .9, fh * .4) }
+  }
   g.restore();
-}, { rad: 900, name: 'circle / film' });
+  g.globalCompositeOperation = 'lighter'; const wg = g.createRadialGradient(dx, 0, 0, dx, 0, rx); wg.addColorStop(0, `rgba(255,248,230,${.25 * (1 - mem)})`); wg.addColorStop(1, 'rgba(255,248,230,0)');
+  g.save(); g.scale(1, ry / rx); g.fillStyle = wg; g.fillRect(dx - rx, -rx, 2 * rx, 2 * rx); g.restore(); g.globalCompositeOperation = 'source-over';   // overexposed core
+}, { rad: 900, name: 'pool / film' });
 
 // ================= lyrics =================
 // L14 a pencil note in the margin of the cast board, next to 행인 7
@@ -88,11 +97,15 @@ lyric('SUBJECT', 9980, 5760, 20, t => { runs(t, 20, [{ a: 0, b: 2, font: MK(96, 
 lyric('SUBJECT', 10430, 5330, 21, t => { runs(t, 21, [{ a: 0, b: all(21), font: MK(84, 800), col: PAL.title }], 0, 0, { keep: .45 }) });
 // booth glass: L22 the reflection of the stage, then ME's own lines (credit type, growing a little)
 lyric('SUBJECT', 10760, 4290, 22, t => { runs(t, 22, [{ a: 0, b: all(22), font: CK(56, 500), col: '#FFE9C8' }], -380, -240, { al: 'left', keep: .35 }) });
-lyric('SUBJECT', 10760, 4290, 23, t => { runs(t, 23, [{ a: 0, b: all(23), font: CE(30 * meGrow(t), 500), col: PAL.me }], -380, 318, { al: 'left', keep: .8, rise: .1 }) });
-lyric('SUBJECT', 10760, 4290, 24, t => {
-  txt('LIGHT OP.  ·········', 170, -250, CE(24 * meGrow(t), 400), 'rgba(142,138,166,.8)', 'left');
-  runs(t, 24, [{ a: 0, b: all(24), font: CE(26 * meGrow(t), 500), col: PAL.me }], 170, -210, { al: 'left', keep: .8, rise: .1 });
-});
+function lampLabel(t) {                  // called inside the lamp's transform (world.js): the label plate on the lamp body
+  if (!Ln[23] || t < Ln[23].s - .3) return;
+  g.save(); g.translate(80, 0); g.rotate(Math.PI); g.fillStyle = '#C9CCD6'; g.fillRect(-92, -22, 184, 44);
+  runs(t, 23, [{ a: 0, b: all(23), font: CE(17 * meGrow(t), 600), col: '#1E2A3A' }], 0, 7, { keep: 1, rise: 0 }); g.restore();
+}
+function boothWall(t) {                  // called before ME is drawn (world.js): small production credits on the wall behind her
+  txt('LIGHT OP.  ·········', 150, -250, CE(22 * meGrow(t), 400), 'rgba(150,160,180,.55)', 'left');
+  if (Ln[24] && t > Ln[24].s - .3) runs(t, 24, [{ a: 0, b: all(24), font: CE(24 * meGrow(t), 500), col: 'rgba(143,211,255,.8)' }], 150, -212, { al: 'left', keep: .8, rise: .1 });
+}
 lyric('SUBJECT', 10760, 4290, 25, t => {                              // the glass fills up with the line
   g.save(); g.beginPath(); g.rect(-400, -330, 800, 580); g.clip();
   const s = Ln[25].s, d = Ln[25].e - s + .4, f = CK(42 * meGrow(t), 400);
@@ -100,7 +113,15 @@ lyric('SUBJECT', 10760, 4290, 25, t => {                              // the gla
   g.globalAlpha = 1; runs(t, 25, [{ a: 0, b: all(25), font: CK(46 * meGrow(t), 500), col: PAL.me }], -380, -300, { al: 'left', keep: .6 }); g.restore();
 });
 // L26 "Tell me" on the glass, then 내가 나쁜 맘일까 written on the floor and read only where the moving spot lights it
-lyric('SUBJECT', 10760, 4290, 26, t => { runs(t, 26, [{ a: 0, b: 6, font: CE(62 * meGrow(t), 500), col: PAL.me }], -380, 225, { al: 'left', keep: .6 }) });
+lyric('SUBJECT', 10760, 4290, 26, t => {  // grease pencil on the glass, only seen where the swinging lamp light sweeps across it
+  const bx = lerp(-520, 520, clamp((t - 64.05) / .95)), seen = clamp((t - 64.05) / .95);
+  g.save(); g.beginPath(); g.rect(-400, -330, 800, 580); g.clip();
+  const sw = g.createLinearGradient(bx - 220, 0, bx + 220, 0); sw.addColorStop(0, 'rgba(255,240,210,0)'); sw.addColorStop(.5, 'rgba(255,240,210,.22)'); sw.addColorStop(1, 'rgba(255,240,210,0)');
+  g.globalCompositeOperation = 'lighter'; g.fillStyle = sw; g.fillRect(bx - 220, -330, 440, 580); g.globalCompositeOperation = 'source-over';
+  g.beginPath(); g.rect(-400, -330, bx + 400 + 60, 580); g.clip();                                      // written only where the light has passed
+  runs(t, 26, [{ a: 0, b: 6, font: `italic 500 ${Math.round(66 * meGrow(t))}px "IBM Plex Mono"`, col: 'rgba(230,238,255,.85)' }], -360, 200, { al: 'left', keep: .5, alpha: .35 + .65 * seen });
+  g.restore();
+});
 function floorText(t, i, segs, x, o = {}) {
   const px = spotX(t) - x, asp = circleAspect(); g.save(); g.beginPath(); g.ellipse(px, 0, 396, 396 * asp, 0, 0, 7); g.clip();
   g.scale(1, Math.min(1, asp * 1.5)); runs(t, i, segs, 0, o.dy || 0, { keep: .9, rise: 0, al: o.al }); g.restore();
