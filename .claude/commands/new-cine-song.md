@@ -36,6 +36,9 @@ Steps — stop at every ⏸ and wait for my answer.
 6. **Engine page.** Copy `ashita/cine.html` → `<folder>/cine.html` and `ashita/build_cine.py` (set `dur` to the song
    length). Rewrite the camera path, the scene table `SC`, per-line layouts in `lyrics()`/`SPEC`, and the effects for
    the new story. Keep `var SUB_BOX=1` and the `maxW` limits so lines never leave the 1080-wide frame.
+   For motion, read `shared/MOTION.md` first and load `shared/motion.js` (`MO.*`): eases, timeline/stagger, spring,
+   interpolate, keyframe tracks, SplitText-style mask reveals, paths/morphs, the 2.5D camera (SmoothDamp, dolly vs zoom,
+   fitToBox) and scene transitions — all pure functions of t, so renders stay deterministic.
    Build, then render stills at the key moments: `node work/render.mjs --page <folder>/kinetic_cine.html --stills ... --dir out/<folder>_stills`
    and look at them (text inside the frame, readable subtitles). Show me a contact sheet. ⏸
 7. **Plates.** Write `<folder>/plates/plates.json` (shared `style`, one prompt per scene, `key` for layers,

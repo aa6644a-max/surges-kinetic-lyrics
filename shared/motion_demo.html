@@ -1,0 +1,51 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>MO demo</title>
+<style>html,body{margin:0;background:#12131F}canvas{display:block}</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="motion.js"></script>
+<script>
+/* A test card for shared/motion.js: six cells, each one technique, all driven by t only.
+   node work/render.mjs --page shared/motion_demo.html --stills .4,1,1.6,2.4 --dir out/motion_demo */
+const g = document.getElementById('c').getContext('2d'), W = 1080, H = 1920, CW = 540, CH = 640;
+const cell = (i, title, fn) => { const x = (i % 2) * CW, y = Math.floor(i / 2) * CH; g.save(); g.translate(x, y); g.beginPath(); g.rect(0, 0, CW, CH); g.clip();
+  g.fillStyle = i % 3 === 0 ? '#1B1C2E' : i % 3 === 1 ? '#23243F' : '#191A2B'; g.fillRect(0, 0, CW, CH); fn(); g.restore();
+  g.fillStyle = '#FFD23F'; g.font = '600 26px sans-serif'; g.fillText(title, x + 20, y + 40) };
+const TL = MO.timeline({ defaults: { dur: .5, ease: 'back.out(2)' } })
+  .to(['d0', 'd1', 'd2', 'd3', 'd4', 'd5', 'd6'], { from: 520, to: 180, stagger: { each: .08, from: 'center' } }, .2)
+  .addLabel('hit', '>').to('ring', { from: 0, to: 1, dur: .8, ease: 'expo.out' }, 'hit');
+const TR = MO.track([[0, [80, 540], 'power3.inOut'], [1, [460, 300], [.2, .9, .3, 1.4]], [1.8, [260, 120], 'hold'], [2.4, [80, 540]]]);
+const PATH = MO.path([[60, 560], [200, 200], [340, 500], [480, 140]]);
+const A = MO.resample([[170, 220], [370, 220], [370, 420], [170, 420]], 64), B = MO.resample(Array.from({ length: 5 }, (_, k) => { const a = -Math.PI / 2 + k * 4 * Math.PI / 5; return [270 + Math.cos(a) * 150, 330 + Math.sin(a) * 150] }), 64);
+let SPLIT = null;
+window.DUR = 6;
+window.READY = Promise.resolve();
+window.renderAt = t => {
+  g.fillStyle = '#12131F'; g.fillRect(0, 0, W, H);
+  // 0 SplitText mask reveal, staggered from the center
+  cell(0, 'split + maskReveal', () => { SPLIT = SPLIT || MO.split(g, 'sub character is still a character', '800 64px sans-serif', { maxWidth: 460 });
+    g.font = '800 64px sans-serif'; MO.maskReveal(g, SPLIT, 270, 220, t, { t0: .1, by: 'chars', stagger: { each: .03, from: 'start' }, dur: .6, ease: 'power4.out', align: 'center', fill: '#FFF9F1' }) });
+  // 1 GSAP timeline + center stagger, then a label-positioned ring
+  cell(1, 'timeline + stagger', () => { for (let k = 0; k < 7; k++) { g.fillStyle = '#FF6B6B'; g.beginPath(); g.arc(70 + k * 66, TL.get('d' + k, t, 520), 24, 0, 7); g.fill() }
+    const r = TL.get('ring', t); if (r > 0) { g.strokeStyle = `rgba(255,210,63,${1 - r})`; g.lineWidth = 10; g.beginPath(); g.arc(270, 180, 40 + r * 220, 0, 7); g.stroke() } });
+  // 2 spring presets (Remotion) side by side
+  cell(2, 'spring: default / gentle / critical', () => { [[{}, '#FF6B6B'], [{ damping: 6, stiffness: 60 }, '#62B6B7'], [{ damping: 20 }, '#FFB36B']].forEach(([cfg, col], k) => {
+    const y = 180 + k * 150, x = MO.spring({ t: t - .2, from: 60, to: 460, ...cfg }); g.fillStyle = col; g.beginPath(); g.arc(x, y, 34, 0, 7); g.fill() }) });
+  // 3 Theatre-style track (bezier handle + hold) and a motion path drawn on with autoRotate
+  cell(3, 'track + path + drawStroke', () => { g.strokeStyle = '#5A3CF0'; g.lineWidth = 8; PATH.draw(g, 0, MO.clamp(t / 2)); g.stroke();
+    const p = PATH.at(MO.ease('power2.inOut')(MO.clamp(t / 2))); g.save(); g.translate(p.x, p.y); g.rotate(p.angle); g.fillStyle = '#FFF9F1'; g.fillRect(-30, -14, 60, 28); g.restore();
+    const [x, y] = TR(t); g.fillStyle = '#FFD23F'; g.beginPath(); g.arc(x, y, 20, 0, 7); g.fill() });
+  // 4 MorphSVG-style morph square -> star, colour through OKLab
+  cell(4, 'morph + interpolateColors', () => { const u = MO.ease('elastic.out(1,.4)')(MO.clamp((t - .3) / 1.4)); MO.shape(g, MO.morph(A, B, u));
+    g.fillStyle = MO.interpolateColors(t, [0, 1.5, 3], ['#FF6B6B', '#5A3CF0', '#62B6B7']); g.fill() });
+  // 5 camera: dolly with parallax layers, SmoothDamp between two framings
+  cell(5, 'camera dolly/parallax', () => { const c = MO.camPath(t, [[0, { x: 0, y: 0, dist: 1000 }], [.8, { x: 120, y: 0, dist: 600, rot: .08 }], [2, { x: -80, y: 40, dist: 900, zoom: 1.3 }]], .35);
+    for (const [z, col, n] of [[-600, '#2E3052', 7], [0, '#6D5B80', 5], [300, '#FF8FB1', 3]]) for (let k = 0; k < n; k++) { const p = MO.project(c, (k - (n - 1) / 2) * 180, (z / 6), z, CW, CH); if (!p.visible) continue;
+      g.fillStyle = col; g.fillRect(p.x - 40 * p.s, p.y - 40 * p.s, 80 * p.s, 80 * p.s) } });
+  // after 3 s: the nine scene transitions (Remotion presentations), each tile going from scene A to scene B
+  if (t >= 3) { g.fillStyle = '#12131F'; g.fillRect(0, 0, W, H); const kinds = ['fade', 'slide', 'wipe', 'push', 'clockWipe', 'iris', 'flip', 'cube', 'zoom'], p = MO.tProgress(t, 3.3, 1.6, 'power2.inOut');
+    kinds.forEach((k, i) => { const x = (i % 3) * 360, y = Math.floor(i / 3) * 640, TW = 360, TH = 640; g.save(); g.translate(x, y); g.beginPath(); g.rect(4, 4, TW - 8, TH - 8); g.clip();
+      const scene = (col, txt) => () => { g.fillStyle = col; g.fillRect(0, 0, TW, TH); g.fillStyle = '#FFF9F1'; g.font = '800 120px sans-serif'; g.textAlign = 'center'; g.fillText(txt, TW / 2, TH / 2 + 40); g.textAlign = 'left' };
+      MO.transition(g, p, k, scene('#5A3CF0', 'A'), scene('#FF6B6B', 'B'), { W: TW, H: TH, dir: 'from-right' }); g.restore();
+      g.fillStyle = '#FFD23F'; g.font = '600 28px sans-serif'; g.fillText(k, x + 20, y + 44) }) }
+};
+</script></body></html>
