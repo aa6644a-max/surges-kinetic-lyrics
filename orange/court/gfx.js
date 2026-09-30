@@ -162,3 +162,16 @@ function subtitle(t) {
 
 // a drop under gravity from y0 (at t0) that lands on y1 at tLand
 function fall(t, t0, tLand, y0, y1) { if (t <= t0) return y0; if (t >= tLand) return y1; const p = (t - t0) / (tLand - t0); return lerp(y0, y1, p * p) }
+
+// ---------------------------------------------------------------- painted plates (orange/plates/<id>.webp) and prop cut-outs
+const PL = {}, PLATES = ['gym_lit', 'gym_dark', 'court_top', 'gym_sunset', 'sky_horizon', 'sky_up', 'sky_orange', 'gym_ceiling', 'net_close', 'floor_close', 'stands', 'arena_teal', 'board',
+  'bench_orange', 'gym_after', 'locker', 'dawn', 'p_ball', 'p_orange', 'p_shoe', 'p_cloud_a', 'p_cloud_b', 'p_flare', 'p_dust'];
+const loadPlates = () => Promise.all(PLATES.map(id => new Promise(r => { const im = new Image(); im.onload = () => { PL[id] = im; r() }; im.onerror = () => r(); im.src = `../plates/${id}.webp` })));
+// plate(id, { zoom, fx, fy (focus 0..1), dx, dy, alpha, filter }): cover the frame; returns false when the plate is missing
+function plate(id, o = {}) { const im = PL[id]; if (!im) return false;
+  const s = Math.max(W / im.width, H / im.height) * (o.zoom ?? 1), w = im.width * s, h = im.height * s, fx = o.fx ?? .5, fy = o.fy ?? .5;
+  const x = clamp(CX - w * fx, W - w, 0) + (o.dx || 0), y = clamp(CY - h * fy, H - h, 0) + (o.dy || 0);
+  g.save(); g.globalAlpha = o.alpha ?? 1; if (o.filter) g.filter = o.filter; g.drawImage(im, x, y, w, h); g.restore(); return true }
+// prop(id, x, y, width, rot, { alpha, add (additive light), filter })
+function prop(id, x, y, w, rot = 0, o = {}) { const im = PL[id]; if (!im) return false; const h = w * im.height / im.width;
+  g.save(); g.translate(x, y); g.rotate(rot); g.globalAlpha = o.alpha ?? 1; if (o.filter) g.filter = o.filter; if (o.add) g.globalCompositeOperation = 'lighter'; g.drawImage(im, -w / 2, -h / 2, w, h); g.restore(); return true }

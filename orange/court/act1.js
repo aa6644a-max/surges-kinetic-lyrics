@@ -7,19 +7,23 @@ function A0(t) {
   fill(BK);
   const on = LB.map(t0 => t < t0 ? 0 : eOut(seg(t, t0, .18)) * (1 - .45 * Math.exp(-(t - t0) * 10) * (Math.sin((t - t0) * 70) > 0 ? 1 : 0)));
   const lit = .06 + .94 * on.reduce((a, b) => a + b, 0) / LB.length, cam = { z0: lerp(6.5, 3.2, eIO(seg(t, 0, 13.6))), camH: lerp(1.2, 1.7, eIO(seg(t, 0, 13.6))) }, C = Object.assign({}, GYM, cam);
-  gymPersp(t, lit, { cam });
-  gymLights(t, on, C);
+  const zm = lerp(1, 1.16, eIO(seg(t, 0, 13.7))), painted = plate('gym_dark', { zoom: zm, fy: .52 });
+  if (painted) { plate('gym_lit', { zoom: zm, fy: .52, alpha: clamp(lit * 1.05) }); on.forEach((a, k) => { if (a > 0 && t - LB[k] < .5) rect(0, 0, W, H, WH, .25 * (1 - (t - LB[k]) / .5)) }) }
+  else { gymPersp(t, lit, { cam }); gymLights(t, on, C) }
   // the dribble: bounces on the beats before the band comes in, the ball coming toward us; then the toss
   const bs = [], n0 = -10; for (let n = n0; n <= -2; n++) bs.push(onBeat(n));
-  if (t > bs[0] - .5) {
-    let x = .7, y, z; const tt = Math.min(t, bs[bs.length - 1]);
-    if (t < bs[0]) { const p = seg(t, bs[0] - .5, .5); y = lerp(3.2, 0, p * p); z = 15 }
-    else if (t < bs[bs.length - 1]) { let k = 0; while (t > bs[k + 1]) k++; const p = (t - bs[k]) / (bs[k + 1] - bs[k]); y = 1.0 * 4 * p * (1 - p); z = lerp(15, 4.5, (k + p) / (bs.length - 1)) }
-    else { const p = seg(t, bs[bs.length - 1], B0 - bs[bs.length - 1]); y = 7 * p * (2 - p); z = lerp(4.5, 2.2, p); x = lerp(.7, 0, p) }
-    const [sx, sy] = pj(x, y + .12, z, C), [hx, hy] = pj(x, 0, z, C), r = .12 * C.f / (z + C.z0);
-    g.globalAlpha = .35 * lit; g.fillStyle = BK; g.beginPath(); g.ellipse(hx, hy, r * 1.2, r * .35, 0, 0, 7); g.fill(); g.globalAlpha = 1;
-    const sq = bs.reduce((a, b) => a + MO.wiggle(1, 'easeOut')(clamp((t - b) / .25)) * .0, 0) + bs.reduce((a, b) => a + (t >= b && t < b + .08 ? .22 : 0), 0);
-    ball(sx, sy, r, t * 5, { sq, ang: Math.PI / 2 });
+  if (t > bs[0] - .5) {                                       // screen space, matching the painted gym: from the net toward the camera
+    const pos = u => [CX + lerp(60, 150, u), lerp(800, 1600, u ** 1.4)], rad = u => lerp(16, 92, u ** 1.3);
+    let u, hgt, x, y, r;
+    if (t < bs[0]) { u = 0; hgt = 1 - seg(t, bs[0] - .5, .5) ** 2 }
+    else if (t < bs[bs.length - 1]) { let k = 0; while (t > bs[k + 1]) k++; const p = (t - bs[k]) / (bs[k + 1] - bs[k]); u = (k + p) / (bs.length - 1); hgt = 4 * p * (1 - p) }
+    else { u = 1; hgt = 0 }
+    [x, y] = pos(u); r = rad(u);
+    if (t >= bs[bs.length - 1]) { const p = seg(t, bs[bs.length - 1], B0 - bs[bs.length - 1]); y = lerp(y, -200, eIn(p)); r = lerp(r, 160, p); x = lerp(x, CX, p) }   // the toss, up past the camera
+    else y -= hgt * r * 9;
+    const [fx, fy] = pos(u); g.globalAlpha = .35 * lit * (1 - hgt * .5); g.fillStyle = BK; g.beginPath(); g.ellipse(fx, fy + r, r * 1.2, r * .3, 0, 0, 7); g.fill(); g.globalAlpha = 1;
+    const sq = bs.reduce((a, b) => a + (t >= b && t < b + .08 ? .22 : 0), 0);
+    ball(x, y, r, t * 5, { sq, ang: Math.PI / 2 });
   }
   // small HUD labels arrive with the lights
   const hud = (k, s, x, y, o = {}) => { const a = on[k]; if (a > 0) txt(s, x, y, Object.assign({ size: 30, fam: EN, col: WH, tr: .25, alpha: a * .9 }, o)) };
@@ -57,7 +61,8 @@ function A1title(t, b) {
 function A1court(t, b) {
   fill(BK); const p = eIO(seg(t, b(8), b(12) - b(8))), rot = lerp(-.5, 0, eIO(seg(t, b(8), b(14) - b(8)))), sc = lerp(1.35, 1, eIO(seg(t, b(8), b(14) - b(8))));
   g.save(); g.translate(CX, CY); g.rotate(rot); g.scale(sc, sc); g.translate(-CX, -CY);
-  courtTop(CX, CY, 88, { p, floorA: .9 * seg(t, b(8), .6) });
+  const pc = plate('court_top', { alpha: .9 * seg(t, b(8), .6), zoom: 1.05, filter: 'blur(6px)' }); if (pc) rect(0, 0, W, H, BK, .5 * seg(t, b(8), .6));
+  courtTop(CX, CY, 88, { p, floorA: .9 * seg(t, b(8), .6), floor: !pc });
   // positions: six dots a side pop in on the beats (rotation 1..6), ours orange, theirs white
   const POS = [[-3, 6], [0, 6.5], [3, 6], [3, 1.8], [0, 1.8], [-3, 1.8]];
   POS.forEach(([x, y], k) => { for (const side of [1, -1]) { const t0 = b(10) + k * BEAT / 2 + (side < 0 ? BEAT / 4 : 0), s = MO.springStep(t - t0, { damping: 9, stiffness: 240 }); if (s <= 0) continue;
@@ -66,7 +71,7 @@ function A1court(t, b) {
   const a = seg(t, b(12), .3); txt('SET 1', CX, 170, { size: 110, fam: EN, col: WH, al: 'center', alpha: a, tr: .08 }); txt('HOME', CX, 1830, { size: 40, fam: EN, col: OR, al: 'center', tr: .4, alpha: a }); txt('AWAY', CX, 120, { size: 40, fam: EN, col: WH, al: 'center', tr: .4, alpha: a * 0 });
 }
 function A1score(t, b) {
-  fill(BK); streaks(t, 0, { a: .08, n: 26 });
+  fill(BK); if (plate('stands', { zoom: 1.08 + .03 * seg(t, b(16), 5), filter: 'blur(3px)' })) rect(0, 0, W, H, BK, .55); streaks(t, 0, { a: .08, n: 26 });
   const a = seg(t, b(16), .25);
   // the scoreboard: two flip cards per team, flipping to 0 on the beats
   const card = (x, y, d, k) => flipCard(x, y, 190, 270, ' ', d, b(17) + k * BEAT / 2, t);
@@ -80,9 +85,9 @@ function A1score(t, b) {
     for (let k = 0; k < 3; k++) ring(CX, 1420, 120 + ((t - b(22)) * 500 + k * 110) % 330, 6, WH, .6 * (1 - ((t - b(22)) * 500 + k * 110) % 330 / 330)) }
 }
 function A1serve(t, b) {
-  fill(BK); const floor = g.createLinearGradient(0, 1100, 0, H); floor.addColorStop(0, BK); floor.addColorStop(1, AMB2); g.fillStyle = floor; g.fillRect(0, 1100, W, H - 1100);
-  // far net across the frame
-  rect(0, 640, W, 10, WH, .8); for (let x = 0; x < W; x += 22) line(x, 650, x, 780, 1.5, WH, .25); rect(0, 780, W, 4, WH, .5);
+  fill(BK); if (plate('floor_close', { zoom: 1.04 + .04 * seg(t, b(24), 4) })) rect(0, 0, W, H, BK, .2);
+  else { const floor = g.createLinearGradient(0, 1100, 0, H); floor.addColorStop(0, BK); floor.addColorStop(1, AMB2); g.fillStyle = floor; g.fillRect(0, 1100, W, H - 1100);
+    rect(0, 640, W, 10, WH, .8); for (let x = 0; x < W; x += 22) line(x, 650, x, 780, 1.5, WH, .25); rect(0, 780, W, 4, WH, .5) }
   // hand holds the ball; three bounces on the beats, the toss, the ball hangs as the voice comes in
   const hx = CX, hy = 1560, bounces = [b(25), b(26), b(27)], toss = b(28), hitT = S(0);
   let by = hy - 170, r = 120;
@@ -106,7 +111,8 @@ function V1(t) {
   if (t >= S(4) - .2) return V1gym(t);
   fill(BK); const drift = (t - S(0)) * 4;
   g.save(); g.translate(CX, CY); g.rotate(-.02 + drift * .0012); g.scale(1.02, 1.02); g.translate(-CX, -CY);
-  courtTop(CX, CY, 96, { floorA: .55, netWob: [S(1) + 2.46].reduce((a, t0) => a + (t > t0 ? Math.exp(-(t - t0) * 6) * Math.sin((t - t0) * 30) : 0), 0) });
+  const pv = plate('court_top', { zoom: 1.08, filter: 'blur(6px)' }); if (pv) rect(0, 0, W, H, BK, .42);
+  courtTop(CX, CY, 96, { floorA: .55, floor: !pv, lineCol: pv ? 'rgba(255,246,236,.55)' : WH, netWob: [S(1) + 2.46].reduce((a, t0) => a + (t > t0 ? Math.exp(-(t - t0) * 6) * Math.sin((t - t0) * 30) : 0), 0) });
   g.restore();
   rect(0, 0, W, H, BK, .25);
   for (const a of RALLY()) writeArc(t, a.i, a);
@@ -117,15 +123,17 @@ function V1(t) {
 function V1sun(t) {
   const up = eIO(seg(t, S(2) - .35, .7)), hor = 1000;
   const sky = g.createLinearGradient(0, 0, 0, hor); sky.addColorStop(0, LILAC); sky.addColorStop(.55, PINK); sky.addColorStop(1, PEACH); g.fillStyle = sky; g.fillRect(0, 0, W, hor);
+  g.save(); g.beginPath(); g.rect(0, 0, W, hor); g.clip(); plate('sky_horizon', { fy: .3, zoom: 1.1 - .04 * seg(t, S(2), 9) }); g.restore();
   const fl = g.createLinearGradient(0, hor, 0, H); fl.addColorStop(0, AMB); fl.addColorStop(1, AMB2); g.fillStyle = fl; g.fillRect(0, hor, W, H - hor);
   // the sun (an orange) rises behind the horizon
   const sr = 300, sy = hor + lerp(sr * 1.1, sr * .15, eOut(seg(t, S(2) - .2, 1.6))), bite = seg(t, cT(2, 7), .12);
   g.save(); g.beginPath(); g.rect(0, 0, W, hor); g.clip();
   const gl = g.createRadialGradient(CX, sy, sr * .6, CX, sy, sr * 2.6); gl.addColorStop(0, 'rgba(255,200,120,.7)'); gl.addColorStop(1, 'rgba(255,200,120,0)'); g.fillStyle = gl; g.fillRect(0, 0, W, hor);
-  g.beginPath(); g.arc(CX, sy, sr, 0, 7);
+  if (!(bite > 0 && PL.p_orange)) { g.beginPath(); g.arc(CX, sy, sr, 0, 7);
   const og = g.createRadialGradient(CX - sr * .3, sy - sr * .35, sr * .1, CX, sy, sr); og.addColorStop(0, OR2); og.addColorStop(1, OR); g.fillStyle = og; g.fill();
-  g.fillStyle = 'rgba(255,255,255,.18)'; for (let k = 0; k < 90; k++) { const a = R(k, 1) * 6.28, rr = Math.sqrt(R(k, 2)) * sr * .95; g.beginPath(); g.arc(CX + Math.cos(a) * rr, sy + Math.sin(a) * rr, 3, 0, 7); g.fill() }
-  if (bite > 0) { g.fillStyle = sky; g.beginPath(); for (const [bx, by, br] of [[CX + sr * .78, sy - sr * .55, sr * .32], [CX + sr * .55, sy - sr * .82, sr * .3], [CX + sr * .93, sy - sr * .2, sr * .26]]) { g.moveTo(bx + br * bite, by); g.arc(bx, by, br * bite, 0, 7) } g.fill() }   // the bite
+  g.fillStyle = 'rgba(255,255,255,.18)'; for (let k = 0; k < 90; k++) { const a = R(k, 1) * 6.28, rr = Math.sqrt(R(k, 2)) * sr * .95; g.beginPath(); g.arc(CX + Math.cos(a) * rr, sy + Math.sin(a) * rr, 3, 0, 7); g.fill() } }
+  if (bite > 0 && PL.p_orange) { rect(0, 0, 0, 0, BK); const ch = MO.springStep(t - cT(2, 7), { damping: 7, stiffness: 320 }); g.save(); g.beginPath(); g.rect(0, 0, W, hor); g.clip(); prop('p_orange', CX + 20, sy - sr * .05, sr * 3.9 * (1.08 - .08 * ch), -.1); g.restore() }
+  else if (bite > 0) { g.fillStyle = sky; g.beginPath(); for (const [bx, by, br] of [[CX + sr * .78, sy - sr * .55, sr * .32], [CX + sr * .55, sy - sr * .82, sr * .3], [CX + sr * .93, sy - sr * .2, sr * .26]]) { g.moveTo(bx + br * bite, by); g.arc(bx, by, br * bite, 0, 7) } g.fill() }   // the bite
   // rays on 光 / 眩しくて
   const ray = seg(t, cT(3, 5) - .1, .6); if (ray > 0) { g.save(); g.translate(CX, sy); g.rotate(t * .12); g.fillStyle = `rgba(255,246,236,${.28 * ray})`; for (let k = 0; k < 14; k++) { g.rotate(Math.PI * 2 / 14); g.beginPath(); g.moveTo(sr * 1.05, -18); g.lineTo(sr * 3.2, -70); g.lineTo(sr * 3.2, 70); g.lineTo(sr * 1.05, 18); g.fill() } g.restore() }
   g.restore();
@@ -140,7 +148,7 @@ function V1sun(t) {
 // back in the gym: sweat, voices, shoulders slapped, laughing and crying
 function V1gym(t) {
   fill(NAVY); const tin = eOut(seg(t, S(4) - .2, .5)); g.save(); g.translate(0, (1 - tin) * -H);
-  courtTop(CX, 1900, 110, { floorA: .5, net: false });
+  if (plate('gym_sunset', { zoom: 1.06 + .05 * seg(t, S(4), 9) })) rect(0, 0, W, H, BK, .38); else courtTop(CX, 1900, 110, { floorA: .5, net: false });
   // L4 sweat: each char drops in and then slides down slowly like a drop
   if (t < S(5) - .1) { const C = chars(4);
     for (let k = 0; k < 7; k++) { const G = C[k], x = 150 + k * 128, yl = 560 + k * 14; if (t < G.t - .3) continue;
@@ -161,10 +169,12 @@ function V1gym(t) {
 // ================= P1 60.55 - 70.5: the approach. The camera tilts up to the sky; vertical lines climb; 羽ばたいていく lifts off =================
 function P1(t) {
   const up = t - 60.3, sky = g.createLinearGradient(0, 0, 0, H); sky.addColorStop(0, NAVY); sky.addColorStop(.45, LILAC); sky.addColorStop(.75, PINK); sky.addColorStop(1, OR); g.fillStyle = sky; g.fillRect(0, 0, W, H);
+  const psky = plate('sky_up', { zoom: 1.25, fy: lerp(.1, .9, seg(t, 60.3, 10.2)) });
   // the court drops away below as we look up
   const drop = eIn(seg(t, 60.3, .9)); if (drop < 1) { g.save(); g.translate(0, drop * 1400); rect(0, 1000, W, 920, AMB); rect(0, 993, W, 14, WH); g.restore() }
   // passing cloud streaks = rising
-  g.save(); g.fillStyle = 'rgba(255,246,236,.28)'; for (let k = 0; k < 16; k++) { const y = ((R(k, 1) * 2400 + up * (240 + R(k, 2) * 300)) % 2400) - 240, x = R(k, 3) * W; g.beginPath(); g.ellipse(x, y, 160 + R(k, 4) * 200, 14 + R(k, 5) * 16, 0, 0, 7); g.fill() } g.restore();
+  if (PL.p_cloud_a) for (let k = 0; k < 9; k++) { const y = ((R(k, 11) * 2600 + up * (300 + R(k, 12) * 380)) % 2600) - 400; prop(k % 2 ? 'p_cloud_b' : 'p_cloud_a', R(k, 13) * W, y, 500 + R(k, 14) * 500, 0, { alpha: .85 }) }
+  else { g.save(); g.fillStyle = 'rgba(255,246,236,.28)'; for (let k = 0; k < 16; k++) { const y = ((R(k, 1) * 2400 + up * (240 + R(k, 2) * 300)) % 2400) - 240, x = R(k, 3) * W; g.beginPath(); g.ellipse(x, y, 160 + R(k, 4) * 200, 14 + R(k, 5) * 16, 0, 0, 7); g.fill() } g.restore() }
   // vertical lines (Japanese is written top to bottom): 明日へ向かう right, オレンジ色の空へ left
   const col = (i, a, b, x, y0, step, size, c, hide) => { const C = chars(i); for (let k = a; k < b; k++) { const G = C[k], p = seg(t, G.t - .05, .25); if (p <= 0) continue; const out = hide ? 1 - seg(t, hide, .4) : 1, y = y0 + (k - a) * step + (1 - eOut(p)) * 80 - (t - G.t) * 22;
     lettering(x, y, () => { txt(G.c, 8, 10, { size, fam: JP, col: BK, al: 'center', alpha: .35 * p * out }); txt(G.c, 0, 0, { size, fam: JP, col: c, al: 'center', alpha: p * out }) }) } };
@@ -180,6 +190,7 @@ function C1A(t) {
   if (t >= S(10) - .05) return C1spike(t);
   const tt = MO.posterize(t, 8);                                                               // the held, anime "hang" frames
   const sky = g.createLinearGradient(0, 0, 0, H); sky.addColorStop(0, OR); sky.addColorStop(1, PEACH); g.fillStyle = sky; g.fillRect(0, 0, W, H);
+  if (plate('gym_ceiling', { zoom: 1.08 + .05 * seg(tt, 70.3, 10) })) { rect(0, 0, W, H, OR, .28); for (let k = 0; k < 3; k++) prop('p_flare', [220, 540, 860][k], [300, 180, 330][k], 520 + 60 * Math.sin(tt * 3 + k), 0, { add: true, alpha: .7 }) }
   focusLines(tt, CX, 430, { a: .35, col: WH, speed: 1.2, r0: 220 });
   // the ball hangs at the top; sweat drops frozen around it
   ball(CX, 430 + Math.sin(tt * 2) * 6, 150, tt * .6, {});
@@ -202,7 +213,7 @@ function C1A(t) {
 }
 function C1spike(t) {
   const hit = S(10), d = t - hit;
-  fill(BK); if (d < .45) rect(0, 0, W, H, OR, 1 - d / .45);
+  fill(BK); if (plate('net_close', { zoom: 1.1 + .1 * seg(t, hit, 3) })) rect(0, 0, W, H, BK, .5); if (d < .45) rect(0, 0, W, H, OR, 1 - d / .45);
   streaks(t, -.62, { a: .35, n: 50, speed: 3600 });
   // KITTO in outline, huge, behind; きっと slammed diagonally from the top right
   g.save(); g.translate(CX, CY); g.rotate(-.3);
@@ -213,7 +224,7 @@ function C1spike(t) {
   // the ball smashed down the diagonal
   if (d > -.2 && d < .6) { const p = clamp((d + .2) / .8); ballTrail(t, tt => { const q = clamp((tt - hit + .2) / .8); return [lerp(1100, -100, q), lerp(-100, 1500, q)] }, 120, { n: 8, dt: .012 }) }
   // after the shout: the instrumental; the court from above with the spike's line drawn, a dig sends the ball back up
-  if (t > 82.9) { const a = seg(t, 82.9, .4); g.globalAlpha = a; courtTop(CX, CY, 88, { floorA: .8 }); g.globalAlpha = 1;
+  if (t > 82.9) { const a = seg(t, 82.9, .4); g.globalAlpha = a; if (plate('court_top', { alpha: a, filter: 'blur(6px)' })) rect(0, 0, W, H, BK, .45 * a); g.globalAlpha = a; courtTop(CX, CY, 88, { floorA: .8, floor: !PL.court_top }); g.globalAlpha = 1;
     const arr = eOut(seg(t, 83.2, .6)); g.save(); g.strokeStyle = OR; g.lineWidth = 14; g.lineCap = 'round'; g.beginPath(); g.moveTo(CX + 200, CY - 500); g.lineTo(lerp(CX + 200, CX - 180, arr), lerp(CY - 500, CY + 560, arr)); g.stroke(); g.restore();
     txt('SPIKE', 70, 200, { size: 120, fam: EN, col: OR, alpha: a });
     const dig = onBeat(Math.ceil(beatN(85.8))), dd = t - dig; if (dd > 0) { txt('DIG!', CX - 180, CY + 760, { size: 140 * MO.springStep(dd, { damping: 8, stiffness: 300 }), fam: EN, col: WH, al: 'center' });
