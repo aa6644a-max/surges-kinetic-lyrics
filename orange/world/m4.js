@@ -133,33 +133,33 @@ function topM4(t) {
   lockup(t, { x: SV[0], y: SV[1] + 470, alpha: fadeOld(TGO + .6), rows: [{ i: 28, a: 6, b: 12, size: 150, st: 'heavyY', ent: 'stamp' }] });
   lockup(t, { x: SV[0] - 20, y: SV[1] + 690, alpha: fadeOld(TGO + .6), rows: [{ i: 29, a: 0, b: 3, size: 96, st: 'handW', ent: 'type' }, { i: 29, a: 3, b: 9, size: 110, st: 'thin', ent: 'rise', gap: 4 }] });
   if (t > TGO && t < TGO + .5) { const d = t - TGO; burst(t, SV[0], SV[1], 380 * eOut(clamp(d / .1)) * (1 - seg(d, .3, .2)), '#FFFFFF', { n: 14, line: INK, lw: 8 }) }
-  lockup(t, { x: SV[0], y: SV[1], rot: -.06, rows: [{ i: 29, a: 9, b: 12, size: 270, st: 'heavyO', ent: 'stamp' }] });
+  lockup(t, { x: SV[0], y: SV[1], rot: -.06, alpha: fadeOld(192), rows: [{ i: 29, a: 9, b: 12, size: 270, st: 'heavyO', ent: 'stamp' }] });
   if (t > TGO) stampIn(t, TGO + .02, SV[0] + 300, SV[1] - 380, .1, () => sticker('GO!!', 0, 0, 200, { fam: BG, col: ORG, line: INK, lwk: .1, alpha: fadeOld(TGO + .8)(t) }), { from: 2.2 });
   // 限られた時間がいつか — a battery on the corridor floor drains to 1%
-  if (t > S(30) - .3) { lockup(t, { x: 0, y: -3330, rows: [{ i: 30, a: 0, b: 4, size: 120, st: 'thin', ent: 'rise' }] });
-    lockup(t, { x: 0, y: -3075, rows: [{ i: 30, a: 4, b: 6, size: 330, st: 'heavy', ent: 'stamp' }] });
-    lockup(t, { x: 0, y: -2835, rows: [{ i: 30, a: 6, b: 10, size: 120, st: 'thin', ent: 'rise' }] });
+  if (t > S(30) - .3) { const fa = fadeOld(S(31) + .2); lockup(t, { x: 0, y: -3330, alpha: fa, rows: [{ i: 30, a: 0, b: 4, size: 120, st: 'thin', ent: 'rise' }] });
+    lockup(t, { x: 0, y: -3075, alpha: fa, rows: [{ i: 30, a: 4, b: 6, size: 330, st: 'heavy', ent: 'stamp' }] });
+    lockup(t, { x: 0, y: -2835, alpha: fa, rows: [{ i: 30, a: 6, b: 10, size: 120, st: 'thin', ent: 'rise' }] });
     const bt = cT(30, 4) - .1; if (t > bt) { const s = Math.min(1.04, MO.springStep(t - bt, { damping: 10, stiffness: 220 })), p = lerp(1, .01, eIn(seg(t, cT(30, 6), cT(30, 9) - cT(30, 6) + .05)));
-      battery(0, -3800, s, p, t); if (p < .02) stampIn(t, cT(30, 9) + .1, 300, -3960, .12, () => sticker('LOW!', 0, 0, 90, { fam: BG, col: RED, line: INK, lwk: .1 }), { from: 1.8 }) } }
+      battery(0, -3800, s, p, t); if (p < .02) stampIn(t, cT(30, 9) + .1, 300, -3960, .12, () => sticker('LOW!', 0, 0, 90, { fam: BG, col: RED, line: INK, lwk: .1, alpha: fa(t) }), { from: 1.8 }) } }
   // ふいに恋しくなっても — memories fall onto the floor; a notification suggests looking back
   if (t > S(31) - .3) { POLS4.forEach(([x, y, r, id, cap], k) => { const t0 = cT(31, k * 2) - .05; if (t < t0) return; const s = MO.springStep(t - t0, { damping: 11, stiffness: 200 }), q = Math.min(1, s);
       polaroid(x, y, 300, r + (1 - q) * .5, id, { s: lerp(1.7, 1, q), cap, alpha: clamp((t - t0) / .12) }) });
     const ns = eOut(seg(t, S(31) - .1, .4)), out = eIn(seg(t, S(32) - .05, .45)); if (ns > 0 && out < 1) memoryNote(0, -4990 - (1 - ns) * 300, 1 - out, out * 1300);
-    lockup(t, { x: 0, y: -4520, rows: [{ i: 31, a: 0, b: 3, size: 110, st: 'handW', ent: 'type' }] });
-    lockup(t, { x: 0, y: -4300, rows: [{ i: 31, a: 3, b: 6, size: 300, st: 'heavyO', ent: 'stamp' }] });
-    lockup(t, { x: 0, y: -4075, rows: [{ i: 31, a: 6, b: 10, size: 120, st: 'thin', ent: 'rise' }] }) }
+    const fb = fadeOld(S(32) + .2); lockup(t, { x: 0, y: -4520, alpha: fb, rows: [{ i: 31, a: 0, b: 3, size: 110, st: 'handW', ent: 'type' }] });
+    lockup(t, { x: 0, y: -4300, alpha: fb, rows: [{ i: 31, a: 3, b: 6, size: 300, st: 'heavyO', ent: 'stamp' }] });
+    lockup(t, { x: 0, y: -4075, alpha: fb, rows: [{ i: 31, a: 6, b: 10, size: 120, st: 'thin', ent: 'rise' }] }) }
   // 立ち止まらないで 振り返らないで — arrows painted on the floor, GO STRAIGHT, no U-turn
-  if (t > S(32) - .3) { const pa = eOut(seg(t, S(32), .35)); if (pa > 0) withA(.6 * pa, () => arrowFloor(0, -4800 + (1 - pa) * 120, 380, -Math.PI / 2, '#FFFFFF', 1));
-    const gs = eOut(seg(t, cT(32, 4), .4)); if (gs > 0) txt('GO STRAIGHT', 0, -5330, { size: 150, fam: BG, col: '#FFFFFF', al: 'center', base: 'middle', alpha: .45 * gs, tr: .06 });
-    lockup(t, { x: 0, y: -5100, rows: [{ i: 32, a: 0, b: 8, size: 120, st: 'heavy', ent: 'stamp' }] });
-    lockup(t, { x: 0, y: -5580, rows: [{ i: 32, a: 8, b: 15, size: 130, st: 'heavyO', ent: 'stamp' }] });
+  if (t > S(32) - .3) { const fc = fadeOld(S(33) + .2), pa = eOut(seg(t, S(32), .35)); if (pa > 0) withA(.6 * pa * fc(t), () => arrowFloor(0, -4800 + (1 - pa) * 120, 380, -Math.PI / 2, '#FFFFFF', 1));
+    const gs = eOut(seg(t, cT(32, 4), .4)); if (gs > 0) txt('GO STRAIGHT', 0, -5330, { size: 150, fam: BG, col: '#FFFFFF', al: 'center', base: 'middle', alpha: .45 * gs * fc(t), tr: .06 });
+    lockup(t, { x: 0, y: -5100, alpha: fc, rows: [{ i: 32, a: 0, b: 8, size: 120, st: 'heavy', ent: 'stamp' }] });
+    lockup(t, { x: 0, y: -5580, alpha: fc, rows: [{ i: 32, a: 8, b: 15, size: 130, st: 'heavyO', ent: 'stamp' }] });
     const ut = cT(32, 8) - .05; if (t > ut) { const s = Math.min(1.05, MO.springStep(t - ut, { damping: 9, stiffness: 260 })); noUturn(0, -5860, .9 * s);
-      [-330, 330].forEach((x, k) => { const p = eOut(seg(t, ut + .15 + k * .1, .3)); if (p > 0) withA(.6 * p, () => arrowFloor(x, -5860 + (1 - p) * 80, 300, -Math.PI / 2, '#FFFFFF', 1)) }) } }
+      [-330, 330].forEach((x, k) => { const p = eOut(seg(t, ut + .15 + k * .1, .3)); if (p > 0) withA(.6 * p * fc(t), () => arrowFloor(x, -5860 + (1 - p) * 80, 300, -Math.PI / 2, '#FFFFFF', 1)) }) } }
   // NEXT STAGE, then the arena: 君は進んで行けばいいんだよ
   nextStage(t);
-  lockup(t, { x: 0, y: -6905, rows: [{ i: 33, a: 0, b: 2, size: 110, st: 'thin', ent: 'rise' }, { i: 33, a: 2, b: 5, size: 280, st: 'heavyS', ent: 'stamp', gap: 4 }, { i: 33, a: 5, b: 13, size: 120, st: 'round', ent: 'fly', gap: 6 }] });
+  lockup(t, { x: 0, y: -6905, alpha: fadeOld(210.6), rows: [{ i: 33, a: 0, b: 2, size: 110, st: 'thin', ent: 'rise' }, { i: 33, a: 2, b: 5, size: 280, st: 'heavyS', ent: 'stamp', gap: 4 }, { i: 33, a: 5, b: 13, size: 120, st: 'round', ent: 'fly', gap: 6 }] });
   // the final spike in slow motion: きっと, the long vowel trailing the ball as ーーー
-  lockup(t, { x: 40, y: -8440, rot: -.05, rows: [{ i: 34, a: 0, b: 3, size: 240, st: 'heavyO', ent: 'stamp' }] });
+  lockup(t, { x: 40, y: -8440, rot: -.05, alpha: fadeOld(GSET + .6), rows: [{ i: 34, a: 0, b: 3, size: 240, st: 'heavyO', ent: 'stamp' }] });
   const t0 = cT(34, 2) + .15; if (t > t0) { const dx = LAND[0] - SPK[0], dy = LAND[1] - SPK[1], L = Math.hypot(dx, dy), nx = -dy / L, ny = dx / L, ang = Math.atan2(dy, dx);
     for (let k = 0; k < 10; k++) { const tk = t0 + k * .11; if (t < tk) break; const u = .16 + k * .075, sd = k % 2 ? 1 : -1, s = MO.springStep(t - tk, { damping: 9, stiffness: 400 });
       g.save(); g.translate(SPK[0] + dx * u + nx * sd * 250, SPK[1] + dy * u + ny * sd * 250); g.rotate(ang); g.scale(s, s); sticker('ー', 0, 0, 150, { fam: SFX, col: INK, line: '#FFFFFF', lwk: .1, alpha: fadeOld(GSET + .5)(t) }); g.restore() } }

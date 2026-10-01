@@ -85,7 +85,7 @@ function topM2(t) {
   const hit = 80.6;
   if (t < hit + .05) { const p = eIn(seg(t, 80.35, hit - 80.35)); ballTop(t, { x: lerp(-600, PK[0], p), y: lerp(-1500, PK[1], p), h: lerp(14, .2, p) }) }
   else { const d = t - hit; burst(t, PK[0], PK[1], 300 * eOut(clamp(d / .12)) * (1 - seg(d, 1.2, .4)), '#FFFFFF', { n: 14, line: INK, lw: 8 }); if (d < 1.2) ballTop(t, { x: PK[0] - d * 300, y: PK[1] + d * 200, h: .2 + 9 * d - 4 * d * d }) }
-  if (t > hit) stampIn(t, hit, PK[0] + 260, PK[1] + 260, .1, () => sticker('DIG!!', 0, 0, 150, { fam: BG, col: SKY, line: INK, lwk: .1, alpha: 1 - .7 * seg(t, 83, .5) }), { from: 2 });
+  if (t > hit) stampIn(t, hit, PK[0] + 260, PK[1] + 260, .1, () => sticker('DIG!!', 0, 0, 150, { fam: BG, col: SKY, line: INK, lwk: .1, alpha: fadeOld(83)(t) }), { from: 2 });
   lockup(t, { x: 0, y: -900, alpha: fadeOld(87), rows: [{ i: 10, a: 0, b: 3, size: 330, st: 'heavyO', ent: 'stamp' }] });
   const t0 = cT(10, 2) + .25; if (t > t0) { const n = Math.min(14, Math.floor((t - t0) / .11) + 1), fa = fadeOld(87)(t); for (let k = 0; k < n; k++) { const a = -Math.PI / 2 + (k - 6.5) * .26, r = 560 + (k % 2) * 120, s = MO.springStep(t - t0 - k * .11, { damping: 9, stiffness: 400 });
       g.save(); g.translate(Math.cos(a) * r, -900 + Math.sin(a) * r * .55 + 260); g.rotate(a + Math.PI / 2); g.scale(s, s); sticker('ー', 0, 0, 180, { fam: SFX, col: INK, line: '#FFFFFF', lwk: .1, alpha: fa }); g.restore() } }

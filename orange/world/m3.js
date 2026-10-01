@@ -71,7 +71,7 @@ function topM3(t) {
     if (t < LIGHTS_ON) vball(0, 430, 130, .4);
     lockup(t, { x: 0, y: 740, alpha: fa, rows: [{ i: 26, a: 0, b: 4, size: 140, st: 'thin', ent: 'rise' }, { i: 26, a: 4, b: 11, size: 190, st: 'heavy', ent: 'rise', gap: 8 }] });
     lockup(t, { x: 0, y: 1080, alpha: fa, rows: [{ i: 27, a: 0, b: 5, size: 130, st: 'thin', ent: 'rise' }] });
-    const C = chars(27); for (let k = 5; k < 8; k++) { const G = C[k]; if (t < G.t - .03) continue; const a = 1 - seg(t, G.t + 1.1 + (k - 5) * .25, .6) * .85; sticker(G.c, -250 + (k - 5) * 250, 1320, 230, { fam: MJ, col: '#FFFFFF', line: INK, lwk: .12, alpha: a * clamp((t - G.t + .03) / .3) }) } }
+    const C = chars(27); for (let k = 5; k < 8; k++) { const G = C[k]; if (t < G.t - .03) continue; const a = (1 - seg(t, G.t + 1.1 + (k - 5) * .25, .6) * .85) * fadeOld(LIGHTS_ON)(t); sticker(G.c, -250 + (k - 5) * 250, 1320, 230, { fam: MJ, col: '#FFFFFF', line: INK, lwk: .12, alpha: a * clamp((t - G.t + .03) / .3) }) } }
 }
 // the whiteboard: a court diagram, magnets, marker writing; red ✕, a flower circle (花丸), a ring for oh
 const MARK = { fam: MK, col: INK, outline: false, shadow: false };

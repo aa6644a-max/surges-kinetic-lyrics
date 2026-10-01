@@ -68,7 +68,7 @@ function topWorld(t) {
   g.save(); g.fillStyle = '#0B0E15'; g.fillRect(-7000, -12500, 14000, 18000); g.fillStyle = dots('rgba(255,255,255,.07)', 300, 12); g.fillRect(-7000, -12500, 14000, 18000); g.restore();   // the map around the world
   floorTop(t, lightLv(t)); corridorFloor(t); arenaFloor(t); scoreboardObj(t, { until: 200 });
   // ORANGE painted on our half; it settles back to a floor logo once the ticket scene starts
-  const ta0 = t < bb(8) ? 1 : lerp(1, .14, seg(t, bb(8), .6)), ta = t < REST ? ta0 : lerp(ta0, .85, eOut(seg(t, REST, 1.2)));
+  const ta0 = t < bb(8) ? 1 : 1 - seg(t, bb(8), .6), ta = t < REST ? ta0 : lerp(ta0, .85, eOut(seg(t, REST, 1.2)));
   [['O', -190, 250], ['R', 190, 250], ['A', -190, 560], ['N', 190, 560], ['G', -190, 870], ['E', 190, 870]].forEach(([c, x, y], k) =>
     stampIn(t, bb(k) - .02, x, y, (R(k, 8) - .5) * .2, () => { if (c === 'O') vball(0, 0, 270, (t - bb(0)) * 1.2, { alpha: ta }); else sticker(c, 0, 26, 380, { fam: BG, col: [null, ORG, '#FFFFFF', SKY, '#FFFFFF', ORG][k], line: INK, lwk: .1, alpha: ta }) }, { from: 2.6, dur: .1 }));
   if (t > bb(6) && t < bb(9)) stampIn(t, bb(6), 0, 1080, -.06, () => sticker('SPYAIR', 0, 0, 110, { fam: PM, col: '#FFFFFF', line: INK, lwk: .14, alpha: 1 - seg(t, bb(8), .5) }), { from: 1.8 });
@@ -107,7 +107,7 @@ function serveZone(t) { const x0 = PA[0], y0 = PA[1], a = seg(t, bb(24) - .2, .3
   const gr = g.createLinearGradient(mx, 0, mx + mw, 0); gr.addColorStop(0, LIME); gr.addColorStop(.6, YEL); gr.addColorStop(.9, ORG); gr.addColorStop(1, RED); g.fillStyle = gr; g.fillRect(mx, my, mw, 76); g.restore();
   const kx = mx + mw * (t < S(0) ? tri : 1); g.save(); g.globalAlpha = a; g.fillStyle = INK; g.beginPath(); g.moveTo(kx, my - 6); g.lineTo(kx - 26, my - 50); g.lineTo(kx + 26, my - 50); g.fill(); g.fillRect(kx - 4, my, 8, 76); g.restore();
   txt('POWER', mx, my - 26, { size: 46, fam: BG, col: '#FFFFFF', alpha: a, tr: .06 });
-  const za = 1 - .65 * seg(t, S(1), .6); if (t < S(0) + .6) stampIn(t, bb(24), x0, y0 - 330, -.06, () => sticker('READY?', 0, 0, 120, { fam: BG, col: YEL, line: INK, lwk: .1, alpha: 1 - seg(t, S(0), .5) }), { from: 1.8 });
+  const za = fadeOld(S(1))(t); if (t < S(0) + .6) stampIn(t, bb(24), x0, y0 - 330, -.06, () => sticker('READY?', 0, 0, 120, { fam: BG, col: YEL, line: INK, lwk: .1, alpha: 1 - seg(t, S(0), .5) }), { from: 1.8 });
   [3, 2, 1].forEach((n, k) => { const t0 = bb(27 + k); if (t < t0 || t > t0 + BEAT) return; stampIn(t, t0, x0 + 230, y0 - 120, 0, () => sticker(String(n), 0, 40, 300, { fam: BG, col: '#FFFFFF', line: INK, lwk: .08, alpha: 1 - seg(t, t0 + BEAT * .7, BEAT * .3) }), { from: 1.6, dur: .08 }) });
   if (t < S(0) + .25) { g.save(); g.globalAlpha = 1 - seg(t, S(0), .25); handVec(x0 - 10, y0 + 110, .42, 0, 'cup', { col: '#FFFFFF', line: INK }); g.restore() }
   if (t >= S(0) - .02 && t < S(0) + .35) burst(t, x0, y0, 220 * eOut(seg(t, S(0), .1)), '#FFFFFF', { n: 12, line: INK, lw: 6 });
@@ -115,8 +115,13 @@ function serveZone(t) { const x0 = PA[0], y0 = PA[1], a = seg(t, bb(24) - .2, .3
 }
 // verse 1 written by the rally; older lines settle back but stay where they were written (Maps). In the final reveal (REST)
 // every line lights up again.
-const REST = 214.6;
-const fadeOld = t0 => t => { const f = 1 - .8 * seg(t, t0, .6); return t < REST ? f : lerp(f, 1, eOut(seg(t, REST, 1.2))) };
+// A sung line fades out completely once its moment has passed. Two recaps bring every earlier line back on purpose:
+// 全てが (RECAP, the first big reveal, where each line gets a tick) and the final map of the whole world (REST).
+const REST = 214.6, RECAP = [cT(14, 7) - .35, 108.3];
+const fadeOld = t0 => t => { const f = 1 - seg(t, t0, .5);
+  if (t >= REST) return lerp(f, 1, eOut(seg(t, REST, 1.2)));
+  if (t0 < RECAP[0] && t > RECAP[0]) return Math.max(f, eOut(seg(t, RECAP[0], .4)) * (1 - seg(t, RECAP[1], .5)));
+  return f };
 function rallyText(t) {
   pathText(t, 0, 0, 9, pAB(US[0]), pAB(US[8]), 130, { rot: THS, fade: fadeOld(S(1) + .4) });
   lockup(t, { x: L0B[0], y: L0B[1], rot: THS, alpha: fadeOld(S(1) + .4), rows: [{ i: 0, a: 9, b: 11, size: 280, st: 'boil', ent: 'type' }, { i: 0, a: 11, b: 14, size: 150, st: 'heavyO', ent: 'stamp' }] });

@@ -81,7 +81,7 @@ function ballTop(t, bl, o = {}) { if (!bl) return; const s = 1 + bl.h * .16, d =
 // lyric chars laid along a straight path (a court line, a ball's flight); each char is upright for a camera at angle `rot`
 function pathText(t, i, a, b2, p0, p1, size, o = {}) { const C = chars(i), n = b2 - a, ang = Math.atan2(p1[1] - p0[1], p1[0] - p0[0]);
   for (let k = 0; k < n; k++) { const G = C[a + k], u = n === 1 ? .5 : k / (n - 1), x = lerp(p0[0], p1[0], u), y = lerp(p0[1], p1[1], u);
-    if (t < G.t - .03) continue; const al = o.fade ? o.fade(t) : 1;
+    if (t < G.t - .03) continue; const al = o.fade ? o.fade(t) : 1; if (al <= .002) continue;
     stampIn(t, G.t - .03, x, y, (o.rot ?? ang) + (R(k, 7) - .5) * (o.wob ?? .12), () => sticker(G.c, 0, 0, size, Object.assign({ fam: MJ, col: '#FFFFFF', line: INK, lwk: .14 }, o.st, { alpha: al })), { from: o.from ?? 1.8, dur: .1 }) } }
 // a point offset from (x0, y0) along the screen axes of a camera rolled by `rot` (dx right, dy down on screen)
 const wp = (x0, y0, dx, dy, rot) => [x0 + dx * Math.cos(rot) - dy * Math.sin(rot), y0 + dx * Math.sin(rot) + dy * Math.cos(rot)];

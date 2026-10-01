@@ -20,6 +20,7 @@ const ST = {
 function lockup(t, L) {
   { const m = g.getTransform(), r = L.rows.reduce((a, r2) => a + ((r2.b ?? chars(r2.i).length) - r2.a) * r2.size, 0) * (L.s ?? 1) * Math.max(Math.hypot(m.a, m.b), Math.hypot(m.c, m.d)),
       sx = m.a * L.x + m.c * L.y + m.e, sy = m.b * L.x + m.d * L.y + m.f; if (sx < -r || sx > W + r || sy < -r || sy > H + r) return null }   // off screen: skip
+  if (L.alpha && L.alpha(t) <= .002) return null;
   const rows = L.rows.map(r => { const st = Object.assign({}, typeof r.st === 'string' ? ST[r.st] : (r.st ?? ST.heavy), r.col ? { col: r.col } : {}); const C = chars(r.i).slice(r.a, r.b ?? chars(r.i).length);
     font(st.w ?? 400, r.size, st.fam); setTrack(0); const tr = (st.tr ?? 0) * r.size, ws = C.map(G => g.measureText(G.c).width + tr), sp = C.map((G, k) => k && G.sp ? r.size * .3 : 0);
     return { r, st, C, ws, sp, width: ws.reduce((a, c) => a + c, 0) + sp.reduce((a, c) => a + c, 0) - tr, h: r.size * (r.lh ?? 1.1) } });
