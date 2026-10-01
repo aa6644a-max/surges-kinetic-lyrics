@@ -156,6 +156,47 @@
    "ref": "gym_lit",
    "key": "black",
    "prompt": "Many tiny warm glowing dust sparkles and bokeh dots of different sizes floating in a light beam, scattered across the frame."
+  },
+  {
+   "id": "p_vball",
+   "size": "1024x1024",
+   "ref": "gym_lit",
+   "key": "green",
+   "prompt": "A single volleyball with the classic yellow-and-blue design of an official Japanese match ball: curved swirling panels alternating bright yellow and royal blue, glossy highlight and soft shading, painted in the same anime style, seen slightly from above, centred. No logos, no text, no letters, no numbers on the ball."
+  },
+  {
+   "id": "sky_clean",
+   "size": "1024x1536",
+   "ref": "gym_lit",
+   "prompt": "A clean, wide sunset sky with almost no clouds: a smooth gradient from soft clear blue at the top through lilac and pink to a warm peach-orange glow near the bottom, only a few very faint thin haze streaks. Mostly empty open sky, calm and luminous."
+  },
+  {
+   "id": "cl_far",
+   "size": "1536x1024",
+   "ref": "ref_cloud",
+   "key": "black",
+   "prompt": "A wide horizontal band of distant soft clouds at golden hour, hazy and low in contrast, pale peach and pink tops, soft lilac undersides, gentle and airy."
+  },
+  {
+   "id": "cl_mid",
+   "size": "1536x1024",
+   "ref": "ref_cloud",
+   "key": "black",
+   "prompt": "A big fluffy cumulus cloud bank at golden hour, bright cream-gold tops lit by the low sun, soft peach-pink and lilac shadows underneath, soft feathered edges, floating across the middle of the frame."
+  },
+  {
+   "id": "cl_near",
+   "size": "1536x1024",
+   "ref": "ref_cloud",
+   "key": "black",
+   "prompt": "Large soft wisps of nearby cloud and mist at golden hour, very soft feathered edges, translucent and glowing warm white-peach, drifting across the frame, partly see-through."
+  },
+  {
+   "id": "cl_puff",
+   "size": "1536x1024",
+   "ref": "ref_cloud",
+   "key": "black",
+   "prompt": "Three or four separate soft round cloud puffs of different sizes at sunset, translucent warm peach and cream with soft violet shading, isolated with plenty of space between them."
   }
  ]
 }

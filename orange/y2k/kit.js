@@ -8,7 +8,8 @@ const UB = '"Unbounded"', RD = '"M PLUS Rounded 1c"', HW = '"Klee One"', PM = '"
 
 // ---------------------------------------------------------------- plates (../plates/<id>.webp) and the prop cut-outs
 const PL = {}, PLATES = ['gym_lit', 'gym_dark', 'court_top', 'gym_sunset', 'sky_horizon', 'sky_up', 'sky_orange', 'gym_ceiling', 'net_close', 'floor_close', 'stands', 'arena_teal', 'board',
-  'bench_orange', 'gym_after', 'locker', 'dawn', 'p_ball', 'p_orange', 'p_shoe', 'p_cloud_a', 'p_cloud_b', 'p_flare', 'p_dust'];
+  'bench_orange', 'gym_after', 'locker', 'dawn', 'p_ball', 'p_orange', 'p_shoe', 'p_cloud_a', 'p_cloud_b', 'p_flare', 'p_dust',
+  'p_vball', 'sky_clean', 'cl_far', 'cl_mid', 'cl_near', 'cl_puff'];
 const loadPlates = () => Promise.all(PLATES.map(id => new Promise(r => { const im = new Image(); im.onload = () => { PL[id] = im; r() }; im.onerror = () => r(); im.src = `../plates/${id}.webp` })));
 // cover-draw a plate into the box (x, y, w, h) around focus (fx, fy)
 function cover(id, x, y, w, h, o = {}) { const im = typeof id === 'string' ? PL[id] : id; if (!im) return false;
@@ -157,3 +158,27 @@ function subtitle(t) {
   rr(CX - w / 2 - 30, 1762, w + 60, 72, 36, INK, { alpha: .82 * a });
   txt(s, CX, 1811, { size: 40, w: 700, col: '#FFFFFF', al: 'center', alpha: a });
 }
+
+// ---------------------------------------------------------------- the ball (the yellow-and-blue match ball) and clouds you fly through
+// vball(x, y, d, rot): a ball of diameter d (the cut-out has a margin, hence the 1.3); falls back to the older ball, then the emoji
+function vball(x, y, d, rot = 0, o = {}) { if (prop('p_vball', x, y, d * 1.2, rot, o)) return; if (prop('p_ball', x, y, d * 1.3, rot, o)) return; emo('🏐', x, y, d, rot, o) }
+function vballPop(t, t0, x, y, d, rot = 0) { const s = MO.springStep(t - t0, { damping: 8, stiffness: 300 }); if (s <= .01) return; vball(x, y + (1 - Math.min(1, s)) * 60, d * s, rot + (t - t0) * 2) }
+// cloudField: translucent cloud sprites (black-keyed plates) travel from far (small, faint) to near (huge) and fade as they pass us.
+// They are drawn in 'screen' mode: the dark parts let the sky through and only the lit parts glow, so a cloud reads as mist,
+// never as a dark-edged sticker. Near ones are softened; the closest ones also leave a light haze over the whole frame.
+const CLOUDS = ['cl_far', 'cl_mid', 'cl_puff', 'cl_near'];
+function cloudField(t, o = {}) {
+  const ids = o.ids ?? CLOUDS, n = o.n ?? 9, sp = o.speed ?? .12, L = []; let haze = 0;
+  for (let k = 0; k < n; k++) L.push([(((t * sp + k / n + (o.phase ?? 0)) % 1) + 1) % 1, k]);
+  L.sort((a, b) => a[0] - b[0]);
+  for (const [ph, k] of L) { const im = PL[ids[k % ids.length]]; if (!im) continue;
+    const z = lerp(o.zFar ?? 6, o.zNear ?? .45, ph), s = 1 / z, w = (o.w ?? 1800) * s, h = w * im.height / im.width;
+    const x = (o.cx ?? CX) + (R(k, 1) - .5) * (o.spread ?? 1900) * s, y = (o.cy ?? CY) + (R(k, 2) - .5) * (o.spreadY ?? 1400) * s;
+    const a = (o.alpha ?? .9) * clamp(ph / .22) * (1 - clamp((ph - .68) / .32));
+    if (a <= .005) continue; haze = Math.max(haze, a * clamp((ph - .55) / .3));
+    g.save(); g.globalCompositeOperation = 'screen'; g.globalAlpha *= a; if (ph > .5 && o.soft !== false) g.filter = `blur(${Math.round((ph - .5) * 16)}px)`;
+    g.translate(x, y); if (R(k, 3) > .5) g.scale(-1, 1); g.drawImage(im, -w / 2, -h / 2, w, h); g.restore() }
+  if (o.haze !== false && haze > 0) { const gr = g.createRadialGradient(CX, CY, 200, CX, CY, 1300); gr.addColorStop(0, `rgba(255,244,230,${.32 * haze})`); gr.addColorStop(1, `rgba(255,236,220,${.12 * haze})`); g.save(); g.fillStyle = gr; g.fillRect(0, 0, W, H); g.restore() } }
+// cloudBand: one cloud plate repeated in a sideways drifting band (a parallax layer)
+function cloudBand(t, id, y, w, speed, o = {}) { const im = PL[id]; if (!im) return; const h = w * im.height / im.width, x0 = (((-t * speed) % w) + w) % w - w;
+  g.save(); g.globalCompositeOperation = 'screen'; g.globalAlpha = o.alpha ?? 1; if (o.blur) g.filter = `blur(${o.blur}px)`; for (let x = x0; x < W + w; x += w) g.drawImage(im, x, y - h / 2, w, h); g.restore() }

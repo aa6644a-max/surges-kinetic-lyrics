@@ -9,7 +9,7 @@ const lstr = (i, a, bb) => chars(i).slice(a, bb).map(c => c.c).join('');
 
 // ================= I0 0 - 13.777: the desktop. ORANGE.exe loads the match; files pop on the guitar accents; the cursor clicks START
 const ACC = [.4, 2.75, 4.75, 7.5, 9.75, 12.25];
-const FILES = [['🏐', 'ball.png', 165, 330], ['👟', 'shoes.png', 915, 330], ['🍊', 'orange.jpg', 165, 1470], ['📣', 'cheer.mp3', 915, 1470], ['🏆', 'final.txt', 165, 1130], ['🔥', 'fire.gif', 915, 1130]];
+const FILES = [['🏐', 'ball.png', 165, 330], ['👟', 'shoes.png', 915, 330], ['📸', 'team.jpg', 165, 1470], ['📣', 'cheer.mp3', 915, 1470], ['🏆', 'final.txt', 165, 1130], ['🔥', 'fire.gif', 915, 1130]];
 function I0(t) {
   paper(t, { word: 'ORANGE' });
   const ph = MO.springStep(t - .25, { damping: 12, stiffness: 140 });
@@ -22,7 +22,7 @@ function I0(t) {
   const pr = clamp(ACC.reduce((a, t0) => a + eOut(seg(t, t0, .9)) / ACC.length, 0) * .94 + .06 * seg(t, 12.5, .8));
   win(CX, 800, 760, 470, 'ORANGE.exe', { s: ws, rot: .015, draw: (w, h) => {
     const bb = [...Array(40).keys()].map(n => onBeat(-n - 1)).filter(x => x > 0), last = bb.filter(x => x <= t)[0] ?? 0, hop = Math.sin(clamp((t - last) / BEAT) * Math.PI);
-    emo('🏐', w / 2, 140 - hop * 60, 150, t * 2); disc(w / 2, 222, 50 * (1 - hop * .4), 'rgba(0,0,0,.12)');
+    vball(w / 2, 140 - hop * 60, 130, t * 2); disc(w / 2, 222, 50 * (1 - hop * .4), 'rgba(0,0,0,.12)');
     txt('LOADING THE MATCH', w / 2, 290, { size: 30, w: 800, fam: UB, col: INK, al: 'center', tr: .06 });
     progress(60, 320, w - 120, 58, pr, { t }); txt(Math.round(pr * 100) + '%', w - 60, 440, { size: 60, fam: EN, col: ORG, al: 'right', upper: false }) } });
   // START button and the cursor that clicks it on the downbeat
@@ -40,9 +40,9 @@ function T1(t) {
   torn(840, 330, 400, 300, -.1, (w, h) => cover('net_close', -w / 2, -h / 2, w, h, { zoom: 1.1 }), { s: MO.springStep(t - b(5), { damping: 10, stiffness: 220 }), seed: 9 });
   const L = [['O', 330, 650], ['R', 750, 650], ['A', 330, 950], ['N', 750, 950], ['G', 330, 1250], ['E', 750, 1250]];
   L.forEach(([c, x, y], k) => stampIn(t, b(k), x, y, (R(k, 8) - .5) * .22, () => {
-    if (c === 'O' && PL.p_orange) prop('p_orange', 0, 0, 560, .1); else sticker(c, 0, 18, 330, { fam: UB, w: 900, col: k % 2 ? INK : '#FFFFFF', line: INK, lwk: .1, shadowCol: INK }) }, { from: 2.6, dur: .1 }));
+    if (c === 'O') vball(0, 0, 300, (t - b(0)) * 1.5); else sticker(c, 0, 18, 330, { fam: UB, w: 900, col: k % 2 ? INK : '#FFFFFF', line: INK, lwk: .1, shadowCol: INK }) }, { from: 2.6, dur: .1 }));
   stampIn(t, b(6), 560, 1480, -.08, () => sticker('SPYAIR', 0, 0, 96, { fam: PM, col: '#FFFFFF', line: INK, lwk: .14 }), { from: 1.8 });
-  emoPop(t, b(6) + .3, '🏐', 900, 1500, 150, .2); emoPop(t, b(7), '🔥', 160, 360, 150, -.2);
+  vballPop(t, b(6) + .3, 900, 1500, 150, .2); emoPop(t, b(7), '🔥', 160, 360, 150, -.2);
   starSticker(t, b(1), 110, 820, 40, SKY, 1); starSticker(t, b(3), 980, 800, 34, LIME, 2); starSticker(t, b(5), 540, 1080, 30, '#FFFFFF', 3);
   flash(t, B0, '#FFFFFF', .18);
 }
@@ -64,7 +64,7 @@ function T2(t) {
   // stub, torn away on the last beat
   g.save(); g.translate(tear * 260, tear * 120); g.rotate(tear * .35);
   card(L + BW, T, SW, H2, 26, '#FFF8EC', { sh: 14 }); for (let y = T + 16; y < T + H2 - 10; y += 26) rect(L + BW - 3, y, 6, 14, INK, .8);
-  g.save(); g.translate(L + BW + SW / 2, 0); g.rotate(-Math.PI / 2); txt('No. 010', 0, -30, { size: 40, w: 900, fam: UB, col: INK, al: 'center' }); g.restore(); emo('🏐', L + BW + SW / 2 + 40, 120, 80);
+  g.save(); g.translate(L + BW + SW / 2, 0); g.rotate(-Math.PI / 2); txt('No. 010', 0, -30, { size: 40, w: 900, fam: UB, col: INK, al: 'center' }); g.restore(); vball(L + BW + SW / 2 + 40, 120, 80, t);
   g.restore();
   g.restore();
   // hand-drawn circle around FINAL, then the seal
@@ -74,12 +74,12 @@ function T2(t) {
 }
 
 // ================= T3 23.439 - 28.27: the team group chat — only stickers and emoji, no words yet
-const CHAT = [[16, 'a', '🔥', 1], [17, 'b', '🏐🏐🏐', 0], [18, 'me', '💪💪', 0], [19, 'c', 'VOICE', 0], [20, 'a', '‼️', 1], [21, 'me', '🍊', 1]];
+const CHAT = [[16, 'a', '🔥', 1], [17, 'b', '🏐🏐🏐', 0], [18, 'me', '💪💪', 0], [19, 'c', 'VOICE', 0], [20, 'a', '‼️', 1], [21, 'me', '🙌', 1]];
 const AV = { a: ['😤', ORG], b: ['😎', SKY], c: ['🤓', LIME] };
 function chatFrame(t, title = 'バレー部', n = 6) {
   rect(0, 0, W, H, '#BFE0F3'); g.save(); g.fillStyle = dots('rgba(255,255,255,.45)', 14, 2); g.fillRect(0, 0, W, H); g.restore();
   rect(0, 0, W, 200, '#FFFFFF'); line(0, 200, W, 200, 4, INK);
-  txt('‹', 50, 140, { size: 90, w: 500, fam: RD, col: INK, upper: false }); disc(170, 116, 52, ORG); ring(170, 116, 52, 4, INK); emo('🏐', 170, 118, 62);
+  txt('‹', 50, 140, { size: 90, w: 500, fam: RD, col: INK, upper: false }); disc(170, 116, 52, ORG); ring(170, 116, 52, 4, INK); vball(170, 116, 72, 0);
   txt(title, 240, 136, { size: 50, w: 800, fam: RD, col: INK, upper: false }); font(800, 50, RD); const tw = g.measureText(title).width; txt(`(${n})`, 250 + tw, 136, { size: 38, w: 500, fam: RD, col: GREY, upper: false });
   txt('☰', W - 70, 140, { size: 54, w: 800, fam: RD, col: INK, al: 'center', upper: false });
 }
@@ -105,14 +105,14 @@ function T4(t) {
   stampIn(t, b(24), CX, 330, -.06, () => sticker('READY?', 0, 0, 130, { fam: UB, w: 900, col: YEL, line: INK, lwk: .12 }), { from: 1.8 });
   [3, 2, 1].forEach((n, k) => { const t0 = b(27 + k); if (t < t0 || t > t0 + BEAT) return; const a = 1 - seg(t, t0 + BEAT * .7, BEAT * .3); stampIn(t, t0, CX, 820, 0, () => sticker(String(n), 0, 40, 460, { fam: UB, w: 900, col: '#FFFFFF', line: INK, lwk: .08, alpha: a }), { from: 1.6, dur: .08 }) });
   // the toss
-  const tp = seg(t, b(28), b(30) - b(28)); if (PL.p_ball) prop('p_ball', CX + 30, lerp(1220, 560, eOut(tp)) - (t < b(28) ? 30 * Math.abs(Math.sin((t - b(24)) * 5)) : 0), lerp(260, 200, tp), t * 3);
+  const tp = seg(t, b(28), b(30) - b(28)); vball(CX + 30, lerp(1220, 560, eOut(tp)) - (t < b(28) ? 30 * Math.abs(Math.sin((t - b(24)) * 5)) : 0), lerp(240, 190, tp), t * 3);
   // the power meter: swings on the beat, full on the downbeat of the voice
   const u = (t - b(30)) / BEAT + 1, tri = 1 - Math.abs(((u % 2) + 2) % 2 - 1), mx = 110, mw = 860, my = 1400;
   card(mx - 10, my - 10, mw + 20, 96, 48, '#FFFFFF', { sh: 8 }); g.save(); g.beginPath(); g.roundRect(mx, my, mw, 76, 38); g.clip();
   const gr = g.createLinearGradient(mx, 0, mx + mw, 0); gr.addColorStop(0, LIME); gr.addColorStop(.6, YEL); gr.addColorStop(.9, ORG); gr.addColorStop(1, RED); g.fillStyle = gr; g.fillRect(mx, my, mw, 76); g.restore();
   const kx = mx + mw * tri; g.fillStyle = INK; g.beginPath(); g.moveTo(kx, my - 6); g.lineTo(kx - 26, my - 50); g.lineTo(kx + 26, my - 50); g.fill(); rect(kx - 4, my, 8, 76, INK);
   txt('POWER', mx, my - 30, { size: 34, w: 900, fam: UB, col: '#FFFFFF' });
-  const click = b(30) - .03; g.save(); g.translate(CX, 1620); const pz = t >= click ? .9 : 1; g.scale(pz, pz); card(-220, -64, 440, 128, 64, ORG); emo('🏐', -130, 0, 80); txt('SERVE', 40, 24, { size: 60, w: 900, fam: UB, col: '#FFFFFF', al: 'center' }); g.restore();
+  const click = b(30) - .03; g.save(); g.translate(CX, 1620); const pz = t >= click ? .9 : 1; g.scale(pz, pz); card(-220, -64, 440, 128, 64, ORG); vball(-130, 0, 80, t); txt('SERVE', 40, 24, { size: 60, w: 900, fam: UB, col: '#FFFFFF', al: 'center' }); g.restore();
   const cp = eIO(seg(t, b(28), click - b(28) - .1)); cursor(t, lerp(940, CX + 60, cp), lerp(1800, 1640, cp), { click });
 }
 
@@ -162,12 +162,13 @@ function V2(t) {
   torn(CX, 960, 960, 1260, -.025, (w, h) => cover('sky_horizon', -w / 2, -h / 2, w, h, { fy: .7, zoom: 1.08 - .04 * seg(t, S(2), 5) }), { seed: 21 });
   const hy = 1150, bite = t >= cT(2, 7) - .02;
   sketch([[70, hy], [1010, hy - 12]], t, { col: '#FFFFFF', lw: 10, p: eOut(seg(t, S(2) - .2, .8)), jit: 3 });
-  // the sun: a whole orange rising behind the line; then the painted bitten orange with a chomp
-  g.save(); g.beginPath(); g.rect(0, 0, W, hy); g.clip();
-  const rise = eOut(seg(t, S(2) - .3, 2.4)), sy = lerp(hy + 260, hy - 150, rise);
-  if (!bite) emo('🍊', CX, sy, 380); else { const ch = MO.springStep(t - cT(2, 7), { damping: 7, stiffness: 320 }); prop('p_orange', CX, sy - 10, 640 * (1.1 - .1 * ch), -.08) }
-  g.restore();
-  if (bite) { const d = t - cT(2, 7); for (let k = 0; k < 9; k++) { const a = -1.2 + R(k, 2) * 1.6, v = 500 + R(k, 3) * 500; disc(CX + 170 + Math.cos(a) * v * d, sy - 120 + Math.sin(a) * v * d + 900 * d * d, 12 * (1 - seg(d, 0, 1)), ORG) }
+  // the sun is the ball: it rises behind the horizon; on かじる the horizon bites into it (the line climbs over its lower part)
+  const rise = eOut(seg(t, S(2) - .3, 2.4)), sy = lerp(hy + 300, hy - 170, rise), bt = bite ? MO.springStep(t - cT(2, 7), { damping: 7, stiffness: 300 }) : 0, cut = hy - 70 * bt;
+  const gl = g.createRadialGradient(CX, sy, 60, CX, sy, 520); gl.addColorStop(0, 'rgba(255,230,150,.55)'); gl.addColorStop(1, 'rgba(255,230,150,0)'); g.fillStyle = gl; g.fillRect(0, 0, W, hy);
+  const edge = () => Array.from({ length: 25 }, (_, k) => { const x = W - k * W / 24, dip = Math.max(0, 1 - Math.abs(x - CX) / 330); return [x, lerp(hy, cut + (k % 2 ? 18 : -18) * bt, dip)] });
+  g.save(); g.beginPath(); g.moveTo(0, 0); g.lineTo(W, 0); edge().forEach(([x, y]) => g.lineTo(x, y)); g.closePath(); g.clip();
+  vball(CX, sy, 420, -.15 + (t - S(2)) * .3); g.restore();
+  if (bite) { sketch(edge(), t, { col: '#FFFFFF', lw: 9, jit: 2 });
     stampIn(t, cT(2, 7), 840, 560, .18, () => sticker('ガブッ', 0, 0, 120, { fam: JP, col: ORG, line: INK, lwk: .12 }), { from: 2 }) }
   // lyric
   stampChars(t, 2, 0, 5, k => [150 + k * 125, 330 + Math.sin(k * .8) * 20, (R(k, 4) - .5) * .25], 120, { fam: RD, w: 800, col: ORG, line: INK, lwk: .14 });
@@ -254,7 +255,7 @@ function P0(t) {
   if (open < 1) rr(x + 14, y + 16, w, h, r, INK);
   g.save(); g.beginPath(); g.roundRect(x, y, w, h, r); g.clip();
   const gr = g.createLinearGradient(0, y, 0, y + h); gr.addColorStop(0, '#5CB8EA'); gr.addColorStop(1, ORG); g.fillStyle = gr; g.fillRect(x, y, w, h);
-  if (open > 0) { cover('sky_up', x, y, w, h, { alpha: open, fy: lerp(.9, .3, seg(t, cT(6, 6), 4)) }); for (let k = 0; k < 5; k++) prop(k % 2 ? 'p_cloud_b' : 'p_cloud_a', ((R(k, 3) * 1400 + (t - 63) * (90 + 60 * R(k, 4))) % 1500) - 200, 300 + k * 300, 520, 0, { alpha: open * .9 }) }
+  if (open > 0) { g.save(); g.globalAlpha = open; if (!cover('sky_clean', x, y, w, h, { fy: lerp(.8, .4, seg(t, cT(6, 6), 4)) })) cover('sky_up', x, y, w, h); cloudField(t, { speed: .1, n: 9, alpha: .8 }); g.restore() }
   if (open < 1) { rays(t, x + w - 200, y + 300, { col: 'rgba(255,255,255,.2)', n: 16 }); emo('☀️', x + w - 200, y + 300, 260, t * .2);
     [['15', '☀️'], ['16', '☀️'], ['17', '⛅'], ['18', '🌇']].forEach(([hh, e], k) => { rr(x + 60 + k * 210, y + h - 260, 180, 200, 30, 'rgba(255,255,255,.3)'); emo(e, x + 150 + k * 210, y + h - 180, 80); txt(hh + ':00', x + 150 + k * 210, y + h - 90, { size: 32, w: 800, fam: UB, col: '#FFFFFF', al: 'center' }) }) }
   g.restore(); g.restore();
@@ -264,12 +265,13 @@ function P0(t) {
 }
 // ================= P1 67.18 - 70.5: 羽ばたいていく — the words flap like wings and fly off with the birds
 function P1(t) {
-  cover('sky_up', 0, 0, W, H, { fy: .2, zoom: 1.1 }); for (let k = 0; k < 5; k++) prop(k % 2 ? 'p_cloud_b' : 'p_cloud_a', ((R(k, 3) * 1400 + (t - 63) * (90 + 60 * R(k, 4))) % 1500) - 200, 300 + k * 300, 520, 0, { alpha: .9 });
+  if (!cover('sky_clean', 0, 0, W, H, { fy: .35, zoom: 1.05 })) cover('sky_up', 0, 0, W, H, { fy: .2, zoom: 1.1 }); cloudField(t, { speed: .2, n: 10, alpha: .85 });
   const C = chars(7);
   for (let k = 0; k < 7; k++) { const G = C[k]; if (t < G.t - .03) continue; const d = Math.max(0, t - G.t - .35), vx = (k - 3) * 40, x = 150 + k * 130 + vx * d, y = 1000 - d * d * 260 - d * 120 - Math.abs(k - 3) * 30 * Math.min(1, d);
     const flap = .55 + .45 * Math.abs(Math.cos((t - G.t) * 11)); stampIn(t, G.t - .03, x, y, (R(k, 2) - .5) * .2, () => { g.scale(1, flap); sticker(G.c, 0, 0, 150, { fam: RD, w: 800, col: '#FFFFFF', line: INK, lwk: .14 }) }, { from: 1.5 }) }
   for (let k = 0; k < 4; k++) { const t0 = S(7) + k * .5, d = t - t0; if (d < 0) continue; emo('🕊️', -100 + d * (300 + k * 60), 1500 - d * (260 + k * 40), 120 + k * 10, -.2) }
   const pl = seg(t, 69.2, 1.2); if (pl > 0) emo('✈️', lerp(-100, 1200, pl), lerp(1300, 200, pl), 150, -.6);
+  cloudBand(t, 'cl_near', 1550, 1900, 460, { alpha: .7, blur: 6 });
 }
 
 // ================= C0 70.54 - 75.28: あと1秒だけ — a timer running out; もう1秒だけ — the cursor presses +1秒, twice
@@ -323,13 +325,13 @@ function C2(t) {
     // the held vowel: ー multiplies, row by row, like the o's in toooo
     const t0 = cT(10, 2) + .25; if (t > t0) { const n = Math.min(24, Math.floor((t - t0) / .075) + 1); for (let k = 0; k < n; k++) { const row = Math.floor(k / 4), col = k % 4, s = MO.springStep(t - t0 - k * .075, { damping: 9, stiffness: 400 });
       g.save(); g.translate(170 + col * 250, 880 + row * 150); g.scale(s, s); sticker('ー', 0, 0, 200, { fam: JP, col: INK, line: '#FFFFFF', lwk: .1 }); g.restore() } }
-    emoPop(t, hit + .3, '🏐', 900, 360, 170, .3); emoPop(t, hit + .5, '🔥', 170, 330, 170, -.2);
+    vballPop(t, hit + .3, 900, 360, 170, .3); emoPop(t, hit + .5, '🔥', 170, 330, 170, -.2);
     // the spike comes down the diagonal
-    if (t > spike - .1) { const p = eIn(seg(t, spike - .1, land - spike + .1)); for (let k = 0; k < 14; k++) { const q = p - k * .02; if (q <= 0) continue; disc(lerp(1150, 380, q), lerp(-150, 1250, q), 90 - k * 5, ORG, .12) } prop('p_ball', lerp(1150, 380, p), lerp(-150, 1250, p), 300, t * 12) }
+    if (t > spike - .1) { const p = eIn(seg(t, spike - .1, land - spike + .1)); for (let k = 0; k < 14; k++) { const q = p - k * .02; if (q <= 0) continue; disc(lerp(1150, 380, q), lerp(-150, 1250, q), 90 - k * 5, ORG, .12) } vball(lerp(1150, 380, p), lerp(-150, 1250, p), 260, t * 12) }
     flash(t, hit, '#FFFFFF', .14);
   } else {
     const d = t - land; paper(t, { bg: ORG, word: 'SPIKE', rows: ['SP', 'IK', 'E!'], size: 820, dot: 'rgba(255,255,255,.35)' }); rays(t, 380, 1250, { col: 'rgba(255,255,255,.2)', n: 20 });
-    burst(t, 380, 1250, 360 * eOut(clamp(d / .15)), '#FFFFFF', { n: 14, line: INK, lw: 7 }); prop('p_ball', 380, 1250, 300 * (1 + .25 * Math.exp(-d * 8)), t * 2, { sy: 1 - .3 * Math.exp(-d * 10) });
+    burst(t, 380, 1250, 360 * eOut(clamp(d / .15)), '#FFFFFF', { n: 14, line: INK, lw: 7 }); vball(380, 1250, 260 * (1 + .25 * Math.exp(-d * 8)), t * 2, { sy: 1 - .3 * Math.exp(-d * 10) });
     stampIn(t, land, 700, 1450, -.1, () => sticker('バシッ!!', 0, 0, 170, { fam: JP, col: YEL, line: INK, lwk: .12 }), { from: 2.2 });
     win(CX, 560, 820, 520, 'MATCH.exe', { s: MO.springStep(t - (land + .5), { damping: 10, stiffness: 220 }), bar: YEL, rot: -.03, draw: (w, h) => {
       txt('NICE', w / 2, 170, { size: 120, w: 900, fam: UB, col: INK, al: 'center' }); txt('SPIKE!', w / 2, 300, { size: 120, w: 900, fam: UB, col: ORG, al: 'center' });
