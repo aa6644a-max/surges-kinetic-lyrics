@@ -6,7 +6,7 @@
 
 const SIDEL = [450, 780], SIDET = [450, -780], BASEL = [700, -1010], BASER = [-900, -1010];
 const pL15 = u => [lerp(SIDEL[0], SIDET[0], u), lerp(SIDEL[1], SIDET[1], u)], pL16 = u => [lerp(BASEL[0], BASER[0], u), lerp(BASEL[1], BASER[1], u)];
-const CONT = ANIME ? { x: 20, y: 1480, r: -Math.PI / 2 } : { x: -1500, y: -1350, r: -Math.PI / 2 };   // anime: the serving area, inside the painted gym
+const CONT = ANIME ? { x: 250, y: 1480, r: -Math.PI / 2 } : { x: -1500, y: -1350, r: -Math.PI / 2 };   // anime: the serving area, inside the painted gym
 const DOTS = [[-320, 820], [-20, 600], [300, 800], [330, 380], [0, 230], [-310, 420]];
 const BOARD = ANIME ? { x: 0, y: -1260 } : { x: 1900, y: -1500 };
 let BOARD_W = 1560;                                                                  // the painted board sprite's width (fitted after generation)
