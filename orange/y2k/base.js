@@ -2,7 +2,7 @@
    Canvas 2D, 1080x1920. Every frame is a pure function of t (no state carried between frames), so
    renderAt(t) reproduces any frame exactly. Materials: type, simple geometry, line, solid colour. */
 const W = 1080, H = 1920, CX = 540, CY = 960;
-let g = null, Ln = [];
+let g = null, Ln = [], GA = 1;                    // GA: group alpha, see withA()
 
 // ---------- palette: five colours, fixed for the whole piece ----------
 const OR = '#FF6A13', OR2 = '#FF8A3D', BK = '#0E0F14', WH = '#FFF6EC', AMB = '#E3923A', AMB2 = '#C4742A', TEAL = '#16B3A6', NAVY = '#101B2D',
@@ -41,9 +41,9 @@ function measure(txt, w, size, tr = 0, fam = KR) { font(w, size, fam); setTrack(
 function txt(s, x, y, o) {
   const size = o.size, w = o.w ?? 500, fam = o.fam ?? KR; if (o.upper || fam === EN && o.upper !== false) s = s.toUpperCase();
   font(w, size, fam); setTrack((o.tr ?? 0) * size); g.textAlign = o.al ?? 'left'; g.textBaseline = o.base ?? 'alphabetic';
-  g.globalAlpha = o.alpha ?? 1;
+  g.globalAlpha = (o.alpha ?? 1) * GA;
   if (o.outline) { g.strokeStyle = o.col; g.lineWidth = o.lw ?? Math.max(1.5, size * .012); g.lineJoin = 'round'; g.strokeText(s, x, y) } else { g.fillStyle = o.col; g.fillText(s, x, y) }
-  g.globalAlpha = 1; return g.measureText(s).width;
+  g.globalAlpha = GA; return g.measureText(s).width;
 }
 // lyric run: characters a..b of line i, each revealed on its sung time. Returns the laid-out glyphs.
 // o: text style + {rev: 'fade'|'rise'|'drop'|'grow'|'type'|'weight', dur, keep, from (weight for 'weight'), hide (t after which gone), fx(glyph,a) -> extra transform}
@@ -87,10 +87,12 @@ function lyr(t, i, a, b, x, y, o) {
 }
 
 // ---------- geometry ----------
-function rect(x, y, w, h, col, a = 1) { g.globalAlpha = a; g.fillStyle = col; g.fillRect(x, y, w, h); g.globalAlpha = 1 }
-function disc(x, y, r, col, a = 1) { if (r <= 0) return; g.globalAlpha = a; g.fillStyle = col; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); g.globalAlpha = 1 }
-function ring(x, y, r, lw, col, a = 1) { if (r <= 0) return; g.globalAlpha = a; g.strokeStyle = col; g.lineWidth = lw; g.beginPath(); g.arc(x, y, r, 0, 7); g.stroke(); g.globalAlpha = 1 }
-function line(x0, y0, x1, y1, lw, col, a = 1, p = 1) { if (p <= 0) return; g.globalAlpha = a; g.strokeStyle = col; g.lineWidth = lw; g.lineCap = 'butt'; g.beginPath(); g.moveTo(x0, y0); g.lineTo(lerp(x0, x1, p), lerp(y0, y1, p)); g.stroke(); g.globalAlpha = 1 }
+function rect(x, y, w, h, col, a = 1) { g.globalAlpha = a * GA; g.fillStyle = col; g.fillRect(x, y, w, h); g.globalAlpha = GA }
+function disc(x, y, r, col, a = 1) { if (r <= 0) return; g.globalAlpha = a * GA; g.fillStyle = col; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); g.globalAlpha = GA }
+function ring(x, y, r, lw, col, a = 1) { if (r <= 0) return; g.globalAlpha = a * GA; g.strokeStyle = col; g.lineWidth = lw; g.beginPath(); g.arc(x, y, r, 0, 7); g.stroke(); g.globalAlpha = GA }
+function line(x0, y0, x1, y1, lw, col, a = 1, p = 1) { if (p <= 0) return; g.globalAlpha = a * GA; g.strokeStyle = col; g.lineWidth = lw; g.lineCap = 'butt'; g.beginPath(); g.moveTo(x0, y0); g.lineTo(lerp(x0, x1, p), lerp(y0, y1, p)); g.stroke(); g.globalAlpha = GA }
+// withA(a, fn): draw fn() with every primitive's alpha multiplied by a (fades an object made of many parts)
+function withA(a, fn) { if (a <= .002) return; const p = GA; GA = p * a; g.save(); g.globalAlpha = GA; try { fn() } finally { g.restore(); GA = p } }
 function fill(col) { g.fillStyle = col; g.fillRect(-2000, -2000, W + 4000, H + 4000) }
 // a bracket pair drawn as lines: open 0..1 (1 = wide open)
 function brackets(cx, cy, w, h, lw, col, open = 0, a = 1) {

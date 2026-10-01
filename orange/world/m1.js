@@ -13,8 +13,11 @@ const THS = Math.atan2(PB[1] - PA[1], PB[0] - PA[0]);                           
 const pAB = u => [lerp(PA[0], PB[0], u), lerp(PA[1], PB[1], u)], pSC = u => [lerp(PS[0], PC[0], u), lerp(PS[1], PC[1], u)];
 
 // ---------------------------------------------------------------- lights: dark until START, then bank by bank toward the court
-function lightLv(t) { const on = [9.72, 10.95, 12.2, 12.2, 13.1, 13.1];
-  return on.map(t0 => t < t0 ? 0 : eOut(seg(t, t0, .15)) * (1 - .5 * Math.exp(-(t - t0) * 9) * (Math.sin((t - t0) * 80) > 0 ? 1 : 0))) }
+// the drop (172.6 - 174.1) switches them off again, their side first; the last chorus (181.62) brings them all back at once
+const LIGHTS_ON = 181.62;
+function lightLv(t) { const on = [9.72, 10.95, 12.2, 12.2, 13.1, 13.1], off = [174.1, 173.6, 173.1, 173.1, 172.6, 172.6];
+  return on.map((t0, k) => { if (t >= LIGHTS_ON) return eOut(seg(t, LIGHTS_ON, .1)); const v = t < t0 ? 0 : eOut(seg(t, t0, .15)) * (1 - .5 * Math.exp(-(t - t0) * 9) * (Math.sin((t - t0) * 80) > 0 ? 1 : 0));
+    return v * (1 - seg(t, off[k], .12)) }) }
 
 // ---------------------------------------------------------------- the ball's rally over the court
 const US = Array.from({ length: 9 }, (_, k) => .07 + k * .08);                 // where each char of さよならは言わない sits on the serve
@@ -55,79 +58,83 @@ const TOPK = camKeys([
   [cT(1, 7) - .2, 0, 230, .92, 0, .25],                                           // the spike down to our side
   [40.85, PC[0], PC[1], 1.35, 0, .12],
   [41.15, PC[0], PC[1], 2.6, 0, .08],                                             // the dig rushes up into the camera
-  [55.95, 0, 380, 2.6, .3, .01], [56.15, 0, 430, 1.35, .08, .12],                // back on the court for the high five
+  [55.9, 0, 380, 2.6, .3, .01], [56.15, 0, 430, 1.35, .08, .12],                // back on the court for the high five
   [58.3, 0, 330, 1.3, .05, .8],
   [cT(5, 6) - .05, 0, -520, .62, 0, .45],                                         // pull back: the stands and every line so far
   [60.4, 0, -330, .52, -.03, .8]]);
 
 // ---------------------------------------------------------------- the court
 function topWorld(t) {
-  floorTop(t, lightLv(t));
+  g.save(); g.fillStyle = '#0B0E15'; g.fillRect(-7000, -12500, 14000, 18000); g.fillStyle = dots('rgba(255,255,255,.07)', 300, 12); g.fillRect(-7000, -12500, 14000, 18000); g.restore();   // the map around the world
+  floorTop(t, lightLv(t)); corridorFloor(t); arenaFloor(t); scoreboardObj(t, { until: 200 });
   // ORANGE painted on our half; it settles back to a floor logo once the ticket scene starts
-  const ta = t < bb(8) ? 1 : lerp(1, .14, seg(t, bb(8), .6));
+  const ta0 = t < bb(8) ? 1 : lerp(1, .14, seg(t, bb(8), .6)), ta = t < REST ? ta0 : lerp(ta0, .85, eOut(seg(t, REST, 1.2)));
   [['O', -190, 250], ['R', 190, 250], ['A', -190, 560], ['N', 190, 560], ['G', -190, 870], ['E', 190, 870]].forEach(([c, x, y], k) =>
-    stampIn(t, bb(k) - .02, x, y, (R(k, 8) - .5) * .2, () => { if (c === 'O') vball(0, 0, 270, (t - bb(0)) * 1.2, { alpha: ta }); else sticker(c, 0, 20, 320, { fam: UB, w: 900, col: k % 2 ? INK : '#FFFFFF', line: INK, lwk: .1, alpha: ta }) }, { from: 2.6, dur: .1 }));
+    stampIn(t, bb(k) - .02, x, y, (R(k, 8) - .5) * .2, () => { if (c === 'O') vball(0, 0, 270, (t - bb(0)) * 1.2, { alpha: ta }); else sticker(c, 0, 26, 380, { fam: BG, col: [null, ORG, '#FFFFFF', SKY, '#FFFFFF', ORG][k], line: INK, lwk: .1, alpha: ta }) }, { from: 2.6, dur: .1 }));
   if (t > bb(6) && t < bb(9)) stampIn(t, bb(6), 0, 1080, -.06, () => sticker('SPYAIR', 0, 0, 110, { fam: PM, col: '#FFFFFF', line: INK, lwk: .14, alpha: 1 - seg(t, bb(8), .5) }), { from: 1.8 });
   // the locker corner and the phone that loads the match
-  prop('p_shoe', -1200, 1720, 420, .55); emo('🎒', -2000, 2250, 300, -.3); vball(-1380, 2080, 150, .4);
+  prop('p_shoe', -1200, 1720, 420, .55); vball(-1380, 2080, 150, .4);
   phoneObj(t, PHONE1.x, PHONE1.y, PHONE1.r, PHONE1.s, loaderScreen, { glow: 1 - seg(t, 9.72, 2) });
   // the ticket dropped at the entrance
   if (t > bb(8) - .3) { const s = MO.springStep(t - bb(8) + .1, { damping: 11, stiffness: 220 }), k = TICKET.s * (2 - Math.min(1, s));
     g.save(); g.translate(TICKET.x, TICKET.y); g.rotate(TICKET.r); g.scale(k, k); ticketObj(t, eOut(seg(t, bb(14), .4)), eOut(seg(t, bb(10), .4)), () => hanko(t, bb(12), 250, 150, 80, '勝')); g.restore() }
   // the bench: a towel, the phone with the team chat
   rr(1500, -420, 150, 240, 16, '#FFFFFF'); rect(1500, -360, 150, 18, ORG);
-  phoneObj(t, PHONE2.x, PHONE2.y, PHONE2.r, PHONE2.s, T3);
+  phoneObj(t, PHONE2.x, PHONE2.y, PHONE2.r, PHONE2.s, chatScreen2);
   if (t > bb(24) - .2) serveZone(t);
   rallyText(t);
   netTop2(t, (t > cT(1, 9) ? Math.exp(-(t - cT(1, 9)) * 5) : 0) + (t > 40.6 && t < 41.5 ? .6 : 0));
-  if (t > 55.9) highFive(t);
+  if (t > 55.9) withA(fadeOld(61)(t), () => highFive(t));
   ballTop(t, topBall(t));
 }
 // the phone's screen in the intro: the desktop loads the match; START is clicked when the lights come on
 function loaderScreen(t) {
   paper(t, { word: 'ORANGE' });
   FILES.slice(0, 4).forEach(([e, name, x, y], k) => { const s = MO.springStep(t - ACC[k], { damping: 8, stiffness: 300 }); if (s <= .01) return;
-    g.save(); g.translate(x, y); g.scale(s, s); card(-80, -80, 160, 160, 34, '#FFFFFF', { sh: 8 }); emo(e, 0, 0, 104); rr(-95, 96, 190, 46, 23, '#FFFFFF', { line: INK, lw: 3 }); txt(name, 0, 128, { size: 24, w: 800, fam: RD, col: INK, al: 'center', upper: false }); g.restore() });
+    g.save(); g.translate(x, y); g.scale(s, s); card(-80, -80, 160, 160, 34, '#FFFFFF', { sh: 8 }); fileIcon(k, t); rr(-95, 96, 190, 46, 23, '#FFFFFF', { line: INK, lw: 3 }); txt(name, 0, 128, { size: 24, w: 800, fam: RD, col: INK, al: 'center', upper: false }); g.restore() });
   const ws = MO.springStep(t - .6, { damping: 11, stiffness: 200 }), pr = clamp(ACC.slice(0, 4).reduce((a, t0) => a + eOut(seg(t, t0, .9)) / 4, 0) * .9 + .1 * seg(t, 8.2, .9));
-  win(CX, 800, 760, 470, 'ORANGE.exe', { s: ws, rot: .015, draw: (w, h) => { vball(w / 2, 140 - 50 * Math.abs(Math.sin((t - .19) / BEAT * Math.PI)), 130, t * 2);
+  win(CX, 830, 760, 560, 'ORANGE.exe', { s: ws, rot: .015, draw: (w, h) => { vball(w / 2, 140 - 50 * Math.abs(Math.sin((t - .19) / BEAT * Math.PI)), 130, t * 2);
     txt('LOADING THE MATCH', w / 2, 290, { size: 30, w: 800, fam: UB, col: INK, al: 'center', tr: .06 }); progress(60, 320, w - 120, 58, pr, { t }); txt(Math.round(pr * 100) + '%', w - 60, 440, { size: 60, fam: EN, col: ORG, al: 'right', upper: false }) } });
   const click = 9.68, bs = MO.springStep(t - 8.5, { damping: 9, stiffness: 260 });
   if (bs > .01) { g.save(); g.translate(CX, 1210); const pz = t >= click ? .9 : 1; g.scale(bs * pz, bs * pz); card(-190, -58, 380, 116, 58, LIME); txt('START ▶', 0, 20, { size: 52, w: 900, fam: UB, col: INK, al: 'center' }); g.restore() }
   if (t > 8.7) { const p = eIO(seg(t, 8.7, click - 8.82)); cursor(t, lerp(960, CX + 40, p), lerp(1720, 1225, p), { click }) }
-  if (t > click) { flash(t, click, '#FFFFFF', .3); stampIn(t, click + .05, CX, 1500, -.08, () => sticker("LET'S GO!", 0, 0, 120, { fam: UB, w: 900, col: ORG, line: INK }), { from: 2 }) }
+  if (t > click) { flash(t, click, '#FFFFFF', .3); stampIn(t, click + .05, CX, 1500, -.08, () => sticker("LET'S GO!", 0, 0, 150, { fam: BG, col: ORG, line: INK, lwk: .1 }), { from: 2 }) }
 }
 // the service zone: READY?, a count on the floor, the power meter painted behind the server, the toss and the hit
-function serveZone(t) { const x0 = PA[0], y0 = PA[1], a = seg(t, bb(24) - .2, .3);
+function serveZone(t) { const x0 = PA[0], y0 = PA[1], a = seg(t, bb(24) - .2, .3) * fadeOld(S(1) + .4)(t);
   const mx = x0 - 300, my = y0 + 300, mw = 600, u = (t - bb(30)) / BEAT + 1, tri = 1 - Math.abs(((u % 2) + 2) % 2 - 1);
   g.save(); g.globalAlpha = a; card(mx - 10, my - 10, mw + 20, 96, 48, '#FFFFFF', { sh: 8 }); g.beginPath(); g.roundRect(mx, my, mw, 76, 38); g.clip();
   const gr = g.createLinearGradient(mx, 0, mx + mw, 0); gr.addColorStop(0, LIME); gr.addColorStop(.6, YEL); gr.addColorStop(.9, ORG); gr.addColorStop(1, RED); g.fillStyle = gr; g.fillRect(mx, my, mw, 76); g.restore();
   const kx = mx + mw * (t < S(0) ? tri : 1); g.save(); g.globalAlpha = a; g.fillStyle = INK; g.beginPath(); g.moveTo(kx, my - 6); g.lineTo(kx - 26, my - 50); g.lineTo(kx + 26, my - 50); g.fill(); g.fillRect(kx - 4, my, 8, 76); g.restore();
-  txt('POWER', mx, my - 30, { size: 34, w: 900, fam: UB, col: '#FFFFFF', alpha: a });
-  const za = 1 - .65 * seg(t, S(1), .6); if (t < S(0) + .6) stampIn(t, bb(24), x0, y0 - 330, -.06, () => sticker('READY?', 0, 0, 84, { fam: UB, w: 900, col: YEL, line: INK, lwk: .12, alpha: 1 - seg(t, S(0), .5) }), { from: 1.8 });
-  [3, 2, 1].forEach((n, k) => { const t0 = bb(27 + k); if (t < t0 || t > t0 + BEAT) return; stampIn(t, t0, x0 + 230, y0 - 120, 0, () => sticker(String(n), 0, 30, 220, { fam: UB, w: 900, col: '#FFFFFF', line: INK, lwk: .08, alpha: 1 - seg(t, t0 + BEAT * .7, BEAT * .3) }), { from: 1.6, dur: .08 }) });
-  if (t < S(0) + .25) emo('🤚', x0 - 20, y0 + 140, 220, -.2, { alpha: 1 - seg(t, S(0), .25) });
+  txt('POWER', mx, my - 26, { size: 46, fam: BG, col: '#FFFFFF', alpha: a, tr: .06 });
+  const za = 1 - .65 * seg(t, S(1), .6); if (t < S(0) + .6) stampIn(t, bb(24), x0, y0 - 330, -.06, () => sticker('READY?', 0, 0, 120, { fam: BG, col: YEL, line: INK, lwk: .1, alpha: 1 - seg(t, S(0), .5) }), { from: 1.8 });
+  [3, 2, 1].forEach((n, k) => { const t0 = bb(27 + k); if (t < t0 || t > t0 + BEAT) return; stampIn(t, t0, x0 + 230, y0 - 120, 0, () => sticker(String(n), 0, 40, 300, { fam: BG, col: '#FFFFFF', line: INK, lwk: .08, alpha: 1 - seg(t, t0 + BEAT * .7, BEAT * .3) }), { from: 1.6, dur: .08 }) });
+  if (t < S(0) + .25) { g.save(); g.globalAlpha = 1 - seg(t, S(0), .25); handVec(x0 - 10, y0 + 110, .42, 0, 'cup', { col: '#FFFFFF', line: INK }); g.restore() }
   if (t >= S(0) - .02 && t < S(0) + .35) burst(t, x0, y0, 220 * eOut(seg(t, S(0), .1)), '#FFFFFF', { n: 12, line: INK, lw: 6 });
-  if (t >= S(0)) stampIn(t, S(0), x0 + 40, y0 + 230, .06, () => sticker('NICE SERVE!', 0, 0, 62, { fam: UB, w: 900, col: ORG, line: INK, alpha: za }), { from: 1.6 });
+  if (t >= S(0)) stampIn(t, S(0), x0 + 40, y0 + 230, .06, () => sticker('NICE SERVE!', 0, 0, 86, { fam: BG, col: ORG, line: INK, lwk: .1, alpha: za }), { from: 1.6 });
 }
-// verse 1 written by the rally; older lines settle back but stay where they were written (Maps)
-const fadeOld = t0 => t => 1 - .72 * seg(t, t0, .6);
+// verse 1 written by the rally; older lines settle back but stay where they were written (Maps). In the final reveal (REST)
+// every line lights up again.
+const REST = 214.6;
+const fadeOld = t0 => t => { const f = 1 - .8 * seg(t, t0, .6); return t < REST ? f : lerp(f, 1, eOut(seg(t, REST, 1.2))) };
 function rallyText(t) {
-  pathText(t, 0, 0, 9, pAB(US[0]), pAB(US[8]), 125, { rot: THS, fade: fadeOld(S(1) + .4) });
+  pathText(t, 0, 0, 9, pAB(US[0]), pAB(US[8]), 130, { rot: THS, fade: fadeOld(S(1) + .4) });
   lockup(t, { x: L0B[0], y: L0B[1], rot: THS, alpha: fadeOld(S(1) + .4), rows: [{ i: 0, a: 9, b: 11, size: 280, st: 'boil', ent: 'type' }, { i: 0, a: 11, b: 14, size: 150, st: 'heavyO', ent: 'stamp' }] });
-  const pk = wp(L0B[0], L0B[1], 300, -150, THS); if (t > cT(0, 9) - .1) { const s = MO.springStep(t - cT(0, 9), { damping: 9, stiffness: 240 }), x0 = cT(0, 12), q = (a, c) => wp(pk[0], pk[1], a, c, THS);
-    emo('🤙', pk[0], pk[1], 210 * s, THS - .1, { alpha: fadeOld(S(1) + .4)(t) }); sketch([q(-110, -110), q(110, 110)], t, { col: RED, lw: 22, p: eOut(seg(t, x0, .2)), jit: 4 }); sketch([q(110, -110), q(-110, 110)], t, { col: RED, lw: 22, p: eOut(seg(t, x0 + .15, .2)), jit: 4 }) }
+  { const x0 = cT(0, 12), q = (a, c) => wp(L0B[0], L0B[1], a, c, THS), fa = fadeOld(S(1) + .4)(t);   // 約束 crossed out in red
+    sketch([q(-300, -230), q(300, 20)], t, { col: RED, lw: 24, p: eOut(seg(t, x0, .2)), jit: 4, alpha: fa }); sketch([q(300, -230), q(-300, 20)], t, { col: RED, lw: 24, p: eOut(seg(t, x0 + .15, .2)), jit: 4, alpha: fa }) }
   lockup(t, { x: -170, y: -330, rot: 0, alpha: fadeOld(41.0), rows: [{ i: 1, a: 0, b: 2, size: 110, st: 'thin', ent: 'rise' }, { i: 1, a: 2, b: 7, size: 175, st: 'heavy', ent: 'fly' }] });
-  const C = chars(1); [.2, .5, .8].forEach((u, k) => { const [x, y] = pSC(u); hanko(t, C[7 + k].t - .02, x + (k % 2 ? 80 : -80), y, 95, C[7 + k].c, { rot: (k - 1) * .15 }) });
+  withA(fadeOld(41.6)(t), () => { const C = chars(1); [.2, .5, .8].forEach((u, k) => { const [x, y] = pSC(u); hanko(t, C[7 + k].t - .02, x + (k % 2 ? 80 : -80), y, 95, C[7 + k].c, { rot: (k - 1) * .15, fam: MJ }) }) });
 }
 // the high five at the centre, the flood from the stands
 function highFive(t) { const hit = S(5), a = eIn(seg(t, hit - .3, .3)), back = t > hit ? .05 * Math.exp(-(t - hit) * 6) * Math.sin((t - hit) * 30) : 0, cy = 420;
   if (t > hit) { burst(t, 0, cy, 300 * eOut(seg(t, hit, .12)), '#FFFFFF', { n: 12, line: INK, lw: 6 }); const d = t - hit; if (d < .5) for (let k = 0; k < 10; k++) { const an = k / 10 * 6.28; sketch([[Math.cos(an) * (330 + d * 300), cy + Math.sin(an) * (330 + d * 300)], [Math.cos(an) * (430 + d * 300), cy + Math.sin(an) * (430 + d * 300)]], t, { lw: 10, alpha: 1 - d * 2 }) } }
-  emo('🤚', lerp(-900, -170, a) - back * 400, cy, 340, .35); emo('✋', lerp(900, 170, a) + back * 400, cy, 340, -.35);
-  if (t > hit) stampIn(t, hit, 0, 180, -.1, () => sticker('パチン!!', 0, 0, 140, { fam: JP, col: ORG, line: INK, lwk: .12 }), { from: 2 });
+  handVec(lerp(-1000, -150, a) - back * 400, cy + 40, .9, .55, 'open', { col: ORG, line: INK, band: '#FFFFFF' }); handVec(lerp(1000, 150, a) + back * 400, cy + 40, .9, -.55, 'open', { col: '#FFFFFF', line: INK, band: ORG });
+  if (t > hit) stampIn(t, hit, 0, 180, -.1, () => sticker('パチン!!', 0, 0, 170, { fam: SFX, col: ORG, line: INK, lwk: .1 }), { from: 2 });
   lockup(t, { x: 0, y: 780, rows: [{ i: 5, a: 0, b: 5, size: 150, st: 'heavy', ent: 'stamp' }, { i: 5, a: 5, b: 6, size: 220, st: 'heavyO', ent: 'stamp', gap: 10 }] });
   const laugh = cT(5, 6), cry = cT(5, 11);
-  for (let k = 0; k < 16; k++) { const t0 = laugh + k * .05; if (t < t0) continue; const s = MO.springStep(t - t0, { damping: 8, stiffness: 260 }); emo('😂', (R(k, 31) - .5) * 1900, -2350 + R(k, 32) * 1900 - (t - t0) * 120, (220 + R(k, 33) * 160) * s, (R(k, 34) - .5) * .8) }
-  for (let k = 0; k < 12; k++) { const t0 = cry + k * .05; if (t < t0) continue; const s = MO.springStep(t - t0, { damping: 8, stiffness: 260 }); emo('😭', (R(k, 41) - .5) * 1900, -2200 + R(k, 42) * 1900 - (t - t0) * 120, (220 + R(k, 43) * 140) * s, (R(k, 44) - .5) * .8) }
+  for (let k = 0; k < 14; k++) sparkPop(t, laugh + k * .06, (R(k, 31) - .5) * 1700, -1900 + R(k, 32) * 1700, 70 + R(k, 33) * 70, R(k, 34), [YEL, '#FFFFFF', ORG][k % 3]);
+  [[-560, -980, -.2], [520, -1250, .18], [-380, -1500, .1]].forEach(([x, y, r], k) => { if (t > laugh + k * .2) stampIn(t, laugh + k * .2, x, y, r, () => sticker('ハハッ', 0, 0, 150, { fam: SFX, col: YEL, line: INK, lwk: .1 }), { from: 1.8 }) });
+  for (let k = 0; k < 10; k++) { const t0 = cry + k * .07; if (t > t0) dropMark(-500 + k * 110, -120 + (t - t0) * (300 + R(k, 41) * 300), .8, 0, { alpha: 1 - seg(t, t0 + .9, .3) }) }
   lockup(t, { x: 0, y: -600, rows: [{ i: 5, a: 6, b: 11, size: 230, st: 'round', ent: 'fly' }] });
   lockup(t, { x: 0, y: -260, rows: [{ i: 5, a: 11, b: 14, size: 270, st: 'heavyS', ent: 'stamp' }] });
 }
@@ -152,7 +159,7 @@ function sunBall(t) { const kt = cT(2, 7), sy = lerp(-1250, -150, eIO(seg(t, 41.
   const gl = g.createRadialGradient(0, sy, 80, 0, sy, 700); gl.addColorStop(0, 'rgba(255,230,150,.6)'); gl.addColorStop(1, 'rgba(255,230,150,0)'); g.fillStyle = gl; g.fillRect(-1000, sy - 700, 2000, 1400);
   const edge = () => Array.from({ length: 33 }, (_, k) => { const x = 1000 - k * 2000 / 32, dip = Math.max(0, 1 - Math.abs(x) / 330); return [x, lerp(0, cut + (k % 2 ? 18 : -18) * bt, dip)] });
   g.save(); g.beginPath(); g.moveTo(-1000, -3400); g.lineTo(1000, -3400); edge().forEach(([x, y]) => g.lineTo(x, y)); g.closePath(); g.clip(); vball(0, sy, 430, -.15 + (t - 41.3) * .3); g.restore();
-  if (bt > 0) { sketch(edge(), t, { col: LINEC, lw: 10, jit: 2 }); stampIn(t, kt, 300, -560, .18, () => sticker('ガブッ', 0, 0, 130, { fam: JP, col: ORG, line: INK, lwk: .12 }), { from: 2 }) } }
+  if (bt > 0) { sketch(edge(), t, { col: LINEC, lw: 10, jit: 2 }); stampIn(t, kt, 300, -560, .18, () => sticker('ガブッ', 0, 0, 170, { fam: SFX, col: ORG, line: INK, lwk: .1 }), { from: 2 }) } }
 function sideLyrics(t) {
   lockup(t, { x: 0, y: -1000, rows: [{ i: 2, a: 0, b: 5, size: 170, st: 'roundO', ent: 'fly' }] });
   if (t > cT(2, 5) - .05) { txt(lstr(2, 5, 7), 300, -820, { size: 110, fam: HW, w: 600, col: '#FFFFFF', upper: false, alpha: seg(t, cT(2, 5) - .05, .15) }); sketch([[290, -790], [520, -800]], t, { col: '#FFFFFF', lw: 8, p: seg(t, cT(2, 6), .25) }) }
@@ -163,17 +170,16 @@ function sideLyrics(t) {
   // sweat: the chars slide down the floor like drops; 汗と stamped
   const C = chars(4); for (let k = 0; k < 5; k++) { const G = C[k]; if (t < G.t - .03) continue; const x = -400 + k * 200, y0 = 2380 + k * 30, d = t - G.t, y = y0 + 380 * eOut(clamp(d / 1.4)) + 40 * d;
     g.save(); g.globalAlpha = .35; g.strokeStyle = '#FFFFFF'; g.lineWidth = 26; g.lineCap = 'round'; g.beginPath(); g.moveTo(x, y0 - 60); g.lineTo(x, y - 90); g.stroke(); g.restore();
-    stampIn(t, G.t - .03, x, y, (R(k, 6) - .5) * .15, () => sticker(G.c, 0, 0, 160, { fam: RD, w: 800, col: SKY, line: INK, lwk: .14 }), { from: 1.6 }); emoPop(t, G.t + .1, '💧', x + 70, y + 100 + d * 120, 70) }
+    stampIn(t, G.t - .03, x, y, (R(k, 6) - .5) * .15, () => sticker(G.c, 0, 0, 170, { fam: MJ, col: SKY, line: INK, lwk: .14 }), { from: 1.6 }); dropPop(t, G.t + .1, x + 80, y + 110, .9, .15, { fall: 120 }) }
   lockup(t, { x: -60, y: 3000, rows: [{ i: 4, a: 5, b: 6, size: 300, st: 'heavyO', ent: 'stamp' }] }); lockup(t, { x: 230, y: 3060, rows: [{ i: 4, a: 6, b: 7, size: 150, st: 'dark', ent: 'stamp' }] });
-  for (let k = 0; k < 4; k++) emoPop(t, cT(4, 5) + k * .12, '💦', -330 + k * 200, 2820 - (k % 2) * 60, 120, (k - 1.5) * .3);
+  for (let k = 0; k < 5; k++) dropPop(t, cT(4, 5) + k * .1, -360 + k * 180, 2830 - (k % 2) * 70, 1.1, (k - 2) * .35);
   // the voice: 響いた typed, 声 with rings spreading over the floor
   lockup(t, { x: 0, y: 3330, rows: [{ i: 4, a: 7, b: 10, size: 130, st: 'round', ent: 'type' }] });
   const vt = cT(4, 10); if (t > vt - .03) { for (let k = 0; k < 4; k++) { const d = t - vt - k * .22; if (d > 0 && d < 1.3) sketch(ellPts(0, 3620, 170 + d * 360, 160 + d * 330, 1.02, -1, 40), t, { col: '#FFFFFF', lw: 9 * (1 - d / 1.3), alpha: 1 - d / 1.3 }) }
     lockup(t, { x: 0, y: 3620, rows: [{ i: 4, a: 10, b: 11, size: 340, st: 'heavyO', ent: 'stamp' }] }) }
-  emoPop(t, cT(4, 7), '🎙️', 400, 3380, 180, .25);
 }
 // screen-space moments in the side strip: the exposure blows out on 眩しくて
 function sideOverlay(t) { const blow = eIn(seg(t, cT(3, 6) - .15, .35)) * (1 - seg(t, 50.95, .35)); if (blow <= 0) return;
   rect(0, 0, W, H, '#FFFFFF', blow); if (blow > .95) { rays(t, CX, 900, { col: 'rgba(255,216,58,.35)', n: 30 });
-    stampChars(t, 3, 6, 10, k => [200 + k * 225, 900 + (k % 2) * 60, (R(k, 7) - .5) * .25], 230, { fam: JP, col: INK, line: '#FFFFFF', lwk: .1 }); emoPop(t, cT(3, 9) + .15, '😎', 820, 1380, 260, .15) } }
+    stampChars(t, 3, 6, 10, k => [200 + k * 225, 900 + (k % 2) * 60, (R(k, 7) - .5) * .25], 250, { fam: SFX, col: INK, line: '#FFFFFF', lwk: .1 }); for (let k = 0; k < 6; k++) sparkPop(t, cT(3, 6) + k * .12, 160 + R(k, 51) * 760, 500 + R(k, 52) * 900, 60 + R(k, 53) * 50, R(k, 54), YEL) } }
 function topOverlay(t) { flash(t, B0 - .02, '#FFFFFF', .2); flash(t, 55.95, '#FFFFFF', .25) }

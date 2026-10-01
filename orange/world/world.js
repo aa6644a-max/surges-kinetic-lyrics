@@ -13,11 +13,11 @@ const CW2 = 450, CL2 = 900;                                              // half
 const WOOD = '#D89A58', WOODD = '#AE7645', FREEZ = '#5E4230', LINEC = '#FFF6EC', TILE = '#5E6470';
 // light pools on the floor, grouped in banks that switch on in the intro and off in the drop: [x, y, bank]
 const POOLS = [[-1650, 1750, 0], [-1150, 1450, 0], [-450, 1300, 1], [350, 1300, 1], [1000, 1350, 1], [-550, 560, 2], [80, 560, 2], [650, 560, 2],
-  [-550, -160, 3], [80, -160, 3], [650, -160, 3], [1450, 0, 3], [-550, -820, 4], [80, -820, 4], [650, -820, 4], [-550, -1480, 5], [80, -1480, 5], [650, -1480, 5], [0, -1950, 5]];
+  [-550, -160, 3], [80, -160, 3], [650, -160, 3], [1450, 0, 3], [-550, -820, 4], [80, -820, 4], [650, -820, 4], [-550, -1480, 5], [80, -1480, 5], [650, -1480, 5], [0, -1950, 5], [60, 2450, 1], [-700, 2900, 0], [800, 2850, 1]];
 // floorTop(t, lv): lv = light level per bank (0..1)
 function floorTop(t, lv) {
-  rect(-2600, -2900, 5200, 5800, FREEZ);
-  g.save(); g.globalAlpha = .16; g.fillStyle = '#000'; for (let x = -2600; x < 2600; x += 64) g.fillRect(x, -2900, 3, 5800); g.restore();
+  rect(-2600, -2900, 5200, 6600, FREEZ);
+  g.save(); g.globalAlpha = .16; g.fillStyle = '#000'; for (let x = -2600; x < 2600; x += 64) g.fillRect(x, -2900, 3, 6600); g.restore();
   rect(-2300, 1250, 950, 1500, TILE); g.save(); g.globalAlpha = .25; g.strokeStyle = '#000'; g.lineWidth = 3; for (let x = -2300; x < -1350; x += 90) { g.beginPath(); g.moveTo(x, 1250); g.lineTo(x, 2750); g.stroke() } for (let y = 1250; y < 2750; y += 90) { g.beginPath(); g.moveTo(-2300, y); g.lineTo(-1350, y); g.stroke() } g.restore();
   rect(-CW2 - 320, -CL2 - 420, 2 * CW2 + 640, 2 * CL2 + 840, WOODD);
   rect(-CW2, -CL2, 2 * CW2, 2 * CL2, WOOD);
@@ -29,13 +29,13 @@ function floorTop(t, lv) {
   for (const y of [CL2, -CL2]) for (const x of [-CW2, CW2]) { g.beginPath(); g.moveTo(x, y); g.lineTo(x, y + Math.sign(y) * 150); g.stroke() }
   g.restore();
   // walls: windows (west), stands + scoreboard (north), bench (east)
-  rect(-2600, -2900, 260, 5800, '#3B2A22'); for (let y = -2600; y < 2600; y += 420) rect(-2560, y, 180, 320, '#FFD7A0', .85);
+  rect(-2600, -2900, 260, 6600, '#3B2A22'); for (let y = -2600; y < 3400; y += 420) rect(-2560, y, 180, 320, '#FFD7A0', .85);
   rect(-2600, -2900, 5200, 700, '#2C2F3A'); for (let k = 0; k < 6; k++) rect(-2400, -2850 + k * 110, 4800, 70, k % 2 ? '#3A3E4C' : '#343846');
   rect(-420, -2140, 840, 240, '#16171E'); g.save(); g.strokeStyle = '#000'; g.lineWidth = 8; g.strokeRect(-420, -2140, 840, 240); g.restore();
   rect(1480, -620, 170, 1240, '#8A5B34'); for (let y = -600; y < 600; y += 120) rect(1480, y, 170, 6, '#6E4626');
   // light: darkness where unlit, then the pools (additive)
   const avg = lv.reduce((a, c) => a + c, 0) / lv.length;
-  rect(-2600, -2900, 5200, 5800, '#07080C', .9 * (1 - avg));
+  rect(-2600, -2900, 5200, 6600, '#07080C', .9 * (1 - avg));
   g.save(); g.globalCompositeOperation = 'screen';
   for (const [x, y, k] of POOLS) { const a = lv[k]; if (a <= 0) continue; const gr = g.createRadialGradient(x, y, 0, x, y, 520); gr.addColorStop(0, `rgba(255,236,205,${.3 * a})`); gr.addColorStop(1, 'rgba(255,236,205,0)'); g.fillStyle = gr; g.fillRect(x - 520, y - 520, 1040, 1040) }
   g.restore();
@@ -51,6 +51,7 @@ function netTop2(t, wob = 0, a = 1) { g.save(); g.globalAlpha = a;
 // ---------------------------------------------------------------- objects lying in the world
 // a phone lying on the floor; screen(t) paints its 1080x1920 screen (any act-1 scene works)
 function phoneObj(t, x, y, rot, s, screen, o = {}) {
+  if (!vis(x, y, 1200 * s + (o.glow ? 1800 * s : 0))) return;
   g.save(); g.translate(x, y); g.rotate(rot); g.scale(s, s);
   if (o.glow) { const gr = g.createRadialGradient(0, 0, 200, 0, 0, 1800); gr.addColorStop(0, `rgba(170,210,255,${.35 * o.glow})`); gr.addColorStop(1, 'rgba(170,210,255,0)'); g.fillStyle = gr; g.fillRect(-1800, -1800, 3600, 3600) }
   rr(-W / 2 - 30, -H / 2 - 10, W + 120, H + 120, 150, 'rgba(0,0,0,.35)'); rr(-W / 2 - 60, -H / 2 - 60, W + 120, H + 120, 150, '#121217', { line: '#3A3A44', lw: 8 });
@@ -81,6 +82,6 @@ function ballTop(t, bl, o = {}) { if (!bl) return; const s = 1 + bl.h * .16, d =
 function pathText(t, i, a, b2, p0, p1, size, o = {}) { const C = chars(i), n = b2 - a, ang = Math.atan2(p1[1] - p0[1], p1[0] - p0[0]);
   for (let k = 0; k < n; k++) { const G = C[a + k], u = n === 1 ? .5 : k / (n - 1), x = lerp(p0[0], p1[0], u), y = lerp(p0[1], p1[1], u);
     if (t < G.t - .03) continue; const al = o.fade ? o.fade(t) : 1;
-    stampIn(t, G.t - .03, x, y, (o.rot ?? ang) + (R(k, 7) - .5) * (o.wob ?? .12), () => sticker(G.c, 0, 0, size, Object.assign({ fam: JP, col: '#FFFFFF', line: INK, lwk: .12 }, o.st, { alpha: al })), { from: o.from ?? 1.8, dur: .1 }) } }
+    stampIn(t, G.t - .03, x, y, (o.rot ?? ang) + (R(k, 7) - .5) * (o.wob ?? .12), () => sticker(G.c, 0, 0, size, Object.assign({ fam: MJ, col: '#FFFFFF', line: INK, lwk: .14 }, o.st, { alpha: al })), { from: o.from ?? 1.8, dur: .1 }) } }
 // a point offset from (x0, y0) along the screen axes of a camera rolled by `rot` (dx right, dy down on screen)
 const wp = (x0, y0, dx, dy, rot) => [x0 + dx * Math.cos(rot) - dy * Math.sin(rot), y0 + dx * Math.sin(rot) + dy * Math.cos(rot)];

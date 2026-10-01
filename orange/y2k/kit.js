@@ -15,9 +15,9 @@ const loadPlates = () => Promise.all(PLATES.map(id => new Promise(r => { const i
 function cover(id, x, y, w, h, o = {}) { const im = typeof id === 'string' ? PL[id] : id; if (!im) return false;
   const s = Math.max(w / im.width, h / im.height) * (o.zoom ?? 1), iw = im.width * s, ih = im.height * s, fx = o.fx ?? .5, fy = o.fy ?? .5;
   const ix = clamp(x + w / 2 - iw * fx, x + w - iw, x) + (o.dx || 0), iy = clamp(y + h / 2 - ih * fy, y + h - ih, y) + (o.dy || 0);
-  g.save(); g.globalAlpha = o.alpha ?? 1; if (o.filter) g.filter = o.filter; g.drawImage(im, ix, iy, iw, ih); g.restore(); return true }
+  g.save(); g.globalAlpha = (o.alpha ?? 1) * GA; if (o.filter) g.filter = o.filter; g.drawImage(im, ix, iy, iw, ih); g.restore(); return true }
 function prop(id, x, y, w, rot = 0, o = {}) { const im = PL[id]; if (!im) return false; const h = w * im.height / im.width;
-  g.save(); g.translate(x, y); g.rotate(rot); g.scale(o.sx ?? 1, o.sy ?? 1); g.globalAlpha = o.alpha ?? 1; if (o.filter) g.filter = o.filter; if (o.add) g.globalCompositeOperation = 'lighter'; g.drawImage(im, -w / 2, -h / 2, w, h); g.restore(); return true }
+  g.save(); g.translate(x, y); g.rotate(rot); g.scale(o.sx ?? 1, o.sy ?? 1); g.globalAlpha = (o.alpha ?? 1) * GA; if (o.filter) g.filter = o.filter; if (o.add) g.globalCompositeOperation = 'lighter'; g.drawImage(im, -w / 2, -h / 2, w, h); g.restore(); return true }
 
 // ---------------------------------------------------------------- halftone: dot patterns and halftone photos (cached)
 const PATS = {};
@@ -68,7 +68,7 @@ const boil = (t, fps = 8) => Math.floor(t * fps + 1e-6);
 function sketch(P, t, o = {}) { if (!P.length) return; const b = boil(t, o.fps ?? 8), j = o.jit ?? 3.2, p = o.p ?? 1;
   let pts = P; if (p < 1) { const L = [0]; for (let k = 1; k < P.length; k++) L.push(L[k - 1] + Math.hypot(P[k][0] - P[k - 1][0], P[k][1] - P[k - 1][1])); const tot = L[L.length - 1] * clamp(p);
     pts = []; for (let k = 0; k < P.length; k++) { if (L[k] <= tot) pts.push(P[k]); else { const u = (tot - L[k - 1]) / (L[k] - L[k - 1]); pts.push([lerp(P[k - 1][0], P[k][0], u), lerp(P[k - 1][1], P[k][1], u)]); break } } }
-  g.save(); g.strokeStyle = o.col ?? INK; g.lineWidth = o.lw ?? 6; g.lineCap = 'round'; g.lineJoin = 'round'; g.globalAlpha = o.alpha ?? 1;
+  g.save(); g.strokeStyle = o.col ?? INK; g.lineWidth = o.lw ?? 6; g.lineCap = 'round'; g.lineJoin = 'round'; g.globalAlpha = (o.alpha ?? 1) * GA;
   for (let pass = 0; pass < (o.passes ?? 2); pass++) { g.beginPath(); pts.forEach(([x, y], k) => { const dx = (R(k * 3 + pass * 101, b) - .5) * 2 * j, dy = (R(k * 3 + 1 + pass * 101, b) - .5) * 2 * j; k ? g.lineTo(x + dx, y + dy) : g.moveTo(x + dx, y + dy) });
     if (o.closed && p >= 1) g.closePath(); g.stroke() }
   g.restore() }
@@ -85,14 +85,14 @@ function starSticker(t, t0, x, y, r, col, rot = 0) { const s = MO.springStep(t -
 // ---------------------------------------------------------------- type helpers
 // a sticker word: heavy text with a thick white outline and a hard offset shadow (neo-brutal)
 function sticker(s, x, y, size, o = {}) { const fam = o.fam ?? JP, w = o.w ?? 400; font(w, size, fam); setTrack((o.tr ?? 0) * size); g.textAlign = o.al ?? 'center'; g.textBaseline = o.base ?? 'middle'; g.lineJoin = 'round';
-  g.save(); g.globalAlpha = o.alpha ?? 1;
+  g.save(); g.globalAlpha = (o.alpha ?? 1) * GA;
   if (o.shadow !== false) { g.fillStyle = o.shadowCol ?? INK; g.fillText(s, x + size * .06, y + size * .07) }
   if (o.outline !== false) { g.strokeStyle = o.line ?? '#FFFFFF'; g.lineWidth = size * (o.lwk ?? .16); g.strokeText(s, x, y) }
   g.fillStyle = o.col ?? INK; g.fillText(s, x, y); g.restore(); setTrack(0) }
 // stamp(t, t0, draw): slam in on t0 (big -> 1 with a wobble); draw() paints at (0,0)
 function stampIn(t, t0, x, y, rot, draw, o = {}) { const d = t - t0; if (d < -.02) return; const k = Math.max(0, d), dur = o.dur ?? .12;
   const sc = lerp(o.from ?? 2.3, 1, eOut(clamp(k / dur))) * (1 + (k > dur ? .07 * Math.exp(-(k - dur) * 12) * Math.sin((k - dur) * 42) : 0));
-  g.save(); g.translate(x, y); g.rotate(rot + (1 - clamp(k / dur)) * (o.spin ?? .3)); g.scale(sc, sc); g.globalAlpha = clamp(k / .04 + .2) * (o.alpha ?? 1); draw(); g.restore() }
+  g.save(); g.translate(x, y); g.rotate(rot + (1 - clamp(k / dur)) * (o.spin ?? .3)); g.scale(sc, sc); g.globalAlpha = clamp(k / .04 + .2) * (o.alpha ?? 1) * GA; draw(); g.restore() }
 // lyric chars stamped one by one on their sung times along a list of positions
 function stampChars(t, i, a, b, pos, size, o = {}) { const C = chars(i); for (let k = a; k < b; k++) { const G = C[k], [x, y, rot] = pos(k - a); if (o.hide != null && t > o.hide) continue;
   stampIn(t, G.t - .03, x, y, rot ?? 0, () => sticker(G.c, 0, 0, size, o), o) } }
@@ -106,7 +106,7 @@ function emo(ch, x, y, size, rot = 0, o = {}) { if (size <= 1) return; g.save();
 function emoPop(t, t0, ch, x, y, size, rot = 0, o = {}) { const s = MO.springStep(t - t0, { damping: o.damping ?? 8, stiffness: o.stiffness ?? 300 }); if (s <= .01) return; emo(ch, x, y + (1 - Math.min(1, s)) * 60, size * s, rot + (o.wig ? Math.sin((t - t0) * 9) * .12 : 0), o) }
 
 // ---------------------------------------------------------------- UI: rounded boxes, bubbles, windows, cursor, progress
-function rr(x, y, w, h, r, fill, o = {}) { g.save(); g.globalAlpha = o.alpha ?? 1; g.beginPath(); g.roundRect(x, y, w, h, r); if (fill) { g.fillStyle = fill; g.fill() } if (o.line) { g.lineWidth = o.lw ?? 4; g.strokeStyle = o.line; g.stroke() } g.restore() }
+function rr(x, y, w, h, r, fill, o = {}) { g.save(); g.globalAlpha = (o.alpha ?? 1) * GA; g.beginPath(); g.roundRect(x, y, w, h, r); if (fill) { g.fillStyle = fill; g.fill() } if (o.line) { g.lineWidth = o.lw ?? 4; g.strokeStyle = o.line; g.stroke() } g.restore() }
 // neo-brutal card: solid offset shadow + outline
 function card(x, y, w, h, r, fill, o = {}) { rr(x + (o.sh ?? 12), y + (o.sh ?? 12) + 2, w, h, r, o.shCol ?? INK, { alpha: o.alpha }); rr(x, y, w, h, r, fill, { line: o.line ?? INK, lw: o.lw ?? 5, alpha: o.alpha }) }
 // chat bubble: me (right, lime) / them (left, white); returns its height. text may contain emoji
@@ -119,7 +119,7 @@ function bubble(x, y, text, o = {}) { const size = o.size ?? 46, me = !!o.me, fa
   return ph }
 function typingDots(t, x, y, o = {}) { rr(x, y, 150, 84, 42, o.col ?? '#FFFFFF'); for (let k = 0; k < 3; k++) disc(x + 42 + k * 33, y + 42 - 10 * Math.max(0, Math.sin(t * 9 - k * .8)), 10, GREY) }
 // a flat retro window; draw(w, h) paints the content (origin at the content's top-left)
-function win(x, y, w, h, title, o = {}) { const s = o.s ?? 1; if (s <= .001) return; g.save(); g.translate(x, y); g.rotate(o.rot ?? 0); g.scale(s, s); g.globalAlpha = o.alpha ?? 1;
+function win(x, y, w, h, title, o = {}) { const s = o.s ?? 1; if (s <= .001) return; g.save(); g.translate(x, y); g.rotate(o.rot ?? 0); g.scale(s, s); g.globalAlpha = (o.alpha ?? 1) * GA;
   const L = -w / 2, T = -h / 2; rr(L + 14, T + 16, w, h, 22, INK); rr(L, T, w, h, 22, o.bg ?? '#FFFFFF', { line: INK, lw: 5 });
   g.save(); g.beginPath(); g.roundRect(L, T, w, 70, [22, 22, 0, 0]); g.fillStyle = o.bar ?? SKY; g.fill(); g.restore(); line(L, T + 70, L + w, T + 70, 5, INK);
   [RED, YEL, LIME].forEach((c, k) => { disc(L + 40 + k * 38, T + 35, 12, c); ring(L + 40 + k * 38, T + 35, 12, 3, INK) });

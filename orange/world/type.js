@@ -2,21 +2,24 @@
    a hand-written accent — built char by char on the sung syllables, each row with its own entrance:
    fly (scattered letters assemble), stamp, drop, type, rise (out of a mask). Styles come from ST or an object. */
 const ST = {
-  heavy: { fam: JP, col: '#FFFFFF', line: INK, lwk: .12 },
-  heavyO: { fam: JP, col: ORG, line: INK, lwk: .1 },
-  heavyY: { fam: JP, col: YEL, line: INK, lwk: .1 },
-  heavyS: { fam: JP, col: SKY, line: INK, lwk: .1 },
-  dark: { fam: JP, col: INK, line: '#FFFFFF', lwk: .1 },
-  thin: { fam: RD, w: 500, col: '#FFFFFF', outline: false, shadow: false, tr: .14 },
-  thinD: { fam: RD, w: 500, col: INK, outline: false, shadow: false, tr: .14 },
-  round: { fam: RD, w: 800, col: '#FFFFFF', line: INK, lwk: .14 },
-  roundO: { fam: RD, w: 800, col: ORG, line: INK, lwk: .14 },
+  heavy: { fam: MJ, col: '#FFFFFF', line: INK, lwk: .14 },
+  heavyO: { fam: SFX, col: ORG, line: INK, lwk: .1 },
+  heavyY: { fam: SFX, col: YEL, line: INK, lwk: .1 },
+  heavyS: { fam: SFX, col: SKY, line: INK, lwk: .1 },
+  dark: { fam: MJ, col: INK, line: '#FFFFFF', lwk: .12 },
+  thin: { fam: MJ, col: '#FFFFFF', outline: false, shadow: false, tr: .1 },
+  thinD: { fam: MJ, col: INK, outline: false, shadow: false, tr: .1 },
+  round: { fam: MJ, col: '#FFFFFF', line: INK, lwk: .14 },
+  roundO: { fam: SFX, col: ORG, line: INK, lwk: .1 },
+  sfx: { fam: SFX, col: '#FFFFFF', line: INK, lwk: .1 },
   hand: { fam: HW, w: 600, col: INK, outline: false, shadow: false },
   handW: { fam: HW, w: 600, col: '#FFFFFF', outline: false, shadow: false },
-  boil: { fam: JP, col: '#FFFFFF', boil: true },
+  boil: { fam: MJ, col: '#FFFFFF', boil: true },
 };
 // lockup(t, { x, y, rot, s, al, alpha(t), rows: [{ i, a, b, size, st, ent, gap, dx, dy, wob, from, lh }] }) -> world box
 function lockup(t, L) {
+  { const m = g.getTransform(), r = L.rows.reduce((a, r2) => a + ((r2.b ?? chars(r2.i).length) - r2.a) * r2.size, 0) * (L.s ?? 1) * Math.max(Math.hypot(m.a, m.b), Math.hypot(m.c, m.d)),
+      sx = m.a * L.x + m.c * L.y + m.e, sy = m.b * L.x + m.d * L.y + m.f; if (sx < -r || sx > W + r || sy < -r || sy > H + r) return null }   // off screen: skip
   const rows = L.rows.map(r => { const st = Object.assign({}, typeof r.st === 'string' ? ST[r.st] : (r.st ?? ST.heavy), r.col ? { col: r.col } : {}); const C = chars(r.i).slice(r.a, r.b ?? chars(r.i).length);
     font(st.w ?? 400, r.size, st.fam); setTrack(0); const tr = (st.tr ?? 0) * r.size, ws = C.map(G => g.measureText(G.c).width + tr), sp = C.map((G, k) => k && G.sp ? r.size * .3 : 0);
     return { r, st, C, ws, sp, width: ws.reduce((a, c) => a + c, 0) + sp.reduce((a, c) => a + c, 0) - tr, h: r.size * (r.lh ?? 1.1) } });
@@ -41,4 +44,4 @@ function drawChar(t, t0, c, x, y, r, st, k, ri, alpha) {
 }
 // a boiling outline glyph (hand-drawn double stroke, redrawn 8 times a second)
 function boilChar(t, c, x, y, size, st, a) { const b0 = boil(t); font(400, size, st.fam ?? JP); g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round';
-  g.save(); g.globalAlpha = a; g.strokeStyle = st.col ?? '#FFFFFF'; g.lineWidth = size * .028; for (let p = 0; p < 2; p++) g.strokeText(c, x + (R(p + 3, b0) - .5) * size * .03, y + (R(p + 9, b0) - .5) * size * .03); g.restore() }
+  g.save(); g.globalAlpha = a * GA; g.strokeStyle = st.col ?? '#FFFFFF'; g.lineWidth = size * .028; for (let p = 0; p < 2; p++) g.strokeText(c, x + (R(p + 3, b0) - .5) * size * .03, y + (R(p + 9, b0) - .5) * size * .03); g.restore() }

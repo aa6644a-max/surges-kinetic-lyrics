@@ -18,3 +18,7 @@ body.render #cv { left: 0; top: 0 }
 #bar button { width: 44px; height: 36px; border: 1px solid #333; background: #16131e; color: #fff; border-radius: 6px }
 #rng { flex: 1 }
 #lab { width: 70px; text-align: right }
+/* manga typography for the world version */
+@font-face { font-family: "Shippori Antique B1"; src: url("../fonts/ShipporiAntiqueB1-Regular.ttf") format("truetype"); font-display: block }
+@font-face { font-family: "Potta One"; src: url("../fonts/PottaOne-Regular.ttf") format("truetype"); font-display: block }
+@font-face { font-family: "Bangers"; src: url("../fonts/Bangers-Regular.ttf") format("truetype"); font-display: block }
