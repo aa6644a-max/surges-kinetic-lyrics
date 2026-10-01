@@ -6,9 +6,10 @@
 
 const SIDEL = [450, 780], SIDET = [450, -780], BASEL = [700, -1010], BASER = [-900, -1010];
 const pL15 = u => [lerp(SIDEL[0], SIDET[0], u), lerp(SIDEL[1], SIDET[1], u)], pL16 = u => [lerp(BASEL[0], BASER[0], u), lerp(BASEL[1], BASER[1], u)];
-const CONT = { x: -1500, y: -1350, r: -Math.PI / 2 };
+const CONT = ANIME ? { x: 20, y: 1480, r: -Math.PI / 2 } : { x: -1500, y: -1350, r: -Math.PI / 2 };   // anime: the serving area, inside the painted gym
 const DOTS = [[-320, 820], [-20, 600], [300, 800], [330, 380], [0, 230], [-310, 420]];
-const BOARD = { x: 1900, y: -1500 };
+const BOARD = ANIME ? { x: 0, y: -1260 } : { x: 1900, y: -1500 };
+let BOARD_W = 1560;                                                                  // the painted board sprite's width (fitted after generation)
 // a follow camera along a line of lyric chars: the frame sits on the char being sung (until tEnd, when the next move starts)
 function lineFollow(i, a, b2, pt, rot, z, tEnd, dt = .1, st = .3) { const C = chars(i), n = b2 - a; return followKeys(C[a].t - .25, Math.min(tEnd, C[b2 - 1].t + .4), t => { let k = 0; while (k < n - 1 && t > C[a + k + 1].t) k++; const u0 = k / (n - 1), u1 = Math.min(1, (k + 1) / (n - 1)), f = k < n - 1 ? clamp((t - C[a + k].t) / (C[a + k + 1].t - C[a + k].t)) : 0, [x, y] = pt(lerp(u0, u1, f)); return { x, y, z, r: rot } }, dt, st) }
 const TOPK3 = camKeys([
@@ -60,7 +61,7 @@ function topM3(t) {
     lockup(t, { x: 40, y: 190, alpha: fa, rows: [{ i: 20, a: 5, b: 11, size: 100, st: 'thinD', ent: 'rise' }] }) }
   // REPLAY: the spike again in slow motion; きっと twice in brush lettering; the stands chant
   if (t > 136.3 && t < 156.4) { const ph = ((t - 136.5) / 4.8) % 1, u = eIO(clamp(ph * 1.25)); ballTop(t, { x: lerp(-650, PK[0], u), y: lerp(-1600, PK[1], u), h: lerp(9, .3, u) + 3 * Math.sin(u * Math.PI) });
-    for (let k = 0; k < 6; k++) { const tb = onBeat(Math.floor(beatN(t)) - k); if (t - tb < .5 && tb > 136.5) stampIn(t, tb, (R(Math.round(beatN(tb)), 3) - .5) * 1800, -2350 + R(Math.round(beatN(tb)), 4) * 300, (R(Math.round(beatN(tb)), 5) - .5) * .3, () => sticker('KITTO!!', 0, 0, 120, { fam: BG, col: k % 2 ? YEL : '#FFFFFF', line: INK, lwk: .1, alpha: 1 - (t - tb) / .5 }), { from: 1.6 }) } }
+    for (let k = 0; k < 6; k++) { const tb = onBeat(Math.floor(beatN(t)) - k); if (t - tb < .5 && tb > 136.5) stampIn(t, tb, (R(Math.round(beatN(tb)), 3) - .5) * 1800, (ANIME ? -2040 + R(Math.round(beatN(tb)), 4) * 240 : -2350 + R(Math.round(beatN(tb)), 4) * 300), (R(Math.round(beatN(tb)), 5) - .5) * .3, () => sticker('KITTO!!', 0, 0, 120, { fam: BG, col: k % 2 ? YEL : '#FFFFFF', line: INK, lwk: .1, alpha: 1 - (t - tb) / .5 }), { from: 1.6 }) } }
   lockup(t, { x: 0, y: 330, rot: -.12, alpha: fadeOld(146), rows: [{ i: 21, a: 0, b: 3, size: 420, st: 'heavyO', ent: 'stamp' }] });
   lockup(t, { x: 0, y: -1250, rot: .95, alpha: fadeOld(156), rows: [{ i: 22, a: 0, b: 3, size: 420, st: 'heavyY', ent: 'stamp' }] });
   // TIMEOUT: the whiteboard in marker
@@ -76,8 +77,9 @@ function topM3(t) {
 // the whiteboard: a court diagram, magnets, marker writing; red ✕, a flower circle (花丸), a ring for oh
 const MARK = { fam: MK, col: INK, outline: false, shadow: false };
 function boardObj(t) {
-  rr(-640 + 18, -470 + 22, 1280, 940, 20, 'rgba(0,0,0,.35)'); rr(-660, -490, 1320, 980, 26, '#B9BEC8', { line: INK, lw: 8 }); rr(-620, -450, 1240, 900, 14, '#FBFBF8');
-  g.save(); g.globalAlpha = .35 * GA; g.strokeStyle = '#7A8090'; g.lineWidth = 5; g.strokeRect(-580, -410, 1160, 380); g.restore(); line(0, -410, 0, -30, 5, '#7A8090', .35);
+  if (ANIME && PL.s_board_top) { rr(-640 + 18, -470 + 22, 1280, 940, 20, 'rgba(0,0,0,.3)'); prop('s_board_top', 0, 0, BOARD_W, 0) }   // the painted board
+  else { rr(-640 + 18, -470 + 22, 1280, 940, 20, 'rgba(0,0,0,.35)'); rr(-660, -490, 1320, 980, 26, '#B9BEC8', { line: INK, lw: 8 }); rr(-620, -450, 1240, 900, 14, '#FBFBF8');
+    g.save(); g.globalAlpha = .35 * GA; g.strokeStyle = '#7A8090'; g.lineWidth = 5; g.strokeRect(-580, -410, 1160, 380); g.restore(); line(0, -410, 0, -30, 5, '#7A8090', .35) }
   [[-420, -300, ORG], [-260, -160, '#FFFFFF'], [220, -320, ORG], [420, -150, '#FFFFFF']].forEach(([x, y, c]) => { disc(x, y, 26, c); ring(x, y, 26, 5, INK) });
   if (t > 155.7 && t < 158) stampIn(t, 155.7, 0, -250, -.06, () => sticker('TIME OUT', 0, 0, 150, { fam: BG, col: ORG, line: INK, lwk: .1, alpha: 1 - seg(t, 157.2, .5) }), { from: 1.8 });
   lockup(t, { x: -560, y: -340, al: 'left', rows: [{ i: 23, a: 0, b: 7, size: 100, st: MARK, ent: 'type' }] });

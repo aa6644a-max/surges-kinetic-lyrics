@@ -40,7 +40,9 @@ function birdV(x, y, s, flap) { g.save(); g.translate(x, y); g.scale(s, s); g.st
 function padlock(x, y, s) { g.save(); g.translate(x, y); g.scale(s, s); g.lineWidth = 16; g.strokeStyle = INK; g.beginPath(); g.arc(0, -30, 46, Math.PI, 0); g.stroke(); rr(-70, -30, 140, 110, 18, YEL, { line: INK, lw: 8 }); disc(0, 18, 14, INK); rect(-5, 18, 10, 32, INK); g.restore() }
 function thermo(x, y, s, p) { g.save(); g.translate(x, y); g.scale(s, s); rr(-40, -420, 80, 470, 40, '#FFFFFF', { line: INK, lw: 8 }); disc(0, 80, 70, '#FFFFFF'); ring(0, 80, 70, 8, INK);
   const h = 380 * clamp(p); rr(-22, 30 - h, 44, h + 30, 22, RED); disc(0, 80, 52, RED); for (let k = 0; k < 6; k++) line(40, -360 + k * 64, 70, -360 + k * 64, 6, INK); g.restore() }
-function jerseyObj(x, y, s, rot, num) { g.save(); g.translate(x, y); g.rotate(rot); g.scale(s, s);
+function jerseyObj(x, y, s, rot, num) { if (ANIME && PL.s_jersey_top) { prop('s_jersey_top', x, y, 760 * s, rot); g.save(); g.translate(x, y); g.rotate(rot); g.scale(s, s);   // the painted jersey + its number
+    sticker(String(num), 0, 30, 300, { fam: BG, col: '#FFFFFF', line: 'rgba(40,20,10,.35)', lwk: .05, shadow: false }); g.restore(); return }
+  g.save(); g.translate(x, y); g.rotate(rot); g.scale(s, s);
   g.beginPath(); g.moveTo(-170, -260); g.lineTo(-60, -300); g.quadraticCurveTo(0, -260, 60, -300); g.lineTo(170, -260); g.lineTo(280, -150); g.lineTo(200, -60); g.lineTo(160, -110); g.lineTo(160, 300); g.lineTo(-160, 300); g.lineTo(-160, -110); g.lineTo(-200, -60); g.lineTo(-280, -150); g.closePath();
   g.fillStyle = ORG; g.fill(); g.lineWidth = 10; g.strokeStyle = INK; g.stroke(); rect(-160, 210, 320, 26, INK); rect(-160, 250, 320, 10, '#FFFFFF');
   txt(String(num), 0, 120, { size: 300, fam: BG, col: '#FFFFFF', al: 'center', upper: false }); g.restore() }

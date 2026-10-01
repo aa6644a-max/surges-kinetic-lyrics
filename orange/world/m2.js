@@ -6,15 +6,17 @@
 // ---------------------------------------------------------------- shared objects
 // the scoreboard on the north wall: two flip cards a side; SCORE = [time, home, away, label]
 const SCORE = [[0, '00', '00', ''], [84.4, '01', '00', 'NICE KILL!'], [94.47, '24', '23', 'SET POINT'], [210.3, '24', '23', 'MATCH POINT'], [213.5, '25', '23', '']];   // GAME SET is stamped where the ball lands (m4)
-const SB = { x: 0, y: -2030 };
+const SB = ANIME ? { x: 6, y: -1904, s: .6 } : { x: 0, y: -2030, s: 1 };           // anime: over the painted scoreboard panel
+const JER = ANIME ? { x: 760, y: -620 } : { x: 1560, y: 260 }, OMI = ANIME ? { x: -850, y: -420 } : { x: -1650, y: -430 };   // the jersey, the おみくじ
+const KOKO = ANIME ? SB.y + 520 : SB.y + 560;                                       // ここまで来たんだよ, under the scoreboard
 function scoreAt(t) { let k = 0; for (let j = 0; j < SCORE.length; j++) if (t >= SCORE[j][0]) k = j; return [SCORE[k], SCORE[Math.max(0, k - 1)]] }
 // o: { dx, dy } to place another board (the arena's), until: freeze the score after that time
-function scoreboardObj(t, o = {}) { const tt = Math.min(t, o.until ?? 1e9), [cur, prev] = scoreAt(tt), t0 = cur[0], x = SB.x + (o.dx ?? 0), y = SB.y + (o.dy ?? 0); if (!vis(x, y, 700)) return;
+function scoreboardObj(t, o = {}) { const tt = Math.min(t, o.until ?? 1e9), [cur, prev] = scoreAt(tt), t0 = cur[0], x = SB.x + (o.dx ?? 0), y = SB.y + (o.dy ?? 0), sc = o.s ?? (o.dx || o.dy ? 1 : SB.s); if (!vis(x, y, 700 * sc)) return; g.save(); g.translate(x, y); g.scale(sc, sc); g.translate(-x, -y);
   rr(x - 560 + 16, y - 230 + 20, 1120, 440, 30, 'rgba(0,0,0,.4)'); rr(x - 560, y - 230, 1120, 440, 30, '#15161E', { line: '#000', lw: 10 });
   txt('HOME', x - 280, y - 150, { size: 64, fam: BG, col: ORG, al: 'center', tr: .1 }); txt('AWAY', x + 280, y - 150, { size: 64, fam: BG, col: '#FFFFFF', al: 'center', tr: .1 });
   for (let k = 0; k < 2; k++) { flipCard(x - 380 + k * 200, y + 40, 180, 250, prev[1][k], cur[1][k], t0 + k * .08, tt); flipCard(x + 180 + k * 200, y + 40, 180, 250, prev[2][k], cur[2][k], t0 + .16 + k * .08, tt) }
   txt(':', x, y + 110, { size: 200, fam: BG, col: '#FFFFFF', al: 'center', alpha: Math.floor((t - B0) / BEAT) % 2 ? 1 : .4 });
-  if (cur[3] && tt > t0) stampIn(tt, t0 + .2, x, y + 300, -.04, () => sticker(cur[3], 0, 0, 120, { fam: BG, col: cur[3] === 'GAME SET' ? YEL : ORG, line: INK, lwk: .1 }), { from: 1.8 }) }
+  if (cur[3] && tt > t0) stampIn(tt, t0 + .2, x, y + 300, -.04, () => sticker(cur[3], 0, 0, 120, { fam: BG, col: cur[3] === 'GAME SET' ? YEL : ORG, line: INK, lwk: .1 }), { from: 1.8 }); g.restore() }
 // the 1-second timer: a ring around whatever sits inside it; p = remaining (0..1); the +1秒 button pressed on `clicks`
 function timerObj(t, x, y, s, p, o = {}) { g.save(); g.translate(x, y); g.scale(s, s);
   g.save(); g.lineCap = 'round'; ring(0, 0, 360, 40, 'rgba(30,30,40,.55)'); g.strokeStyle = o.col ?? ORG; g.lineWidth = 40; g.beginPath(); g.arc(0, 0, 360, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * clamp(p)); g.stroke(); g.restore();
@@ -74,11 +76,12 @@ function skyOverlay(t, c) { skyClouds(t, c, true); flash(t, cT(9, 9), '#FFFFFF',
 const PK = [80, -520];                                                               // where our spike lands: their libero digs it
 const TOPK2 = camKeys([
   [80.45, PK[0], PK[1] - 200, 2.0, -.12, .01], [80.85, PK[0], PK[1] - 260, 1.05, -.05, .25],
-  [82.75, SB.x, SB.y + 100, .82, 0, .16], [86.6, SB.x, SB.y + 120, .86, 0, 1.0],                      // the scoreboard: 01 - 00
-  [87.95, 1520, 30, 1.0, 0, .16], [93.9, 1500, 20, 1.08, 0, 1.2],                                       // the bench: the jersey
-  [S(12) - .14, SB.x, SB.y + 200, .8, 0, .15], [97.6, SB.x, SB.y + 230, .86, 0, 1.0],                  // set point
-  [S(13) - .14, -1650, -430, 1.05, .12, .16], [102.9, -1650, -430, 1.12, .12, 1.0],                     // the おみくじ
-  [S(14) - .1, 0, -350, .5, 0, .35], [S(14) + 1.6, 0, -350, .3, -.02, .6], [cT(14, 7) - .1, 0, -300, .22, 0, .5]]);   // the reveal
+  ...(ANIME ? [[82.75, SB.x, SB.y + 400, 1.15, 0, .16], [86.6, SB.x, SB.y + 420, 1.2, 0, 1.0]] : [[82.75, SB.x, SB.y + 100, .82, 0, .16], [86.6, SB.x, SB.y + 120, .86, 0, 1.0]]),   // the scoreboard: 01 - 00
+  [87.95, JER.x - 80, JER.y - 230, 1.0, 0, .16], [93.9, JER.x - 80, JER.y - 240, 1.08, 0, 1.2],         // the bench: the jersey
+  ...(ANIME ? [[S(12) - .14, SB.x, SB.y + 480, 1.05, 0, .15], [97.6, SB.x, SB.y + 500, 1.1, 0, 1.0]] : [[S(12) - .14, SB.x, SB.y + 200, .8, 0, .15], [97.6, SB.x, SB.y + 230, .86, 0, 1.0]]),   // set point
+  [S(13) - .14, OMI.x, OMI.y, 1.05, .12, .16], [102.9, OMI.x, OMI.y, 1.12, .12, 1.0],                   // the おみくじ
+  ...(ANIME ? [[S(14) - .1, -62, 100, .6, 0, .35], [S(14) + 1.6, -62, 120, .44, -.02, .6], [cT(14, 7) - .1, -62, 180, .4, 0, .5]]
+    : [[S(14) - .1, 0, -350, .5, 0, .35], [S(14) + 1.6, 0, -350, .3, -.02, .6], [cT(14, 7) - .1, 0, -300, .22, 0, .5]])]);   // the reveal
 function topM2(t) {
   if (t < 80.4) return;
   // the spike lands where their libero digs it; きっと stamped; the long vowel multiplies as shock rings
@@ -90,23 +93,23 @@ function topM2(t) {
   const t0 = cT(10, 2) + .25; if (t > t0) { const n = Math.min(14, Math.floor((t - t0) / .11) + 1), fa = fadeOld(87)(t); for (let k = 0; k < n; k++) { const a = -Math.PI / 2 + (k - 6.5) * .26, r = 560 + (k % 2) * 120, s = MO.springStep(t - t0 - k * .11, { damping: 9, stiffness: 400 });
       g.save(); g.translate(Math.cos(a) * r, -900 + Math.sin(a) * r * .55 + 260); g.rotate(a + Math.PI / 2); g.scale(s, s); sticker('ー', 0, 0, 180, { fam: SFX, col: INK, line: '#FFFFFF', lwk: .1, alpha: fa }); g.restore() } }
   // the jersey on the bench: a big dream copied onto a small back
-  if (t > 87.6) { const s = MO.springStep(t - 87.8, { damping: 11, stiffness: 200 }); jerseyObj(1560, 260, .95 * Math.min(1.05, s), -.06, 1);
-    lockup(t, { x: 1560, y: 160, alpha: fadeOld(S(12) - .1), rows: [{ i: 11, a: 0, b: 6, size: 70, st: 'thin', ent: 'type' }] });
-    lockup(t, { x: 1490, y: -330, rot: -.04, alpha: fadeOld(S(12) - .1), rows: [{ i: 11, a: 6, b: 11, size: 230, st: 'heavyO', ent: 'stamp' }, { i: 11, a: 11, b: 14, size: 110, st: 'thin', ent: 'rise', gap: 10 }] });
+  if (t > 87.6) { const s = MO.springStep(t - 87.8, { damping: 11, stiffness: 200 }); jerseyObj(JER.x, JER.y, .95 * Math.min(1.05, s), -.06, 1);
+    lockup(t, { x: JER.x, y: JER.y - 100, alpha: fadeOld(S(12) - .1), rows: [{ i: 11, a: 0, b: 6, size: 70, st: 'thin', ent: 'type' }] });
+    lockup(t, { x: JER.x - 70, y: JER.y - 590, rot: -.04, alpha: fadeOld(S(12) - .1), rows: [{ i: 11, a: 6, b: 11, size: 230, st: 'heavyO', ent: 'stamp' }, { i: 11, a: 11, b: 14, size: 110, st: 'thin', ent: 'rise', gap: 10 }] });
     const wsS = MO.springStep(t - (cT(11, 6) + .1), { damping: 10, stiffness: 220 }), pr = eIO(seg(t, cT(11, 9), cT(11, 13) - cT(11, 9) + .3));
-    if (wsS > .01) win(1560, -760, 620, 300, 'COPY', { s: wsS, rot: .03, draw: (w, h) => { txt('大きな夢.zip  999 GB', 40, 70, { size: 34, w: 800, fam: RD, col: INK, upper: false }); txt('→ 小さな背中', 40, 120, { size: 30, w: 500, fam: RD, col: GREY, upper: false }); progress(40, 150, w - 80, 46, pr, { t }); txt(pr >= 1 ? 'DONE!' : Math.round(pr * 100) + '%', w - 40, 70, { size: 40, fam: BG, col: ORG, al: 'right' }) } }) }
+    if (wsS > .01) win(JER.x, JER.y - 1020, 620, 300, 'COPY', { s: wsS, rot: .03, draw: (w, h) => { txt('大きな夢.zip  999 GB', 40, 70, { size: 34, w: 800, fam: RD, col: INK, upper: false }); txt('→ 小さな背中', 40, 120, { size: 30, w: 500, fam: RD, col: GREY, upper: false }); progress(40, 150, w - 80, 46, pr, { t }); txt(pr >= 1 ? 'DONE!' : Math.round(pr * 100) + '%', w - 40, 70, { size: 40, fam: BG, col: ORG, al: 'right' }) } }) }
   // ここまで来たんだよ — under the scoreboard
-  lockup(t, { x: SB.x, y: SB.y + 560, alpha: fadeOld(S(13) - .1), rows: [{ i: 12, a: 0, b: 4, size: 200, st: 'heavy', ent: 'fly' }, { i: 12, a: 4, b: 9, size: 120, st: 'thin', ent: 'rise', gap: 8 }] });
+  lockup(t, { x: SB.x, y: KOKO, alpha: fadeOld(S(13) - .1), rows: [{ i: 12, a: 0, b: 4, size: 200, st: 'heavy', ent: 'fly' }, { i: 12, a: 4, b: 9, size: 120, st: 'thin', ent: 'rise', gap: 8 }] });
   // the おみくじ: a slip unrolls — 未来, small luck
-  if (t > S(13) - .3) { const u = eOut(seg(t, S(13) - .1, .9)); g.save(); g.translate(-1650, -430); g.rotate(.12);
+  if (t > S(13) - .3) { const u = eOut(seg(t, S(13) - .1, .9)); g.save(); g.translate(OMI.x, OMI.y); g.rotate(.12);
     rr(-150, -520, 300, 1040 * u, 10, '#FFFDF6', { line: INK, lw: 6 }); if (u > .1) { rect(-150, -520, 300, 90, RED); txt('おみくじ', 0, -460, { size: 44, w: 800, fam: RD, col: '#FFFFFF', al: 'center', upper: false }) }
     if (u > .6) { txt('小吉', 0, -260, { size: 150, fam: MJ, col: INK, al: 'center', upper: false }); for (let k = 0; k < 6; k++) line(-110, -120 + k * 60, 110, -120 + k * 60, 4, GREY, .6) } g.restore();
-    lockup(t, { x: -1650, y: -1050, rot: .12, alpha: fadeOld(S(14)), rows: [{ i: 13, a: 0, b: 5, size: 120, st: 'thin', ent: 'rise' }, { i: 13, a: 5, b: 7, size: 260, st: 'heavyS', ent: 'stamp' }] });
-    lockup(t, { x: -1600, y: 260, rot: .12, alpha: fadeOld(S(14)), rows: [{ i: 13, a: 7, b: 15, size: 110, st: 'hand', col: '#FFFFFF', ent: 'type' }] }) }
+    lockup(t, { x: OMI.x, y: OMI.y - 620, rot: .12, alpha: fadeOld(S(14)), rows: [{ i: 13, a: 0, b: 5, size: 120, st: 'thin', ent: 'rise' }, { i: 13, a: 5, b: 7, size: 260, st: 'heavyS', ent: 'stamp' }] });
+    lockup(t, { x: OMI.x + 50, y: OMI.y + 690, rot: .12, alpha: fadeOld(S(14)), rows: [{ i: 13, a: 7, b: 15, size: 110, st: 'hand', col: '#FFFFFF', ent: 'type' }] }) }
   // 楽しかったよね, written across the whole court; 全てが — every line so far gets a tick
   lockup(t, { x: 0, y: -60, rot: -.32, alpha: fadeOld(108.3), rows: [{ i: 14, a: 0, b: 7, size: 320, st: 'heavy', ent: 'fly' }] });
   if (t > cT(14, 7) - .05) withA(fadeOld(108.3)(t), () => { CHECKS.forEach(([x, y], k) => { const t0 = cT(14, 7) + k * .07; if (t > t0) sketch([[x - 60, y], [x - 10, y + 60], [x + 90, y - 80]], t, { col: k % 2 ? YEL : RED, lw: 26, p: eOut(seg(t, t0, .2)), jit: 4 }) });
     lockup(t, { x: 0, y: 650, rows: [{ i: 14, a: 7, b: 10, size: 520, st: 'heavyY', ent: 'stamp' }] }) })
 }
 // where every earlier line sits (ticked on 全てが)
-const CHECKS = [[200, 560], [-1180, 1060], [-1650, 1880], [1290, 160], [60, 1500], [-80, 300], [-30, -760], [-170, -330], [100, 230], [0, 780], [0, -600], [0, -900], [1560, 260], [0, -1500], [-1650, -430]];
+const CHECKS = [[200, 560], [TICKET.x, TICKET.y], [PHONE1.x, PHONE1.y], [PHONE2.x, PHONE2.y], [60, 1500], [-80, 300], [-30, -760], [-170, -330], [100, 230], [0, 780], [0, -600], [0, -900], [JER.x, JER.y], [SB.x, KOKO], [OMI.x, OMI.y]];

@@ -7,9 +7,14 @@
    time: GAME SET. Then the whole world with every line lit again and the route drawn through it like a map, the last きっと
    written down the corridor, and up through the clouds into the dawn: credits. */
 
-const SV = [60, 2500];                                                                   // the far service line of our gym
-const COR = { x0: -560, x1: 560, y0: -6500, y1: -2200 };                                 // the corridor north out of the gym
+const SV = ANIME ? [60, 1560] : [60, 2500];                                              // the far service line of our gym
 const AR = { x: 0, y: -8200 }, ARB = { x0: -2000, x1: 2000, y0: -10400, y1: -6000 };    // the arena court (teal) and its hall
+// the painted arena, placed so its court lines sit exactly on AR: measured lines x 355.6 / 668.5, y 390 / 1000
+const ARENA = { x: AR.x - 450 - 355.6 * 900 / 312.9, y: AR.y - 900 - 390 * 1800 / 610, w: 1024 * 900 / 312.9, h: 1536 * 1800 / 610 };
+const ARENA_FZ = [-1194, -9782, 1193, -6512];                                           // its free zone (inside the barrier)
+const COR = ANIME ? { x0: -560, x1: 560, y0: ARENA.y + ARENA.h, y1: GYM.y } : { x0: -560, x1: 560, y0: -6500, y1: -2200 };   // the corridor north out of the gym
+const NEXT_Y = ANIME ? -6120 : -6290, KITTO_C = ANIME ? (COR.y0 + COR.y1) / 2 : -4100;   // the NEXT STAGE bar; the middle of the last きっと
+const WORLD_Z = ANIME ? Math.min(1080 / ARENA.w, 1920 / (GYM.y + GYM.h - ARENA.y)) * .97 : .138, WORLD_Y = ANIME ? (ARENA.y + GYM.y + GYM.h) / 2 : -3350;
 const SPK = [60, -8080], LAND = [-180, -8780], SET0 = [-160, -7760];                    // the final spike, where it lands, the setter
 const TGO = cT(29, 9), GSET = 213.5, ARON = S(33), CLICKS4 = [cT(28, 6) - .02, cT(28, 8) - .02], DAWN0 = 224.5;
 
@@ -39,15 +44,19 @@ const TOPK4 = camKeys([
   [S(31) - .1, 0, -4250, .95, 0, .3], [200.9, 0, -4450, 1.0, 0, 2.0],                                 // ふいに恋しく: polaroids
   [S(32) - .1, 0, -5250, .95, 0, .3], [205.9, 0, -5650, 1.0, 0, 1.4],                                 // 立ち止まらないで 振り返らないで
   [ARON - .05, 0, -6650, .9, 0, .25], [208.8, 0, -6900, .95, 0, 1.2],                                 // into the arena
-  [209.3, 0, -8100, .5, 0, .45],                                                                      // match point: the whole court
+  [209.3, 0, ANIME ? -8250 : -8100, ANIME ? .48 : .5, 0, .45],                                      // match point: the whole court
   [S(34) - .1, SPK[0], SPK[1] - 50, 1.2, 0, .14], [211.4, -20, -8380, 1.25, 0, .8], [213.3, -150, -8700, 1.35, 0, .8],   // the final spike
   [GSET, LAND[0], LAND[1], 1.5, 0, .08], [GSET + .35, LAND[0], LAND[1] + 20, 1.2, 0, .5],             // GAME SET
-  [REST, 0, -3350, .138, 0, 2.0],                                                                     // the whole world
-  [S(35) - .05, 0, -4000, .155, 0, .2], [221.3, 0, -3800, .145, 0, 1.2],                              // the last きっと
-  [223.1, 0, -3600, .07, 0, 1.4]]);                                                                   // up through the clouds
+  [REST, 0, WORLD_Y, WORLD_Z, 0, 2.0],                                                               // the whole world
+  [S(35) - .05, 0, KITTO_C, WORLD_Z * 1.12, 0, .2], [221.3, 0, KITTO_C + 200, WORLD_Z * 1.05, 0, 1.2], // the last きっと
+  [223.1, 0, KITTO_C + 400, WORLD_Z * .5, 0, 1.4]]);                                                                   // up through the clouds
 
 // ---------------------------------------------------------------- the corridor and the arena (floors)
-function corridorFloor(t) { if (!vis(0, -4350, 2600)) return; const { x0, x1, y0, y1 } = COR, w = x1 - x0, h = y1 - y0;
+function corridorFloor(t) { const { x0, x1, y0, y1 } = COR, w = x1 - x0, h = y1 - y0; if (!vis(0, (y0 + y1) / 2, h / 2 + 900)) return;
+  const im = ANIME && PL.w_corridor; if (im) {   // the painted corridor, repeated north from the gym with every other section flipped so the seams match
+    const sh = w * im.height / im.width; g.save(); g.beginPath(); g.rect(x0, y0, w, h); g.clip();
+    for (let k = 0, y = y1; y > y0; k++, y -= sh) { g.save(); g.translate(0, y - sh / 2); if (k % 2) g.scale(1, -1); g.drawImage(im, x0, -sh / 2, w, sh); g.restore() } g.restore();
+    const avg = seg(t, 191.35, .8); if (avg < 1) rect(x0, y0, w, h, '#07080C', .6 * (1 - avg)); return }
   rect(x0 - 90, y0, w + 180, h, '#0A0D16'); rect(x0, y0, w, h, '#1B2236');
   g.save(); g.globalAlpha = .14 * GA; g.fillStyle = '#000'; for (let y = y0; y < y1; y += 140) g.fillRect(x0, y, w, 4); g.restore();
   line(x0 + 120, y0, x0 + 120, y1, 10, '#FFFFFF', .5); line(x1 - 120, y0, x1 - 120, y1, 10, '#FFFFFF', .5);
@@ -69,7 +78,18 @@ function arenaTex() { if (ARTEX) return ARTEX; const k = .5, c = document.create
     for (let j = 0; j < 3200; j++) { const [x, y] = standPt(j + 1000); disc(x, y, 10 + R(j, 203) * 8, [ORG, '#FFFFFF', SKY, YEL, '#E8E1D6', TEAL, '#F58FB0'][j % 7], .8) } GA = ga });
   return ARTEX = c }
 const arenaLv = t => t < ARON - .02 ? 0 : eOut(seg(t, ARON - .02, .25));
-function arenaFloor(t) { if (!vis(0, -8200, 3100)) return; const lv = arenaLv(t);
+// a point in the painted arena's stands (the ring between the image edge and the free-zone barrier)
+function standPtA(k) { const s = Math.floor(R(k, 302) * 4), u = R(k, 303), v = R(k, 304), [fx0, fy0, fx1, fy1] = ARENA_FZ, X0 = ARENA.x + 60, X1 = ARENA.x + ARENA.w - 60, Y0 = ARENA.y + 60, Y1 = ARENA.y + ARENA.h - 60;
+  if (s === 0) return [lerp(X0, X1, u), lerp(Y0, fy0 - 40, v)]; if (s === 1) return [lerp(X0, X1, u) * (Math.abs(lerp(X0, X1, u)) < 260 ? 3 : 1), lerp(fy1 + 40, Y1, v)];
+  return [s === 2 ? lerp(fx1 + 40, X1, v) : lerp(X0, fx0 - 40, v), lerp(fy0, fy1, u)] }
+function arenaFloor(t) { const lv = arenaLv(t);
+  if (ANIME && PL.w_arena_lit) { if (!vis(0, ARENA.y + ARENA.h / 2, ARENA.h / 2 + 1500)) return;
+    g.drawImage(PL.w_arena_lit, ARENA.x, ARENA.y, ARENA.w, ARENA.h);
+    if (lv < 1) { g.save(); g.globalCompositeOperation = 'multiply'; g.globalAlpha = .9 * (1 - lv); g.fillStyle = '#1A2240'; g.fillRect(ARENA.x, ARENA.y, ARENA.w, ARENA.h); g.restore() }
+    scoreboardObj(t, { dx: 0 - SB.x, dy: -10088 - SB.y, s: .6 });
+    if (lv > 0) { const nf = t < 210.3 ? 16 : t < GSET ? 40 : 90; for (let k = 0; k < nf; k++) { const ph = (t * 1.7 + R(k, 301)) % 1; if (ph > .1) continue; const [x, y] = standPtA(k); sparkle(x, y, 60 * Math.sin(ph / .1 * Math.PI), 0, '#FFFFFF', lv) } }
+    return }
+  if (!vis(0, -8200, 3100)) return;
   g.drawImage(arenaTex(), ARB.x0, ARB.y0, 4000, 4400);
   rect(-1500, -9900, 3000, 3400, '#C96A2E'); g.save(); g.globalAlpha = .1 * GA; g.fillStyle = '#000'; for (let x = -1500; x < 1500; x += 50) g.fillRect(x, -9900, 3, 3400); g.restore();
   rect(-450, -9100, 900, 1800, '#159A8E'); g.save(); g.globalAlpha = .08 * GA; g.fillStyle = '#FFFFFF'; for (let x = -450; x < 450; x += 45) g.fillRect(x, -9100, 2, 1800); g.restore();
@@ -109,13 +129,13 @@ function noUturn(x, y, s) { if (s <= .01) return; g.save(); g.translate(x, y); g
   g.save(); g.globalAlpha = GA; g.strokeStyle = INK; g.lineWidth = 26; g.lineCap = 'round'; g.beginPath(); g.moveTo(40, 70); g.lineTo(40, -10); g.arc(-5, -10, 45, 0, Math.PI, true); g.lineTo(-50, 30); g.stroke();
   g.fillStyle = INK; g.beginPath(); g.moveTo(-88, 24); g.lineTo(-12, 24); g.lineTo(-50, 84); g.closePath(); g.fill(); g.restore(); line(-104, -104, 104, 104, 28, RED); g.restore() }
 // the NEXT STAGE bar at the end of the corridor
-function nextStage(t) { const t0 = 204.9, s = MO.springStep(t - t0, { damping: 11, stiffness: 220 }); if (s <= .01 || !vis(0, -6290, 600)) return; const p = eIO(seg(t, t0 + .25, ARON - t0 - .3));
-  g.save(); g.translate(0, -6290); g.scale(Math.min(1.05, s), Math.min(1.05, s)); card(-400, -110, 800, 220, 30, '#15161E', { sh: 12, line: '#000' });
+function nextStage(t) { const t0 = 204.9, s = MO.springStep(t - t0, { damping: 11, stiffness: 220 }); if (s <= .01 || !vis(0, NEXT_Y, 600)) return; const p = eIO(seg(t, t0 + .25, ARON - t0 - .3));
+  g.save(); g.translate(0, NEXT_Y); g.scale(Math.min(1.05, s), Math.min(1.05, s)); card(-400, -110, 800, 220, 30, '#15161E', { sh: 12, line: '#000' });
   txt('NEXT STAGE', -350, -38, { size: 66, fam: BG, col: YEL, tr: .04 }); txt(p >= 1 ? 'GO!' : Math.round(p * 100) + '%', 350, -38, { size: 60, fam: BG, col: '#FFFFFF', al: 'right' });
   progress(-350, 4, 700, 62, p, { t, col: TEAL }); g.restore() }
 // the route of the whole song, drawn over the world like a map, with pins at every scene
-const ROUTE = [[-1650, 1880], [0, 560], [-1180, 1060], [1290, 160], [60, 1180], [-200, -700], [-150, -130], [200, 650], [0, 420], [80, -520], [0, -1800], [1560, 260], [-1650, -430],
-  [450, 780], [450, -780], [700, -1010], [-900, -1010], [-1500, -1350], [-20, 600], [0, -560], [0, 0], [1900, -1500], [0, 430], [60, 2500], [0, -2400], [0, -6300], [60, -8080], [-180, -8780]];
+const ROUTE = [[PHONE1.x, PHONE1.y], [0, 560], [TICKET.x, TICKET.y], [PHONE2.x, PHONE2.y], [60, 1180], [-200, -700], [-150, -130], [200, 650], [0, 420], [80, -520], [SB.x, SB.y + 230 * SB.s], [JER.x, JER.y], [OMI.x, OMI.y],
+  [450, 780], [450, -780], [700, -1010], [-900, -1010], [CONT.x, CONT.y], [-20, 600], [0, -560], [0, 0], [BOARD.x, BOARD.y], [0, 430], [SV[0], SV[1]], [0, COR.y1 - 200], [0, COR.y0 + 200], [60, -8080], [-180, -8780]];
 const ROUTE_L = (() => { const L = [0]; for (let k = 1; k < ROUTE.length; k++) L.push(L[k - 1] + Math.hypot(ROUTE[k][0] - ROUTE[k - 1][0], ROUTE[k][1] - ROUTE[k - 1][1])); return L })();
 function mapPin(x, y, r, col) { g.save(); g.translate(x, y); g.beginPath(); g.moveTo(0, 0); g.lineTo(-r * .62, -r * 1.25); g.arc(0, -r * 1.6, r * .75, Math.PI * .8, Math.PI * .2); g.closePath(); g.globalAlpha = GA; g.fillStyle = col; g.fill(); g.lineWidth = r * .16; g.strokeStyle = '#FFFFFF'; g.stroke(); disc(0, -r * 1.6, r * .3, '#FFFFFF'); g.restore() }
 function routeLine(t) { const p = eIO(seg(t, REST + .3, 4.2)); if (p <= 0) return; const tot = ROUTE_L[ROUTE_L.length - 1] * p;
@@ -171,7 +191,7 @@ function topM4(t) {
     if (d < 4) confetti(t, GSET + .1, LAND[0], LAND[1] - 120, { n: 150, spread: 1.6 }) }
   // the whole world: the route, then the last きっと written down the corridor between the two halls
   routeLine(t);
-  chars(35).forEach((G, k) => { if (t < G.t - .03) return; stampIn(t, G.t - .03, 0, -6100 + k * 2000, (R(k, 9) - .5) * .1, () => sticker(G.c, 0, 0, 1900, { fam: SFX, col: k === 1 ? '#FFFFFF' : ORG, line: INK, lwk: .07 }), { from: 1.7, dur: .14 }) });
+  chars(35).forEach((G, k) => { if (t < G.t - .03) return; stampIn(t, G.t - .03, 0, KITTO_C - 2000 + k * 2000, (R(k, 9) - .5) * .1, () => sticker(G.c, 0, 0, 1900, { fam: SFX, col: k === 1 ? '#FFFFFF' : ORG, line: INK, lwk: .07 }), { from: 1.7, dur: .14 }) });
   ballTop(t, ball4(t), { d: 150 });
 }
 // screen space: flashes, the dash streaks, focus lines on the slow spike, the clouds we rise through

@@ -45,4 +45,6 @@ function drawChar(t, t0, c, x, y, r, st, k, ri, alpha) {
 }
 // a boiling outline glyph (hand-drawn double stroke, redrawn 8 times a second)
 function boilChar(t, c, x, y, size, st, a) { const b0 = boil(t); font(400, size, st.fam ?? JP); g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round';
-  g.save(); g.globalAlpha = a * GA; g.strokeStyle = st.col ?? '#FFFFFF'; g.lineWidth = size * .028; for (let p = 0; p < 2; p++) g.strokeText(c, x + (R(p + 3, b0) - .5) * size * .03, y + (R(p + 9, b0) - .5) * size * .03); g.restore() }
+  g.save(); g.globalAlpha = a * GA;
+  if (ANIME) { g.strokeStyle = 'rgba(20,16,30,.55)'; g.lineWidth = size * .09; g.strokeText(c, x, y) }   // a dark backing so the outline reads on the painted floor
+  g.strokeStyle = st.col ?? '#FFFFFF'; g.lineWidth = size * .028; for (let p = 0; p < 2; p++) g.strokeText(c, x + (R(p + 3, b0) - .5) * size * .03, y + (R(p + 9, b0) - .5) * size * .03); g.restore() }

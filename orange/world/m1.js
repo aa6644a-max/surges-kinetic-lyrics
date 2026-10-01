@@ -8,7 +8,8 @@
 
 const bb = n => onBeat(n);                                                       // (the Y2K act 1 already owns b)
 const PA = [60, 1180], PB = [-200, -700], PS = [-150, -130], PC = [200, 650];   // server, receive, setter, our dig
-const PHONE1 = { x: -1650, y: 1880, r: -.12, s: .34 }, PHONE2 = { x: 1290, y: 160, r: -.45, s: .34 }, TICKET = { x: -1180, y: 1060, r: .32, s: .62 };
+const PHONE1 = ANIME ? { x: -880, y: 1930, r: -.12, s: .3 } : { x: -1650, y: 1880, r: -.12, s: .34 }, PHONE2 = ANIME ? { x: 780, y: 120, r: -.3, s: .34 } : { x: 1290, y: 160, r: -.45, s: .34 },
+  TICKET = ANIME ? { x: -800, y: 1180, r: .32, s: .62 } : { x: -1180, y: 1060, r: .32, s: .62 };
 const THS = Math.atan2(PB[1] - PA[1], PB[0] - PA[0]);                            // the serve's direction: the camera rolls to it
 const pAB = u => [lerp(PA[0], PB[0], u), lerp(PA[1], PB[1], u)], pSC = u => [lerp(PS[0], PC[0], u), lerp(PS[1], PC[1], u)];
 
@@ -40,11 +41,9 @@ function topBall(t) {
 const L0B = wp(PB[0], PB[1], 30, 330, THS);                                        // the receive's lockup sits below the landing spot on screen
 function serveCam(t) { const bl = topBall(t) || { x: PA[0], y: PA[1] }; return { x: bl.x + Math.cos(THS) * 170, y: bl.y + Math.sin(THS) * 170, z: 1.05, r: THS } }
 const TOPK = camKeys([
-  [0, PHONE1.x, PHONE1.y, 2.75, PHONE1.r, .3],
-  [9.72, -1480, 1760, 1.2, -.05, .35],                                           // START: pull back over the locker corner
-  [10.95, -950, 1300, .64, 0, .4],
-  [12.2, -480, 650, .47, 0, .4],
-  [13.1, 0, 0, .38, 0, .3],                                                      // the whole gym, lit
+  [0, PHONE1.x, PHONE1.y, 2.75 * .34 / PHONE1.s, PHONE1.r, .3],
+  ...(ANIME ? [[9.72, -880, 1850, 1.25, -.05, .35], [10.95, -560, 1350, .66, 0, .4], [12.2, -260, 650, .5, 0, .4], [13.1, -62, 185, .42, 0, .3]]   // the painted gym
+    : [[9.72, -1480, 1760, 1.2, -.05, .35], [10.95, -950, 1300, .64, 0, .4], [12.2, -480, 650, .47, 0, .4], [13.1, 0, 0, .38, 0, .3]]),           // START: pull back step by step to the whole gym, lit
   [13.6, 0, 560, .95, -.06, .12],                                                // whip down onto our half: ORANGE
   [16.6, 0, 560, 1.02, .03, 1.2],
   [bb(8) - .12, TICKET.x, TICKET.y, 1.6, TICKET.r, .14],
@@ -66,24 +65,24 @@ const TOPK = camKeys([
 // ---------------------------------------------------------------- the court
 function topWorld(t) {
   g.save(); g.fillStyle = '#0B0E15'; g.fillRect(-7000, -12500, 14000, 18000); g.fillStyle = dots('rgba(255,255,255,.07)', 300, 12); g.fillRect(-7000, -12500, 14000, 18000); g.restore();   // the map around the world
-  floorTop(t, lightLv(t)); corridorFloor(t); arenaFloor(t); scoreboardObj(t, { until: 200 });
+  if (ANIME) floorAnime(t, lightLv(t)); else floorTop(t, lightLv(t)); corridorFloor(t); arenaFloor(t); scoreboardObj(t, { until: 200 });
   // ORANGE painted on our half; it settles back to a floor logo once the ticket scene starts
   const ta0 = t < bb(8) ? 1 : 1 - seg(t, bb(8), .6), ta = t < REST ? ta0 : lerp(ta0, .85, eOut(seg(t, REST, 1.2)));
   [['O', -190, 250], ['R', 190, 250], ['A', -190, 560], ['N', 190, 560], ['G', -190, 870], ['E', 190, 870]].forEach(([c, x, y], k) =>
     stampIn(t, bb(k) - .02, x, y, (R(k, 8) - .5) * .2, () => { if (c === 'O') vball(0, 0, 270, (t - bb(0)) * 1.2, { alpha: ta }); else sticker(c, 0, 26, 380, { fam: BG, col: [null, ORG, '#FFFFFF', SKY, '#FFFFFF', ORG][k], line: INK, lwk: .1, alpha: ta }) }, { from: 2.6, dur: .1 }));
   if (t > bb(6) && t < bb(9)) stampIn(t, bb(6), 0, 1080, -.06, () => sticker('SPYAIR', 0, 0, 110, { fam: PM, col: '#FFFFFF', line: INK, lwk: .14, alpha: 1 - seg(t, bb(8), .5) }), { from: 1.8 });
   // the locker corner and the phone that loads the match
-  prop('p_shoe', -1200, 1720, 420, .55); vball(-1380, 2080, 150, .4);
+  if (ANIME) { prop('s_shoes_top', -1110, 1690, 300, .25); prop('s_bag_top', -470, 2150, 520, -.12); vball(-700, 1610, 120, .4) } else { prop('p_shoe', -1200, 1720, 420, .55); vball(-1380, 2080, 150, .4) }
   phoneObj(t, PHONE1.x, PHONE1.y, PHONE1.r, PHONE1.s, loaderScreen, { glow: 1 - seg(t, 9.72, 2) });
   // the ticket dropped at the entrance
   if (t > bb(8) - .3) { const s = MO.springStep(t - bb(8) + .1, { damping: 11, stiffness: 220 }), k = TICKET.s * (2 - Math.min(1, s));
     g.save(); g.translate(TICKET.x, TICKET.y); g.rotate(TICKET.r); g.scale(k, k); ticketObj(t, eOut(seg(t, bb(14), .4)), eOut(seg(t, bb(10), .4)), () => hanko(t, bb(12), 250, 150, 80, '勝')); g.restore() }
   // the bench: a towel, the phone with the team chat
-  rr(1500, -420, 150, 240, 16, '#FFFFFF'); rect(1500, -360, 150, 18, ORG);
+  if (!ANIME) { rr(1500, -420, 150, 240, 16, '#FFFFFF'); rect(1500, -360, 150, 18, ORG) }
   phoneObj(t, PHONE2.x, PHONE2.y, PHONE2.r, PHONE2.s, chatScreen2);
   if (t > bb(24) - .2) serveZone(t);
   rallyText(t);
-  netTop2(t, (t > cT(1, 9) ? Math.exp(-(t - cT(1, 9)) * 5) : 0) + (t > 40.6 && t < 41.5 ? .6 : 0));
+  if (!ANIME) netTop2(t, (t > cT(1, 9) ? Math.exp(-(t - cT(1, 9)) * 5) : 0) + (t > 40.6 && t < 41.5 ? .6 : 0));
   if (t > 55.9) withA(fadeOld(61)(t), () => highFive(t));
   ballTop(t, topBall(t));
 }
@@ -103,8 +102,8 @@ function loaderScreen(t) {
 // the service zone: READY?, a count on the floor, the power meter painted behind the server, the toss and the hit
 function serveZone(t) { const x0 = PA[0], y0 = PA[1], a = seg(t, bb(24) - .2, .3) * fadeOld(S(1) + .4)(t);
   const mx = x0 - 300, my = y0 + 300, mw = 600, u = (t - bb(30)) / BEAT + 1, tri = 1 - Math.abs(((u % 2) + 2) % 2 - 1);
-  g.save(); g.globalAlpha = a; card(mx - 10, my - 10, mw + 20, 96, 48, '#FFFFFF', { sh: 8 }); g.beginPath(); g.roundRect(mx, my, mw, 76, 38); g.clip();
-  const gr = g.createLinearGradient(mx, 0, mx + mw, 0); gr.addColorStop(0, LIME); gr.addColorStop(.6, YEL); gr.addColorStop(.9, ORG); gr.addColorStop(1, RED); g.fillStyle = gr; g.fillRect(mx, my, mw, 76); g.restore();
+  withA(a, () => { card(mx - 10, my - 10, mw + 20, 96, 48, '#FFFFFF', { sh: 8 }); g.save(); g.beginPath(); g.roundRect(mx, my, mw, 76, 38); g.clip();
+  const gr = g.createLinearGradient(mx, 0, mx + mw, 0); gr.addColorStop(0, LIME); gr.addColorStop(.6, YEL); gr.addColorStop(.9, ORG); gr.addColorStop(1, RED); g.fillStyle = gr; g.fillRect(mx, my, mw, 76); g.restore() });
   const kx = mx + mw * (t < S(0) ? tri : 1); g.save(); g.globalAlpha = a; g.fillStyle = INK; g.beginPath(); g.moveTo(kx, my - 6); g.lineTo(kx - 26, my - 50); g.lineTo(kx + 26, my - 50); g.fill(); g.fillRect(kx - 4, my, 8, 76); g.restore();
   txt('POWER', mx, my - 26, { size: 46, fam: BG, col: '#FFFFFF', alpha: a, tr: .06 });
   const za = fadeOld(S(1))(t); if (t < S(0) + .6) stampIn(t, bb(24), x0, y0 - 330, -.06, () => sticker('READY?', 0, 0, 120, { fam: BG, col: YEL, line: INK, lwk: .1, alpha: 1 - seg(t, S(0), .5) }), { from: 1.8 });

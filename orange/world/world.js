@@ -3,7 +3,26 @@
    Everything is drawn in world coordinates; the camera (cam.js) decides what the frame shows. */
 
 Ln = window.D.lines;                                                              // the camera keys in m1.js read lyric times when they load
+// the painted world (anime background art, top-down) is the default; ?vector shows the drawn floor of the first version
+const ANIME = !/vector/.test(location.search);
+if (ANIME) PLATES.push('w_gym_lit', 'w_arena_lit', 'w_corridor', 's_shoes_top', 's_bag_top', 's_jersey_top', 's_board_top');
 
+// the painted gym, placed so its court lines sit exactly on the code court (±450, ±900): measured lines x 357.5 / 716.4, y 398 / 1011.5
+const GYM = { x: -450 - 357.5 * 900 / 358.9, y: -900 - 398 * 1800 / 613.5, w: 1024 * 900 / 358.9, h: 1536 * 1800 / 613.5 };
+const LOCKER = [GYM.x, 1532, -632, GYM.y + GYM.h];                                    // the locker corner (light bank 0)
+// the light banks as bands across the painted gym, south (locker corner first) to north
+const BANDS = [LOCKER, [GYM.x, 900, GYM.x + GYM.w, GYM.y + GYM.h], [GYM.x, 300, GYM.x + GYM.w, 900], [GYM.x, -300, GYM.x + GYM.w, 300], [GYM.x, -900, GYM.x + GYM.w, -300], [GYM.x, GYM.y, GYM.x + GYM.w, -900]];
+function floorAnime(t, lv) { const im = PL.w_gym_lit; if (!im) return floorTop(t, lv);
+  g.drawImage(im, GYM.x, GYM.y, GYM.w, GYM.h);
+  // a bank that is off: the painting multiplied toward night navy (the south band leaves the locker corner to bank 0)
+  g.save(); g.globalCompositeOperation = 'multiply'; g.fillStyle = '#1A2240';
+  BANDS.forEach(([x0, y0, x1, y1], k) => { const d = 1 - lv[k]; if (d <= .002) return; g.globalAlpha = .93 * d; g.beginPath(); g.rect(x0, y0, x1 - x0, y1 - y0);
+    if (k === 1) g.rect(LOCKER[0], LOCKER[1], LOCKER[2] - LOCKER[0], LOCKER[3] - LOCKER[1]); g.fill('evenodd') });
+  g.restore();
+  // dust drifting in the window light
+  const avg = lv.reduce((a, c) => a + c, 0) / lv.length, dust = PL.p_dust; if (dust && avg > 0) { g.save(); g.globalCompositeOperation = 'screen';
+    [[-760, -1100, 1300], [-700, 150, 1400], [-620, 1350, 1200]].forEach(([x, y, w], k) => { g.globalAlpha = .55 * avg * (.6 + .4 * Math.sin(t * .9 + k * 2)); const h = w * dust.height / dust.width;
+      g.drawImage(dust, x + 60 * Math.sin(t * .23 + k) - w / 2, y + 40 * Math.cos(t * .19 + k * 3) - h / 2, w, h) }); g.restore() } }
 // a plate pre-blurred once (canvas filters are too slow to run on big images every frame)
 const BLURC = {};
 function blurred(id, px, w, h) { const k = [id, px, w, h].join('|'); if (BLURC[k]) return BLURC[k]; const im = PL[id]; if (!im) return null; const c = document.createElement('canvas'); c.width = Math.round(w / 2); c.height = Math.round(h / 2); const x = c.getContext('2d'); x.filter = `blur(${px}px)`; x.drawImage(im, 0, 0, c.width, c.height); return BLURC[k] = c }
