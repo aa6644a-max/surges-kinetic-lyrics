@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sailing My Sea Kinetic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@900&family=Black+Han+Sans&family=Bungee&display=swap" rel="stylesheet">
+<style>
+:root{--acc:#ff6a2b;--acc2:#ffd23d;--hi:#fff36b;--ink:#0b2a5b}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:#000;overflow:hidden}
+#cv{position:absolute;left:50%;top:50%;width:1080px;height:1920px;transform-origin:0 0;overflow:hidden;background:#5cc6ff;font-family:"Noto Sans KR",sans-serif;font-weight:900;color:#fff}
+.L{position:absolute;inset:0;pointer-events:none}
+#sun{position:absolute;left:0;top:0;width:560px;height:560px;margin:-280px 0 0 -280px;border-radius:50%}
+.star{position:absolute;left:0;top:0;width:5px;height:5px;border-radius:50%;background:#fff}
+.cloud{position:absolute;left:0;top:0;width:360px;height:150px}
+.gull{position:absolute;left:0;top:0;width:70px;height:30px}
+#sea{position:absolute;left:0;top:0;width:1080px;height:1920px}
+#world{position:absolute;left:540px;top:820px;width:0;height:0}
+#rays,#speed{position:absolute;left:-1500px;top:-1500px;width:3000px;height:3000px;opacity:0}
+#rays{background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.9) 0deg 2deg,transparent 2deg 12deg);-webkit-mask:radial-gradient(circle,transparent 5%,#000 18%,rgba(0,0,0,.3) 40%,transparent 58%);mask:radial-gradient(circle,transparent 5%,#000 18%,rgba(0,0,0,.3) 40%,transparent 58%)}
+#speed{background:repeating-conic-gradient(from 0deg,#fff 0deg .5deg,transparent .5deg 4.3deg);-webkit-mask:radial-gradient(circle,transparent 17%,#000 30%);mask:radial-gradient(circle,transparent 17%,#000 30%)}
+#stage,#fx,.sc,.grp{position:absolute;left:0;top:0;width:0;height:0}
+.wheel{position:absolute;left:0;top:0}
+.c{position:absolute;left:0;top:0;text-align:center;white-space:nowrap;color:#fff;-webkit-text-stroke:.07em var(--ink);paint-order:stroke fill;text-shadow:.04em .07em 0 var(--ink)}
+.c.em{color:var(--acc);font-family:"Black Han Sans",sans-serif;font-weight:400}
+.c.en{color:var(--acc2);font-family:"Bungee",sans-serif;font-weight:400}
+.c.v{writing-mode:vertical-rl;text-orientation:upright}
+.c.now{color:var(--hi)}
+.c.tl{font-family:"Bungee",sans-serif;font-weight:400;color:var(--acc2)}
+.c.tl.alt{color:#fff}
+.sc.inv .c.en{color:#fff}
+.p{position:absolute;left:0;top:0;width:12px;height:22px;margin:-11px 0 0 -6px}
+.rg{position:absolute;left:0;top:0;border-radius:50%;border:10px solid #fff}
+#inv{opacity:0}
+#flash{background:#fff;opacity:0}
+#fade{background:#000;opacity:0}
+#prog{position:absolute;left:0;top:0;height:8px;background:linear-gradient(90deg,var(--acc2),var(--acc))}
+#ui{position:fixed;left:16px;right:16px;bottom:16px;display:flex;gap:12px;align-items:center;font:13px/1 system-ui;color:#ddd;z-index:2}
+#ui button{background:#ff6a2b;color:#fff;border:0;border-radius:999px;width:44px;height:44px;font-size:18px;cursor:pointer;flex:none}
+#bar{flex:1;height:6px;background:#223;border-radius:3px;position:relative;cursor:pointer}
+#fill{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,#ffd23d,#ff6a2b);border-radius:3px}
+.render #ui{display:none}
+</style>
+</head>
+<body>
+<div id="cv">
+  <div class="L" id="sky"></div>
+  <div class="L" id="stars"></div>
+  <div id="sun"></div>
+  <div class="L" id="clouds"></div>
+  <div class="L" id="gulls"></div>
+  <svg id="sea" viewBox="0 0 1080 1920"><path id="w0"/><path id="w1"/><path id="w2"/></svg>
+  <div class="L" id="inv"></div>
+  <div id="world"><div id="rays"></div><div id="speed"></div><div id="stage"></div><div id="fx"></div></div>
+  <div class="L" id="flash"></div>
+  <div class="L"><div id="prog"></div></div>
+  <div class="L" id="fade"></div>
+</div>
+<div id="ui"><button id="pp">▶</button><div id="bar"><div id="fill"></div></div><span id="time">0:00</span></div>
+<audio id="au" src="song.mp3" preload="auto"></audio>
+<script>
+const D={"dur":139.0,"bpm":117.5,"beats":[0.372,0.813,1.393,1.904,2.415,2.949,3.437,3.994,4.505,5.016,5.526,6.084,6.571,7.012,7.477,8.057,8.568,9.009,9.474,9.985,10.519,11.029,11.564,12.074,12.608,13.119,13.56,14.048,14.559,15.093,15.604,16.115,16.649,17.16,17.624,18.065,18.599,19.133,19.621,20.178,20.712,21.223,21.757,22.245,22.732,23.29,23.8,24.242,24.729,25.263,25.704,26.169,26.703,27.214,27.701,28.235,28.723,29.28,29.814,30.325,30.836,31.324,31.835,32.392,32.926,33.437,33.994,34.435,34.992,35.55,36.014,36.595,37.105,37.547,38.011,38.568,39.01,39.497,39.985,40.519,41.053,41.587,42.098,42.562,43.119,43.561,44.141,44.675,45.209,45.72,46.161,46.742,47.299,47.81,48.344,48.878,49.389,49.9,50.434,50.968,51.479,51.989,52.5,53.034,53.522,54.079,54.59,55.124,55.635,56.146,56.68,57.237,57.794,58.282,58.793,59.281,59.745,60.256,60.79,61.324,61.904,62.346,62.81,63.251,63.716,64.25,64.784,65.295,65.829,66.363,66.873,67.384,67.895,68.429,68.963,69.474,69.985,70.519,71.053,71.564,72.098,72.609,73.096,73.654,74.188,74.629,75.093,75.604,76.138,76.649,77.16,77.601,78.089,78.6,79.041,79.528,79.97,80.434,80.968,81.479,81.966,82.5,82.988,83.545,84.103,84.59,85.078,85.612,86.123,86.657,87.168,87.702,88.282,88.723,89.258,89.838,90.279,90.86,91.371,91.881,92.439,92.949,93.46,93.971,94.505,95.039,95.573,96.084,96.595,97.129,97.64,98.22,98.778,99.312,99.823,100.38,100.844,101.309,101.843,102.33,102.818,103.398,103.933,104.42,104.954,105.465,105.976,106.51,107.067,107.648,108.182,108.739,109.203,109.645,110.225,110.69,111.177,111.688,112.199,112.756,113.29,113.755,114.335,114.869,115.38,115.914,116.448,116.936,117.423,117.981,118.515,119.049,119.56,120.117,120.604,121.139,121.649,122.16,122.694,123.228,123.739,124.273,124.738,125.179,125.759,126.34,126.851,127.385,127.896,128.406,128.987,129.498,130.009,130.589,131.17,131.75,132.284,132.841,133.283,133.77,134.211,134.699,135.14,135.581,136.022,136.464,136.905,137.346,137.787,138.228,138.67,139.111,139.552,139.993,140.434,140.875,141.317,141.758,142.199,142.64,143.081,143.523,143.964,144.405,144.846,145.287,145.728,146.17,146.611,147.052,147.493,147.934],"energy":[0.0,0.0,0.0,0.166,0.328,0.647,0.807,0.77,0.717,0.634,0.677,0.635,0.589,0.592,0.471,0.42,0.498,0.337,0.646,0.589,0.633,0.442,0.53,0.619,0.596,0.567,0.645,0.604,0.495,0.453,0.516,0.538,0.631,0.643,0.648,0.702,0.655,0.633,0.533,0.635,0.652,0.58,0.567,0.578,0.601,0.579,0.512,0.5,0.579,0.604,0.628,0.688,0.693,0.693,0.594,0.536,0.568,0.501,0.524,0.622,0.568,0.535,0.525,0.713,0.514,0.457,0.531,0.523,0.618,0.721,0.763,0.661,0.579,0.719,0.647,0.673,0.642,0.725,0.621,0.728,0.692,0.635,0.63,0.696,0.471,0.584,0.651,0.627,0.571,0.651,0.62,0.599,0.637,0.687,0.782,0.682,0.669,0.774,0.835,0.894,0.859,0.485,0.677,0.591,0.551,0.58,0.639,0.681,0.757,0.771,0.741,0.736,0.672,0.738,0.699,0.619,0.586,0.574,0.536,0.592,0.524,0.566,0.63,0.564,0.589,0.621,0.473,0.288,0.43,0.634,0.506,0.575,0.603,0.643,0.524,0.613,0.614,0.604,0.55,0.55,0.52,0.563,0.571,0.526,0.556,0.561,0.536,0.514,0.552,0.568,0.53,0.553,0.544,0.552,0.494,0.545,0.535,0.546,0.538,0.525,0.556,0.525,0.563,0.603,0.485,0.476,0.535,0.581,0.577,0.503,0.478,0.584,0.623,0.516,0.521,0.536,0.511,0.658,0.71,0.722,0.597,0.589,0.719,0.776,0.76,0.846,0.825,0.774,0.83,0.797,0.769,0.592,0.53,0.547,0.544,0.542,0.535,0.536,0.554,0.538,0.535,0.651,0.806,0.798,0.737,0.657,0.698,0.626,0.631,0.543,0.609,0.431,0.615,0.457,0.715,0.734,0.752,0.511,0.577,0.493,0.584,0.45,0.609,0.713,0.46,0.541,0.512,0.556,0.574,0.554,0.557,0.558,0.59,0.559,0.601,0.63,0.697,0.622,0.64,0.733,0.786,0.854,0.789,0.485,0.635,0.54,0.555,0.546,0.577,0.645,0.674,0.676,0.676,0.7,0.685,0.696,0.661,0.643,0.641,0.638,0.568,0.619,0.559,0.562,0.637,0.605,0.592,0.612,0.485,0.017,0.003,0.001,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"lines":[{"s":1.72,"e":2.78,"t":"Sailing My Sea!","w":[["Sailing",1.72,2.18,1,1],["My",2.18,2.55,1,1],["Sea!",2.55,2.78,1,1]],"ch":[[0,1,0],[1,2,0],[2,3,1]],"st":"wave","fl":[]},{"s":2.8,"e":6.45,"t":"Yeah~ Never Say Die","w":[["Yeah~",2.8,3.7,1,1],["Never",4.37,4.85,1,1],["Say",4.85,5.75,1,1],["Die",5.8,6.45,1,1]],"ch":[[0,1,0],[1,2,0],[2,3,0],[3,4,1]],"st":"stamp","fl":[]},{"s":6.66,"e":9.92,"t":"Gotta Go! Go!! Go!!!","w":[["Gotta",6.66,6.93,1,1],["Go!",6.93,7.83,1,1],["Go!!",7.93,8.83,1,1],["Go!!!",9.02,9.92,1,1]],"ch":[[0,1,0],[1,2,0],[2,3,0],[3,4,1]],"st":"stamp","fl":[]},{"s":11.16,"e":14.15,"t":"내일 향한 지도를 펼쳐놓고","w":[["내",11.16,11.25,0,0],["일",11.25,11.77,1,0],["향",11.77,11.94,0,0],["한",11.94,12.26,1,0],["지",12.26,12.63,0,0],["도",12.63,12.75,0,0],["를",12.75,13.04,1,0],["펼",13.04,13.32,0,0],["쳐",13.32,13.48,0,0],["놓",13.48,13.65,0,0],["고",13.65,14.15,1,0]],"ch":[[0,4,0],[4,7,1],[7,11,0]],"st":"type","fl":[]},{"s":15.33,"e":18.8,"t":"미지의 세계로 가자 Go along along!","w":[["미",15.33,15.5,0,0],["지",15.5,15.62,0,0],["의",15.62,16.02,1,0],["세",16.02,16.11,0,0],["계",16.11,16.67,0,0],["로",16.67,16.92,1,0],["가",16.92,17.17,0,0],["자",17.17,17.42,1,0],["Go",17.42,17.86,1,1],["along",17.86,18.3,1,1],["along!",18.3,18.8,1,1]],"ch":[[0,3,0],[3,6,1],[6,8,0],[8,11,0]],"st":"wave","fl":[]},{"s":19.42,"e":22.52,"t":"내일 향한 지도를 펼쳐놓고","w":[["내",19.42,19.51,0,0],["일",19.51,20.03,1,0],["향",20.03,20.32,0,0],["한",20.32,20.56,1,0],["지",20.56,20.92,0,0],["도",20.92,21.09,0,0],["를",21.09,21.37,1,0],["펼",21.37,21.61,0,0],["쳐",21.61,21.78,0,0],["놓",21.78,22.02,0,0],["고",22.02,22.52,1,0]],"ch":[[0,4,0],[4,7,1],[7,11,0]],"st":"cam","fl":[]},{"s":23.65,"e":27.06,"t":"미지의 세계로 가자 Go along along!","w":[["미",23.65,23.9,0,0],["지",23.9,24.26,0,0],["의",24.26,24.42,1,0],["세",24.42,24.51,0,0],["계",24.51,25.07,0,0],["로",25.07,25.23,1,0],["가",25.23,25.32,0,0],["자",25.32,25.57,1,0],["Go",25.57,26.07,1,1],["along",26.07,26.56,1,1],["along!",26.56,27.06,1,1]],"ch":[[0,3,0],[3,6,1],[6,8,0],[8,11,0]],"st":"scatter","fl":[]},{"s":27.83,"e":29.85,"t":"Get on the Deck! Get on the Deck!","w":[["Get",27.83,28.04,1,1],["on",28.04,28.19,1,1],["the",28.189999999999998,28.34,1,1],["Deck!",28.34,28.84,1,1],["Get",28.84,29.05,1,1],["on",29.05,29.2,1,1],["the",29.2,29.35,1,1],["Deck!",29.35,29.85,1,1]],"ch":[[0,4,0],[4,8,1]],"st":"stamp","fl":[]},{"s":29.63,"e":32.22,"t":"너의 손에 키를 붙잡아","w":[["너",29.63,29.87,0,0],["의",29.87,30.11,1,0],["손",30.11,30.36,0,0],["에",30.36,30.76,1,0],["키",30.76,30.92,0,0],["를",30.92,31.28,1,0],["붙",31.28,31.48,0,0],["잡",31.48,31.72,0,0],["아",31.72,32.22,1,0]],"ch":[[0,4,0],[4,6,1],[6,9,0]],"st":"wheel","fl":[]},{"s":32.0,"e":34.06,"t":"Get on the Deck! Get on the Deck!","w":[["Get",32.0,32.21,1,1],["on",32.21,32.36,1,1],["the",32.36,32.51,1,1],["Deck!",32.51,33.05,1,1],["Get",33.05,33.26,1,1],["on",33.26,33.41,1,1],["the",33.41,33.56,1,1],["Deck!",33.559999999999995,34.06,1,1]],"ch":[[0,4,0],[4,8,1]],"st":"stamp","fl":[]},{"s":34.14,"e":38.2,"t":"붉은 태양의 저 바다로 출발하자","w":[["붉",34.14,34.25,0,0],["은",34.25,34.4,1,0],["태",34.4,34.55,0,0],["양",34.55,34.7,0,0],["의",34.7,34.9,1,0],["저",34.9,35.15,1,0],["바",35.15,35.4,0,0],["다",35.4,35.65,0,0],["로",35.65,36.15,1,0],["출",36.15,36.65,0,0],["발",36.65,37.2,0,0],["하",37.2,37.7,0,0],["자",37.7,38.2,1,0]],"ch":[[0,5,0],[5,9,0],[9,13,1]],"st":"zoom","fl":["sun"]},{"s":38.25,"e":42.1,"t":"다 함께 할렐루야","w":[["다",38.25,38.75,1,0],["함",38.75,39.33,0,0],["께",39.33,39.87,1,0],["할",39.87,40.37,0,0],["렐",40.37,40.88,0,0],["루",40.88,41.43,0,0],["야",41.43,42.1,1,0]],"ch":[[0,3,0],[3,7,1]],"st":"bounce","fl":[]},{"s":42.74,"e":44.62,"t":"힘차게 돛을 올려","w":[["힘",42.74,42.94,0,0],["차",42.94,43.1,0,0],["게",43.1,43.47,1,0],["돛",43.47,43.79,0,0],["을",43.79,44.03,1,0],["올",44.03,44.12,0,0],["려",44.12,44.62,1,0]],"ch":[[0,3,0],[3,5,1],[5,7,0]],"st":"hoist","fl":[]},{"s":44.76,"e":46.55,"t":"너와 나 힘을 모아","w":[["너",44.76,45.0,0,0],["와",45.0,45.2,1,0],["나",45.2,45.52,1,0],["힘",45.52,45.76,0,0],["을",45.76,45.96,1,0],["모",45.96,46.05,0,0],["아",46.05,46.55,1,0]],"ch":[[0,3,0],[3,5,0],[5,7,1]],"st":"scatter","fl":["meet"]},{"s":46.61,"e":50.25,"t":"저 파란 하늘 아래로","w":[["저",46.61,47.21,1,0],["파",47.21,47.7,0,0],["란",47.7,48.26,1,0],["하",48.26,48.46,0,0],["늘",48.46,48.82,1,0],["아",48.82,49.51,0,0],["래",49.51,49.75,0,0],["로",49.75,50.25,1,0]],"ch":[[0,1,0],[1,5,1],[5,8,0]],"st":"stack","fl":["sky"]},{"s":51.07,"e":53.08,"t":"너와 나 꿈을 싣고","w":[["너",51.07,51.31,0,0],["와",51.31,51.51,1,0],["나",51.51,51.8,1,0],["꿈",51.8,52.17,0,0],["을",52.17,52.25,1,0],["싣",52.25,52.58,0,0],["고",52.58,53.08,1,0]],"ch":[[0,3,0],[3,5,1],[5,7,0]],"st":"cam","fl":[]},{"s":53.19,"e":55.26,"t":"떠나자 저 바다로","w":[["떠",53.19,53.35,0,0],["나",53.35,53.6,0,0],["자",53.6,53.88,1,0],["저",53.88,54.16,1,0],["바",54.16,54.25,0,0],["다",54.25,54.76,0,0],["로",54.76,55.26,1,0]],"ch":[[0,3,0],[3,4,0],[4,7,1]],"st":"wave","fl":[]},{"s":54.97,"e":57.41,"t":"바람을 타고 파도를 넘어","w":[["바",54.97,55.17,0,0],["람",55.17,55.49,0,0],["을",55.49,55.69,1,0],["타",55.69,55.78,0,0],["고",55.78,56.25,1,0],["파",56.25,56.5,0,0],["도",56.5,56.7,0,0],["를",56.7,56.82,1,0],["넘",56.82,56.91,0,0],["어",56.91,57.41,1,0]],"ch":[[0,3,0],[3,5,0],[5,8,1],[8,10,0]],"st":"wave","fl":["surf"]},{"s":57.34,"e":59.41,"t":"거침 없이 달려가","w":[["거",57.34,57.67,0,0],["침",57.67,57.83,1,0],["없",57.83,57.92,0,0],["이",57.92,58.47,1,0],["달",58.47,58.67,0,0],["려",58.67,58.91,0,0],["가",58.91,59.41,1,0]],"ch":[[0,2,0],[2,4,0],[4,7,1]],"st":"zoom","fl":["speed"]},{"s":59.28,"e":63.45,"t":"이 세상 끝까지 자유롭게 가보자","w":[["이",59.28,59.52,1,0],["세",59.52,59.61,0,0],["상",59.61,60.41,1,0],["끝",60.41,60.64,0,0],["까",60.64,60.79,0,0],["지",60.79,61.14,1,0],["자",61.14,61.59,0,0],["유",61.59,61.99,0,0],["롭",61.99,62.44,0,0],["게",62.44,62.74,1,0],["가",62.74,63.04,0,0],["보",63.04,63.19,0,0],["자",63.19,63.45,1,0]],"ch":[[0,3,0],[3,6,0],[6,10,1],[10,13,0]],"st":"stack","fl":["fly"]},{"s":65.37,"e":66.44,"t":"Leap On Leap On","w":[["Leap",65.37,65.56,1,1],["On",65.56,65.75,1,1],["Leap",65.75,65.94,1,1],["On",65.94,66.44,1,1]],"ch":[[0,2,0],[2,4,1]],"st":"stamp","fl":[]},{"s":66.23,"e":67.64,"t":"하늘을 봐봐 바다를 봐봐","w":[["하",66.23,66.31,0,0],["늘",66.27,66.39,0,0],["을",66.39,66.47,1,0],["봐",66.47,66.56,0,0],["봐",66.56,66.8,1,0],["바",66.8,66.89,0,0],["다",66.89,66.97,0,0],["를",66.92,67.05,1,0],["봐",67.05,67.14,0,0],["봐",67.14,67.64,1,0]],"ch":[[0,3,0],[3,5,0],[5,8,0],[8,10,1]],"st":"bounce","fl":[]},{"s":67.47,"e":69.69,"t":"모두가 파란 세상 파란 하늘 바다를 봐봐","w":[["모",67.47,67.55,0,0],["두",67.55,67.68,0,0],["가",67.68,67.76,1,0],["파",67.76,67.88,0,0],["란",67.88,68.04,1,0],["세",68.04,68.13,0,0],["상",68.13,68.33,1,0],["파",68.33,68.41,0,0],["란",68.41,68.57,1,0],["하",68.57,68.69,0,0],["늘",68.69,68.81,1,0],["바",68.81,68.9,0,0],["다",68.9,69.02,0,0],["를",69.02,69.1,1,0],["봐",69.1,69.19,0,0],["봐",69.19,69.69,1,0]],"ch":[[0,3,0],[3,7,0],[7,11,0],[11,16,1]],"st":"scatter","fl":[]},{"s":69.59,"e":71.8,"t":"알고도 싶고 보고도 싶은 것도 너무나 많아","w":[["알",69.59,69.68,0,0],["고",69.68,69.79,0,0],["도",69.79,69.91,1,0],["싶",69.91,70.0,0,0],["고",70.0,70.08,1,0],["보",70.07,70.16,0,0],["고",70.16,70.28,0,0],["도",70.28,70.4,1,0],["싶",70.4,70.49,0,0],["은",70.49,70.64,1,0],["것",70.64,70.73,0,0],["도",70.73,70.93,1,0],["너",70.93,71.02,0,0],["무",71.02,71.13,0,0],["나",71.13,71.21,1,0],["많",71.21,71.3,0,0],["아",71.3,71.8,1,0]],"ch":[[0,5,0],[5,12,0],[12,17,1]],"st":"stack","fl":[]},{"s":71.69,"e":73.36,"t":"Go Let's Go 모두 같이 출발","w":[["Go",71.69,71.77,1,1],["Let's",71.76,71.84,1,1],["Go",71.83,72.0,1,1],["모",72.0,72.22,0,0],["두",72.22,72.3,1,0],["같",72.27,72.36,0,0],["이",72.36,72.61,1,0],["출",72.61,72.86,0,0],["발",72.86,73.36,1,0]],"ch":[[0,1,0],[1,3,0],[3,7,0],[7,9,1]],"st":"stamp","fl":[]},{"s":73.74,"e":75.64,"t":"연료탱크 가득 start ignition","w":[["연",73.74,73.86,0,0],["료",73.86,73.98,0,0],["탱",73.98,74.14,0,0],["크",74.14,74.26,1,0],["가",74.26,74.42,0,0],["득",74.42,74.67,1,0],["start",74.67,75.14,1,1],["ignition",75.14,75.64,1,1]],"ch":[[0,4,0],[4,6,0],[6,8,1]],"st":"zoom","fl":["fire"]},{"s":75.71,"e":77.78,"t":"모든 게 준비 완료 파도를 헤쳐","w":[["모",75.71,75.8,0,0],["든",75.8,75.95,1,0],["게",75.95,76.11,1,0],["준",76.11,76.2,0,0],["비",76.2,76.35,1,0],["완",76.35,76.48,0,0],["료",76.48,76.76,1,0],["파",76.76,76.88,0,0],["도",76.88,77.04,0,0],["를",77.04,77.2,1,0],["헤",77.2,77.28,0,0],["쳐",77.28,77.78,1,0]],"ch":[[0,3,0],[3,7,0],[7,10,1],[10,12,0]],"st":"cam","fl":[]},{"s":77.56,"e":80.15,"t":"긴장을 높여 눈 앞에 펼쳐지는 어드벤처","w":[["긴",77.56,77.72,0,0],["장",77.72,77.84,0,0],["을",77.84,78.0,1,0],["높",78.0,78.08,0,0],["여",78.08,78.32,1,0],["눈",78.32,78.49,1,0],["앞",78.49,78.58,0,0],["에",78.58,78.77,1,0],["펼",78.77,78.85,0,0],["쳐",78.85,79.01,0,0],["지",79.01,79.1,0,0],["는",79.1,79.33,1,0],["어",79.33,79.41,0,0],["드",79.37,79.49,0,0],["벤",79.49,79.65,0,0],["처",79.65,80.15,1,0]],"ch":[[0,5,0],[5,8,0],[8,12,0],[12,16,1]],"st":"spiral","fl":[]},{"s":80.01,"e":82.02,"t":"위험을 넘어 끝없이 질주하자 오션라이너","w":[["위",80.01,80.11,0,0],["험",80.11,80.2,0,0],["을",80.2,80.3,1,0],["넘",80.3,80.4,0,0],["어",80.4,80.49,1,0],["끝",80.49,80.59,0,0],["없",80.59,80.68,0,0],["이",80.68,80.8,1,0],["질",80.8,80.95,0,0],["주",80.95,81.1,0,0],["하",81.1,81.25,0,0],["자",81.25,81.4,1,0],["오",81.4,81.5,0,0],["션",81.5,81.65,0,0],["라",81.65,81.8,0,0],["이",81.8,81.9,0,0],["너",81.9,82.02,1,0]],"ch":[[0,5,0],[5,8,0],[8,12,0],[12,17,1]],"st":"zoom","fl":["speed"]},{"s":82.1,"e":84.12,"t":"Get on the Deck! Get on the Deck!","w":[["Get",82.1,82.31,1,1],["on",82.31,82.46,1,1],["the",82.46,82.61,1,1],["Deck!",82.61,83.11,1,1],["Get",83.11,83.32,1,1],["on",83.32,83.47,1,1],["the",83.47,83.62,1,1],["Deck!",83.62,84.12,1,1]],"ch":[[0,4,0],[4,8,1]],"st":"stamp","fl":[]},{"s":83.9,"e":86.49,"t":"너의 손에 키를 붙잡아","w":[["너",83.9,84.14,0,0],["의",84.14,84.38,1,0],["손",84.38,84.63,0,0],["에",84.63,85.03,1,0],["키",85.03,85.19,0,0],["를",85.19,85.55,1,0],["붙",85.55,85.75,0,0],["잡",85.75,85.99,0,0],["아",85.99,86.49,1,0]],"ch":[[0,4,0],[4,6,1],[6,9,0]],"st":"wheel","fl":[]},{"s":86.27,"e":88.33,"t":"Get on the Deck! Get on the Deck!","w":[["Get",86.27,86.48,1,1],["on",86.48,86.63,1,1],["the",86.63,86.78,1,1],["Deck!",86.78,87.32,1,1],["Get",87.32,87.53,1,1],["on",87.53,87.68,1,1],["the",87.68,87.83,1,1],["Deck!",87.83,88.33,1,1]],"ch":[[0,4,0],[4,8,1]],"st":"stamp","fl":[]},{"s":88.41,"e":92.35,"t":"붉은 태양의 저 바다로 출발하자","w":[["붉",88.41,88.52,0,0],["은",88.52,88.67,1,0],["태",88.67,88.82,0,0],["양",88.82,88.97,0,0],["의",88.97,89.17,1,0],["저",89.17,89.42,1,0],["바",89.42,89.67,0,0],["다",89.67,89.92,0,0],["로",89.92,90.42,1,0],["출",90.42,90.92,0,0],["발",90.92,91.47,0,0],["하",91.47,91.97,0,0],["자",91.97,92.35,1,0]],"ch":[[0,5,0],[5,9,0],[9,13,1]],"st":"zoom","fl":["sun"]},{"s":92.52,"e":95.3,"t":"Yeah~ Oh Yeah~","w":[["Yeah~",92.52,93.42,1,1],["Oh",94.17,94.4,1,1],["Yeah~",94.4,95.3,1,1]],"ch":[[0,1,0],[1,3,1]],"st":"wave","fl":[]},{"s":100.85,"e":105.55,"t":"Yeah~ Never Say Die Gotta Go!","w":[["Yeah~",100.85,101.75,1,1],["Never",102.4,102.95,1,1],["Say",102.95,103.85,1,1],["Die",103.88,104.78,1,1],["Gotta",104.78,105.05,1,1],["Go!",105.05,105.55,1,1]],"ch":[[0,1,0],[1,4,0],[4,6,1]],"st":"stamp","fl":[]},{"s":106.08,"e":108.03,"t":"Go!! Go!!!","w":[["Go!!",106.08,106.98,1,1],["Go!!!",107.13,108.03,1,1]],"ch":[[0,1,0],[1,2,1]],"st":"shout","fl":["inv"]},{"s":109.17,"e":112.89,"t":"저 파란 하늘 아래로","w":[["저",109.17,109.79,1,0],["파",109.79,110.03,0,0],["란",110.03,110.88,1,0],["하",110.88,111.09,0,0],["늘",111.09,111.41,1,0],["아",111.41,112.11,0,0],["래",112.11,112.39,0,0],["로",112.39,112.89,1,0]],"ch":[[0,1,0],[1,5,1],[5,8,0]],"st":"stack","fl":["sky"]},{"s":113.7,"e":115.62,"t":"힘차게 돛을 올려","w":[["힘",113.7,113.9,0,0],["차",113.9,114.07,0,0],["게",114.07,114.43,1,0],["돛",114.43,114.51,0,0],["을",114.51,115.03,1,0],["올",115.03,115.12,0,0],["려",115.12,115.62,1,0]],"ch":[[0,3,0],[3,5,1],[5,7,0]],"st":"hoist","fl":[]},{"s":115.8,"e":117.56,"t":"너와 나 힘을 모아","w":[["너",115.8,116.0,0,0],["와",116.0,116.24,1,0],["나",116.24,116.57,1,0],["힘",116.57,116.81,0,0],["을",116.81,116.97,1,0],["모",116.97,117.06,0,0],["아",117.06,117.56,1,0]],"ch":[[0,3,0],[3,5,0],[5,7,1]],"st":"scatter","fl":["meet"]},{"s":117.57,"e":121.18,"t":"저 파란 하늘 아래로","w":[["저",117.57,118.18,1,0],["파",118.18,118.62,0,0],["란",118.62,119.23,1,0],["하",119.23,119.43,0,0],["늘",119.43,119.75,1,0],["아",119.75,120.44,0,0],["래",120.44,120.68,0,0],["로",120.68,121.18,1,0]],"ch":[[0,1,0],[1,5,1],[5,8,0]],"st":"spiral","fl":[]},{"s":122.03,"e":124.04,"t":"너와 나 꿈을 싣고","w":[["너",122.03,122.27,0,0],["와",122.27,122.48,1,0],["나",122.48,122.77,1,0],["꿈",122.77,123.01,0,0],["을",123.01,123.22,1,0],["싣",123.22,123.54,0,0],["고",123.54,124.04,1,0]],"ch":[[0,3,0],[3,5,1],[5,7,0]],"st":"cam","fl":[]},{"s":123.95,"e":126.1,"t":"떠나자 저 바다로","w":[["떠",123.95,124.31,0,0],["나",124.31,124.59,0,0],["자",124.59,124.88,1,0],["저",124.88,125.16,1,0],["바",125.16,125.25,0,0],["다",125.25,125.6,0,0],["로",125.6,126.1,1,0]],"ch":[[0,3,0],[3,4,0],[4,7,1]],"st":"wave","fl":[]},{"s":125.92,"e":128.88,"t":"바람을 타고 파도를 넘어","w":[["바",125.92,126.16,0,0],["람",126.16,126.48,0,0],["을",126.48,126.69,1,0],["타",126.69,126.78,0,0],["고",126.78,127.21,1,0],["파",127.21,127.41,0,0],["도",127.41,127.65,0,0],["를",127.65,128.29,1,0],["넘",128.29,128.38,0,0],["어",128.38,128.88,1,0]],"ch":[[0,3,0],[3,5,0],[5,8,1],[8,10,0]],"st":"wave","fl":["surf"]},{"s":128.33,"e":130.36,"t":"거침 없이 달려가","w":[["거",128.33,128.58,0,0],["침",128.58,128.74,1,0],["없",128.74,128.83,0,0],["이",128.83,129.38,1,0],["달",129.38,129.58,0,0],["려",129.58,129.86,0,0],["가",129.86,130.36,1,0]],"ch":[[0,2,0],[2,4,0],[4,7,1]],"st":"zoom","fl":["speed"]},{"s":130.15,"e":134.45,"t":"이 세상 끝까지 자유롭게 가보자","w":[["이",130.15,130.4,1,0],["세",130.4,130.55,0,0],["상",130.55,131.35,1,0],["끝",131.35,131.6,0,0],["까",131.6,131.75,0,0],["지",131.75,132.1,1,0],["자",132.1,132.55,0,0],["유",132.55,132.95,0,0],["롭",132.95,133.4,0,0],["게",133.4,133.7,1,0],["가",133.7,134.0,0,0],["보",134.0,134.15,0,0],["자",134.15,134.45,1,0]],"ch":[[0,6,0],[6,10,1],[10,13,0]],"st":"shout","fl":["inv","fly"]}]};
+const $=id=>document.getElementById(id);
+const cv=$('cv'),world=$('world'),stage=$('stage'),fxL=$('fx'),skyEl=$('sky'),sunEl=$('sun'),invEl=$('inv'),raysEl=$('rays'),speedEl=$('speed'),
+  flashEl=$('flash'),fadeEl=$('fade'),progEl=$('prog'),WV=[$('w0'),$('w1'),$('w2')];
+function fit(){const s=Math.min(innerWidth/1080,innerHeight/1920);cv.style.transform=`scale(${s}) translate(-50%,-50%)`}
+addEventListener('resize',fit);fit();
+
+/* ---------- math ---------- */
+const clamp=(x,a=0,b=1)=>x<a?a:x>b?b:x, lerp=(a,b,x)=>a+(b-a)*x;
+const eOutC=x=>1-(1-x)**3, eInC=x=>x*x*x, eIO=x=>x<.5?4*x*x*x:1-(-2*x+2)**3/2, eOutX=x=>x>=1?1:1-2**(-10*x);
+const eBack=(x,c=1.70158)=>{x-=1;return 1+(c+1)*x*x*x+c*x*x};
+const eBounce=x=>{const n=7.5625,d=2.75;if(x<1/d)return n*x*x;if(x<2/d)return n*(x-=1.5/d)*x+.75;if(x<2.5/d)return n*(x-=2.25/d)*x+.9375;return n*(x-=2.625/d)*x+.984375};
+const spring=(a,w=26,k=9)=>a<=0?0:1-Math.exp(-k*a)*Math.cos(w*a);
+const H=(i,s=0)=>{const x=Math.sin(i*127.1+s*311.7+.5)*43758.5453;return x-Math.floor(x)};
+const R=(i,s)=>H(i,s)*2-1;
+const nz=(x,s=0)=>Math.sin(x+s*1.3)*.6+Math.sin(x*2.31+s*4.1+1.7)*.4;
+const avg=a=>a.reduce((x,y)=>x+y,0)/a.length;
+function rotp(x,y,d){const r=d*Math.PI/180,c=Math.cos(r),s=Math.sin(r);return [x*c-y*s,x*s+y*c]}
+const boxOf=P=>({x0:Math.min(...P.map(p=>p[0])),x1:Math.max(...P.map(p=>p[0])),y0:Math.min(...P.map(p=>p[1])),y1:Math.max(...P.map(p=>p[1]))});
+const boxRot=(B,d)=>boxOf([[B.x0,B.y0],[B.x1,B.y0],[B.x0,B.y1],[B.x1,B.y1]].map(p=>rotp(p[0],p[1],d)));
+const boxU=(A,B)=>A?{x0:Math.min(A.x0,B.x0),x1:Math.max(A.x1,B.x1),y0:Math.min(A.y0,B.y0),y1:Math.max(A.y1,B.y1)}:B;
+const f1=v=>v.toFixed(1),f3=v=>v.toFixed(3);
+
+/* ---------- beats ---------- */
+const BT=D.beats;
+function beatIdx(t){let lo=0,hi=BT.length-1,b=-1;while(lo<=hi){const m=(lo+hi)>>1;if(BT[m]<=t){b=m;lo=m+1}else hi=m-1}return b}
+function pulse(t){const b=beatIdx(t);return b<0?0:Math.exp(-(t-BT[b])*7)}
+function energy(t){const E=D.energy;return E?E[clamp(Math.floor(t*2),0,E.length-1)]:.5}
+
+/* ---------- palette per section (time of day at sea) ---------- */
+const hex=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+const PAL={
+  morning:{sky1:'#5cc6ff',sky2:'#dff6ff',sea1:'#2a9df4',sea2:'#0b4f9c',acc:'#ff6a2b',acc2:'#ffd23d',hi:'#fff36b',ink:'#0b2a5b',sun:.25,cloud:1,stars:0,gull:1,int:.7,ray:.08},
+  sunrise:{sky1:'#ff7b54',sky2:'#ffd89a',sea1:'#3a7bd5',sea2:'#1b3a7a',acc:'#ff2e3b',acc2:'#ffe14d',hi:'#fff36b',ink:'#3a0d2e',sun:.55,cloud:.6,stars:0,gull:.6,int:.9,ray:.16},
+  midday: {sky1:'#16a3ff',sky2:'#c6f2ff',sea1:'#0f8be0',sea2:'#063f8a',acc:'#ff4d2e',acc2:'#ffe14d',hi:'#fff36b',ink:'#062a66',sun:.95,cloud:1,stars:0,gull:1,int:1,ray:.14},
+  night:  {sky1:'#070b2e',sky2:'#23388a',sea1:'#0b2a6b',sea2:'#020a24',acc:'#3de0ff',acc2:'#ffd23d',hi:'#ff5fa2',ink:'#000820',sun:0,cloud:.15,stars:1,gull:0,int:1.05,ray:.1},
+  sunset: {sky1:'#ff5f6d',sky2:'#ffc371',sea1:'#4a4fb0',sea2:'#1a1f5c',acc:'#ffe14d',acc2:'#ffffff',hi:'#fff36b',ink:'#3b0a3a',sun:.35,cloud:.5,stars:0,gull:.5,int:1,ray:.16},
+  final:  {sky1:'#0d9bff',sky2:'#d6f6ff',sea1:'#0d86dd',sea2:'#04357a',acc:'#ff3b3b',acc2:'#ffd23d',hi:'#fff36b',ink:'#062a66',sun:.95,cloud:1,stars:0,gull:1,int:1.25,ray:.2},
+  dusk:   {sky1:'#3a1c71',sky2:'#ffaf7b',sea1:'#3b3f9a',sea2:'#121640',acc:'#ffd23d',acc2:'#ffffff',hi:'#fff36b',ink:'#1a0b33',sun:.2,cloud:.4,stars:.5,gull:.3,int:.6,ray:.1}};
+for(const k in PAL)for(const c in PAL[k])if(typeof PAL[k][c]==='string')PAL[k][c]=hex(PAL[k][c]);
+const SECT=[[0,'morning'],[27.5,'sunrise'],[42.4,'midday'],[63.8,'night'],[82.95,'sunset'],[100.6,'midday'],[108.9,'final'],[134.6,'dusk']];
+function secAt(t){let i=0;for(let j=0;j<SECT.length;j++)if(t>=SECT[j][0])i=j;return i}
+function palAt(t){const i=secAt(t),P=PAL[SECT[i][1]],a=clamp((t-SECT[i][0])/.6);if(i===0||a>=1)return P;
+  const Q=PAL[SECT[i-1][1]],o={};for(const k in P)o[k]=Array.isArray(P[k])?P[k].map((v,j)=>lerp(Q[k][j],v,a)):lerp(Q[k],P[k],a);return o}
+const rgb=(c,a=1)=>`rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`;
+const mix=(a,b,x)=>a.map((v,i)=>lerp(v,b[i],x));
+
+/* ---------- text measuring ---------- */
+const FONT={kr:'900 100px "Noto Sans KR"',em:'100px "Black Han Sans"',en:'100px "Bungee"'};
+const ctx=document.createElement('canvas').getContext('2d');
+const em=(s,f='kr')=>{ctx.font=FONT[f];return ctx.measureText(s).width/100||1};
+const GAP=.3; // word space in em
+
+/* ---------- layouts (scene-local px, origin = stage centre) ---------- */
+const adv=(u,last)=>u.wr+(u.sp&&!last?GAP:0);
+const chunkEm=c=>c.us.reduce((a,u,i)=>a+adv(u,i===c.us.length-1),0);
+function placeRow(c,f,cx,cy,rot){
+  const w=c.n*f;let x=-w/2;
+  c.us.forEach((u,i)=>{const uw=u.wr*f,[rx,ry]=rotp(x+uw/2,0,rot);u.x=cx+rx;u.y=cy+ry;u.f=f;u.rot=rot;x+=adv(u,i===c.us.length-1)*f});
+  Object.assign(c,{cx,cy,f,w,rot});
+}
+function layoutCam(sc,spiral){
+  let B=null,th=0;
+  sc.chunks.forEach((c,k)=>{
+    if(k>0&&(spiral||k%2===1))th+=spiral?-90:(k%4===1?-90:90);
+    const Bp=B&&boxRot(B,-th);
+    let f=Bp?clamp((Bp.x1-Bp.x0)/c.n,70,300):clamp(760/c.n,100,230);
+    if(Bp&&c.emph)f=Math.min(f*1.2,340);
+    const w=c.n*f,h=f*1.15;let cxp=0,cyp=0;
+    if(Bp){cyp=Bp.y1+f*.12+h/2;const al=c.emph?0:(k%2?-1:1);cxp=al<0?Bp.x0+w/2:al>0?Bp.x1-w/2:(Bp.x0+Bp.x1)/2}
+    const [cx,cy]=rotp(cxp,cyp,th);placeRow(c,f,cx,cy,th);c.th=th;
+    B=boxU(B,boxOf([[-w/2,-h/2],[w/2,-h/2],[-w/2,h/2],[w/2,h/2]].map(p=>rotp(p[0]+cxp,p[1]+cyp,th))));
+    c.z=clamp(820/w,Math.min(120,900/c.nc)/f,240/f);
+  });
+  sc.B=B;
+}
+function layoutRows(sc,fmax=190){
+  const MW=900;let best=null;
+  for(let f=fmax;f>=70;f-=5){
+    const rows=[];let cur=[],cw=0,split=false;
+    const push=()=>{if(cur.length)rows.push(cur);cur=[];cw=0};
+    for(const c of sc.chunks){const k=c.emph?1.2:1,w=c.n*f*k,sp=cur.length?GAP*f:0;
+      if(cw+sp+w<=MW){if(cur.length)cur[cur.length-1][2]=1;c.us.forEach((u,i)=>cur.push([u,f*k,u.sp&&i<c.us.length-1?1:0]));cw+=sp+w}
+      else if(w<=MW){push();c.us.forEach((u,i)=>cur.push([u,f*k,u.sp&&i<c.us.length-1?1:0]));cw=w}
+      else{split=true;for(const u of c.us){const uw=u.wr*f*k;if(cw+uw>MW)push();cur.push([u,f*k,0]);cw+=uw}}}
+    push();best=rows;if(rows.length<=3&&!split)break;
+  }
+  const rh=best.map(r=>Math.max(...r.map(([,f])=>f))*1.25);
+  let y=-rh.reduce((a,b)=>a+b,0)/2;
+  best.forEach((r,ri)=>{const rw=r.reduce((a,[u,f,g],i)=>a+u.wr*f+(g&&i<r.length-1?GAP*f:0),0);let x=-rw/2;const cy=y+rh[ri]/2;
+    r.forEach(([u,f,g])=>{const w=u.wr*f;u.x=x+w/2;u.y=cy;u.f=f;u.rot=0;x+=w+(g?GAP*f:0)});y+=rh[ri]});
+}
+function layoutStack(sc,grow=0){
+  const W=880,G=18,rows=sc.chunks.map((c,k)=>({c,f:Math.max(60,Math.min(W/c.n,(c.emph?290:210)*(1+grow*k)))}));
+  let tot=rows.reduce((a,r)=>a+r.f*1.15,0)+G*(rows.length-1);
+  if(tot>900){const k=900/tot;rows.forEach(r=>r.f*=k);tot=900}
+  let y=-tot/2;
+  rows.forEach((r,k)=>{const {c,f}=r,h=f*1.15,w=c.n*f,j=(k+sc.i)%5;
+    const rot=grow?(k%2?7:-7):[-3,2.5,-2,3,-1.5][j];
+    placeRow(c,f,grow?0:[-1,1,0,1,-1][j]*(W-w)/2,y+h/2,rot);y+=h+G});
+}
+const LAYOUT={
+  cam:sc=>layoutCam(sc,false),spiral:sc=>layoutCam(sc,true),scatter:sc=>layoutRows(sc),bounce:sc=>layoutRows(sc),
+  type:sc=>layoutRows(sc,170),wave:sc=>layoutRows(sc,200),stack:sc=>layoutStack(sc),hoist:sc=>layoutStack(sc),stamp:sc=>layoutStack(sc,.12),
+  zoom(sc){sc.chunks.forEach((c,k)=>placeRow(c,Math.min(900/c.n,c.emph?330:270),0,0,R(sc.i*7+k,3)*6))},
+  tate(sc){
+    const G=26,cols=sc.chunks.map(c=>{const len=c.us.length;return {c,len,f:Math.min(940/len,c.emph?250:190)}});
+    let W=cols.reduce((a,o)=>a+o.f*1.1,0)+G*(cols.length-1);
+    if(W>900){const k=900/W;cols.forEach(o=>o.f*=k);W=900}
+    let x=W/2;
+    cols.forEach((o,k)=>{const cw=o.f*1.1,cx=x-cw/2,hg=o.len*o.f;let y=-hg/2+(k%2?40:-40);
+      o.c.us.forEach(u=>{u.x=cx;u.y=y+o.f/2;u.f=o.f;u.rot=0;y+=o.f});o.c.cx=cx;o.c.cy=y-hg/2;x-=cw+G});
+  },
+  shout(sc){
+    const E=sc.chunks.find(c=>c.emph)||sc.chunks[0],fE=Math.min(940/E.n,380);
+    placeRow(E,fE,0,20,0);E.us.forEach(u=>u.big=1);
+    let top=20-fE*.65,bot=20+fE*.65;
+    for(let k=E.k-1;k>=0;k--){const c=sc.chunks[k],f=Math.min(820/c.n,160),h=f*1.25;top-=h;placeRow(c,f,0,top+h/2,-4);top-=8}
+    for(let k=E.k+1;k<sc.chunks.length;k++){const c=sc.chunks[k],f=Math.min(820/c.n,160),h=f*1.25;placeRow(c,f,0,bot+h/2,3);bot+=h+8}
+  },
+  wheel(sc){ // letters around a ship's wheel; the wheel turns so the sung letter is on top
+    const tot=sc.units.reduce((a,u,i)=>a+u.wr*(u.emph?1.3:1)+(u.sp&&i<sc.units.length-1?GAP:.12),0);
+    const Rr=300,f=.8*2*Math.PI*Rr/tot;let s=0;sc.R=Rr;
+    sc.units.forEach((u,i)=>{const k=u.emph?1.3:1,w=u.wr*f*k;const a=(s+w/2)/Rr;u.ang=a*180/Math.PI;
+      u.x=Rr*Math.sin(a);u.y=-Rr*Math.cos(a);u.f=f*k;u.rot=u.ang;s+=w+(u.sp&&i<sc.units.length-1?GAP:.12)*f});
+    sc.span=s/Rr*180/Math.PI;
+  }};
+const ENT={cam:u=>u.emph?'slam':'pop',spiral:u=>u.emph?'slam':'pop',stack:u=>u.emph?'slam':['flip','pop','drop','pop'][u.ch%4],
+  zoom:u=>u.emph?'slam':'far',scatter:()=>'fly',bounce:()=>'drop',tate:u=>u.emph?'slam':'slide',shout:u=>u.emph?'slam':'pop',
+  type:()=>'type',wave:()=>'rise',wheel:()=>'pop',hoist:()=>'hoist',stamp:()=>'stamp'};
+const LEAD={pop:.04,slam:.03,far:.1,fly:.34,drop:.26,slide:.08,flip:.08,type:.02,rise:.18,hoist:.3,stamp:.03};
+const LAND={pop:.08,slam:.17,far:.25,fly:.18,drop:0,slide:.15,flip:.2,type:.05,rise:.15,hoist:.2,stamp:.12};
+const EXIT={cam:'cam',spiral:'cam',stack:'explode',zoom:'zoom',scatter:'explode',bounce:'fall',tate:'shutter',shout:'explode',
+  type:'fall',wave:'sink',wheel:'wheel',hoist:'up',stamp:'explode'};
+
+/* ---------- hangul composition for the typing effect ---------- */
+const CHO='ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ';
+function steps(ch){const o=ch.charCodeAt(0)-0xAC00;if(o<0||o>=11172)return [ch];
+  const L=Math.floor(o/588),V=Math.floor(o%588/28),T=o%28,s=[CHO[L],String.fromCharCode(0xAC00+(L*21+V)*28)];if(T)s.push(ch);return s}
+
+/* ---------- scenes ---------- */
+let S=[],TT=[],IMP=[];
+function mkChar(parent,u,cls){
+  const d=document.createElement('div'),f=u.f,w=u.vert?f*1.1:u.wr*f,h=u.vert?f:f*1.3;
+  d.className='c'+cls;d.textContent=u.t;
+  Object.assign(d.style,{fontSize:f+'px',width:w+'px',height:h+'px',lineHeight:(u.vert?w:h)+'px',marginLeft:-w/2+'px',marginTop:-h/2+'px',opacity:0});
+  parent.appendChild(d);u.el=d;u.op=0;u.shown=u.t;
+}
+function explodeVel(u,r,k=1){
+  let dx=u.x,dy=u.y,l=Math.hypot(dx,dy);if(l<60){const a=r(6)*Math.PI*2;dx=Math.cos(a);dy=Math.sin(a);l=1}
+  const sp=(700+900*r(7))*k;u.vx=dx/l*sp+(r(8)*2-1)*200;u.vy=dy/l*sp-450-300*r(9);u.spin2=(r(10)*2-1)*900;
+}
+const WHEEL_SVG=R0=>{const r=R0*.78,h=R0*1.18;let s=`<svg class="wheel" width="${2*h}" height="${2*h}" viewBox="${-h} ${-h} ${2*h} ${2*h}" style="margin:${-h}px 0 0 ${-h}px">`;
+  for(let k=0;k<8;k++){const a=k*Math.PI/4,x=Math.sin(a),y=-Math.cos(a);
+    s+=`<line x1="0" y1="0" x2="${f1(x*h*.93)}" y2="${f1(y*h*.93)}" stroke="#6b3a14" stroke-width="22" stroke-linecap="round"/><circle cx="${f1(x*h*.93)}" cy="${f1(y*h*.93)}" r="20" fill="#a8672c" stroke="#3b1d08" stroke-width="6"/>`}
+  return s+`<circle r="${r}" fill="none" stroke="#3b1d08" stroke-width="44"/><circle r="${r}" fill="none" stroke="#a8672c" stroke-width="30"/><circle r="${R0*.2}" fill="#a8672c" stroke="#3b1d08" stroke-width="8"/></svg>`};
+function makeScene(L,i){
+  const next=D.lines[i+1],sc={i,L,st:L.st,fl:new Set(L.fl),s:L.s,e:L.e};
+  sc.inv=sc.fl.has('inv');
+  sc.units=L.w.map(([t,s,e,sp,en],k)=>({t,s,e,k,sp,en}));
+  sc.chunks=L.ch.map(([a,b,m],k)=>{const us=sc.units.slice(a,b),c={k,us,emph:!!m,s:us[0].s,e:us[us.length-1].e,nc:us.length};
+    us.forEach(u=>{u.ch=k;u.emph=c.emph;u.font=u.en?'en':c.emph?'em':'kr';u.wr=em(u.t,u.font)});c.n=chunkEm(c);return c});
+  sc.out=next&&next.s-L.e<2.5?next.s-.06:L.e+1.1;
+  sc.exit=sc.fl.has('fly')?'birds':EXIT[sc.st];
+  LAYOUT[sc.st](sc);
+  sc.chunks.forEach(c=>{if(c.cx===undefined){c.cx=avg(c.us.map(u=>u.x));c.cy=avg(c.us.map(u=>u.y))}});
+  const half=sc.units.length/2;
+  sc.units.forEach(u=>{
+    const r=j=>H(i*97+u.k*13+j,i);
+    u.r1=r(1)*2-1;u.spin=(r(2)*2-1)*540;u.h0=750+350*r(3);u.ent=ENT[sc.st](u);u.lead=LEAD[u.ent];u.steps=u.ent==='type'?steps(u.t):null;
+    if(sc.fl.has('meet')){u.fx=(u.k<half?-1:1)*(1300+300*r(4));u.fy=(r(5)*2-1)*250;u.spin=(r(2)*2-1)*200}
+    else{const a=r(4)*Math.PI*2,d=1200+500*r(5);u.fx=Math.cos(a)*d;u.fy=Math.sin(a)*d}
+    explodeVel(u,r,sc.st==='shout'?1.5:1);
+  });
+  const el=document.createElement('div');el.className='sc'+(sc.inv?' inv':'');el.style.display='none';stage.appendChild(el);sc.el=el;sc.shown=false;
+  if(sc.st==='wheel')el.insertAdjacentHTML('beforeend',WHEEL_SVG(sc.R));
+  sc.chunks.forEach(c=>{const g=document.createElement('div');g.className='grp';el.appendChild(g);c.g=g;
+    c.us.forEach(u=>mkChar(g,u,(u.en?' en':c.emph?' em':'')+(u.vert?' v':'')))});
+  return sc;
+}
+function makeTitle(a,b,v){
+  const tt={a,b,v,units:[],ex:v===1?137.5:b-.45};
+  const el=document.createElement('div');el.className='sc';el.style.display='none';stage.appendChild(el);tt.el=el;tt.shown=false;
+  const rowsT=[[...'SAILING'],[...'MY SEA!']];
+  let k=0;
+  rowsT.forEach((row,ri)=>{const f=Math.min(250,880/row.reduce((s,c)=>s+em(c,'en'),0)),ws=row.map(c=>em(c,'en')*f),W=ws.reduce((x,y)=>x+y,0);
+    let x=-W/2;row.forEach((ch,j)=>{if(ch!==' '){const r=q=>H(k*31+q,v+11);
+      const u={t:ch,x:x+ws[j]/2,y:ri?f*.62:-f*.62,k,f,big:1,s:a+.15+k*.12,rot:0,wr:em(ch,'en'),r1:r(1)*2-1,h0:900+300*r(2),spin:(r(3)*2-1)*540,ent:'drop'};
+      u.e=u.s;u.lead=LEAD.drop;explodeVel(u,r,1.2);u.fx=0;u.fy=0;mkChar(el,u,' tl'+(k%2?' alt':''));tt.units.push(u)}x+=ws[j];k++})});
+  return tt;
+}
+function buildImpacts(){
+  IMP=[];
+  S.forEach(sc=>{
+    const lvl=PAL[SECT[secAt(sc.s+.01)][1]].int;
+    IMP.push({t:sc.s,s:.3*lvl,x:0,y:0,n:0,fl:sc.fl.has('sky')?.6:.2});
+    const cam=sc.st==='cam'||sc.st==='spiral'||sc.st==='zoom';
+    sc.chunks.forEach(c=>{
+      if(sc.st==='stamp')IMP.push({t:c.s+LAND.stamp,s:(c.emph?.9:.55)*lvl,x:c.cx,y:c.cy,n:c.emph?18:8,fl:.25});
+      else if(!c.emph)return;
+      else if(sc.st==='shout')c.us.forEach(u=>IMP.push({t:u.s+.17,s:1.1*lvl,x:u.x,y:u.y,n:22,fl:.5}));
+      else IMP.push({t:c.s+LAND[c.us[0].ent],s:lvl,x:cam?0:c.cx,y:cam?0:c.cy,n:20,fl:.4});
+    });
+  });
+  TT.forEach(tt=>{tt.units.forEach(u=>IMP.push({t:u.s,s:.4,x:u.x,y:u.y+u.f*.45,n:10,fl:.1}));
+    if(tt.v===0)IMP.push({t:tt.ex+.02,s:.9,x:0,y:0,n:30,fl:.4})});
+  IMP.sort((a,b)=>a.t-b.t);
+}
+
+/* ---------- per-character motion ---------- */
+function entry(u,t){
+  const a=t-u.s+u.lead;if(a<0)return null;
+  const o={dx:0,dy:0,ly:0,dr:0,sx:1,sy:1,rx:0,ry:0,op:1,bl:0,txt:null};
+  switch(u.ent){
+    case 'pop':{const p=clamp(a/.35);o.sx=o.sy=spring(a);o.op=clamp(a/.05);o.dr=u.r1*28*(1-eOutC(p));o.ly=60*(1-eOutC(p));break}
+    case 'slam':{const p=clamp(a/.2);let s=1+(u.big?2.6:1.6)*(1-eOutC(p));if(a>.2)s-=.14*Math.sin(clamp((a-.2)/.22)*Math.PI);
+      o.sx=o.sy=s;o.op=clamp(a/.04);o.bl=4*(1-p);o.dr=u.r1*(u.big?30:14)*(1-eOutC(p));break}
+    case 'stamp':{const p=clamp(a/.16);let s=1+2.2*(1-eOutC(p));if(a>.16)s-=.12*Math.sin(clamp((a-.16)/.2)*Math.PI);
+      o.sx=o.sy=s;o.op=clamp(a/.04);o.dr=u.r1*35*(1-eOutC(p));break}
+    case 'far':{const p=clamp(a/.4);o.sx=o.sy=.12+.88*eBack(p,2);o.op=clamp(a/.1);o.bl=10*(1-clamp(a/.22));o.dr=u.r1*20*(1-p);break}
+    case 'fly':{const p=clamp(a/.52),e=eBack(p,1.25);o.dx=u.fx*(1-e);o.dy=u.fy*(1-e);o.dr=u.spin*(1-e);o.sx=o.sy=1+1.4*(1-e);o.op=clamp(a/.1);o.bl=6*(1-clamp(a/.3));break}
+    case 'drop':{const p=clamp(a/.7);o.ly=-u.h0*(1-eBounce(p));let q=0;
+      for(const [c,m] of [[.3636,.34],[.7273,.17],[.9091,.08]])if(p>=c)q=Math.max(q,m*Math.exp(-(p-c)*26));
+      o.sy=1-q;o.sx=1+q*.9;o.ly+=u.f*.55*q;o.dr=u.r1*14*(1-p);o.op=clamp(a/.04);break}
+    case 'slide':{const p=clamp(a/.32),e=eOutX(p);o.ly=-320*(1-e);o.sy=1+.6*(1-e);o.op=clamp(a/.07);o.bl=8*(1-e);break}
+    case 'flip':{const p=clamp(a/.42);o.rx=-110*(1-eBack(p,1.7));o.op=clamp(a/.08);break}
+    case 'type':{const n=u.steps.length,k=Math.min(n-1,Math.floor(a/.06));o.txt=u.steps[k];o.sx=o.sy=.7+.3*spring(a,30,10);o.op=1;break}
+    case 'rise':{const p=clamp(a/.45),e=eBack(p,1.6);o.ly=240*(1-e);o.dr=u.r1*25*(1-p);o.sy=1+.3*(1-p);o.op=clamp(a/.08);break}
+    case 'hoist':{const p=clamp(a/.55),e=eBack(p,1.3);o.ly=900*(1-e);o.sy=1+.5*(1-p);o.sx=1-.2*(1-p);o.op=clamp(a/.1);break}
+  }
+  return o;
+}
+function exitFx(kind,out,u,t,o){
+  const x=t-out;if(x<=0)return;
+  if(kind==='explode'){o.dx+=u.vx*x;o.dy+=u.vy*x+1300*x*x;o.dr+=u.spin2*x;o.op*=1-clamp((x-.2)/.3);o.sx*=1+x*.8;o.sy*=1+x*.8}
+  else if(kind==='fall'){const y=Math.max(0,x-u.k*.018);o.dy+=1600*y*y-200*y;o.dr+=u.r1*300*y;o.op*=1-clamp((y-.25)/.25)}
+  else if(kind==='sink'){const y=Math.max(0,x-u.k*.025);o.dy+=1900*y*y;o.dr+=u.r1*120*y;o.dx+=40*Math.sin(y*12+u.k);o.op*=1-clamp((y-.28)/.2)}
+  else if(kind==='up'){const y=Math.max(0,x-u.k*.02);o.dy-=2200*y*y;o.sx*=1+y;o.op*=1-clamp((y-.25)/.2)}
+  else if(kind==='birds'){const y=Math.max(0,x-u.k*.03);o.dy-=900*y*y+300*y;o.dx+=u.r1*700*y;o.dr+=u.r1*40*y;o.sy*=1-.5*Math.abs(Math.sin(y*28));o.op*=1-clamp((y-.35)/.25)}
+  else if(kind==='shutter'){const p=clamp(x/.4);o.dy+=(u.ch%2?1:-1)*1600*eInC(p);o.op*=1-clamp((p-.6)/.4);o.bl+=10*p}
+}
+function applyU(u,o){
+  if(o.op!==u.op){u.el.style.opacity=o.op;u.op=o.op}
+  const txt=o.txt||u.t;if(txt!==u.shown){u.el.textContent=txt;u.shown=txt}
+  u.el.style.transform=`translate(${f1(u.x+o.dx)}px,${f1(u.y+o.dy)}px) rotate(${(u.rot+o.dr).toFixed(2)}deg) translateY(${f1(o.ly)}px)`+
+    (o.rx?` perspective(600px) rotateX(${f1(o.rx)}deg)`:'')+(o.ry?` perspective(900px) rotateY(${f1(o.ry)}deg)`:'')+` scale(${f3(o.sx)},${f3(o.sy)})`;
+  u.el.style.filter=o.bl>.5?`blur(${f1(o.bl)}px)`:'';
+}
+function hideU(u){if(u.op!==0){u.el.style.opacity=0;u.op=0}}
+
+/* ---------- camera for cam / spiral scenes ---------- */
+function camAt(sc,t){
+  const C=sc.chunks;let k=0;for(let j=1;j<C.length;j++)if(t>=C[j].s-.08)k=j;
+  const T=j=>({x:C[j].cx,y:C[j].cy,a:-C[j].th,z:C[j].z});
+  let cam;
+  if(k===0){const p=eOutC(clamp((t-(C[0].s-.2))/.6)),A=T(0);cam={...A,z:A.z*(2.2-1.2*p),a:A.a+(1-p)*(sc.i%2?20:-20)}}
+  else{const p=clamp((t-(C[k].s-.08))/.34),A=T(k-1),B=T(k),e=eIO(p);
+    cam={x:lerp(A.x,B.x,e),y:lerp(A.y,B.y,e),a:lerp(A.a,B.a,eBack(p,1.2)),z:lerp(A.z,B.z,e)*(1-.22*Math.sin(Math.PI*p))}}
+  const last=C[C.length-1],r0=Math.max(last.s+.55,sc.out-1);
+  if(k===C.length-1&&t>r0&&sc.out-r0>.25){
+    const p=eIO(clamp((t-r0)/Math.min(.6,sc.out-r0))),B=sc.B,Bp=boxRot(B,cam.a);
+    const zo=Math.min(900/(Bp.x1-Bp.x0),1000/(Bp.y1-Bp.y0));
+    cam.x=lerp(cam.x,(B.x0+B.x1)/2,p);cam.y=lerp(cam.y,(B.y0+B.y1)/2,p);cam.z=lerp(cam.z,zo,p);
+  }
+  return cam;
+}
+function wheelAngle(sc,t){ // angle of the currently sung letter
+  const U=sc.units;let k=0;for(let j=0;j<U.length;j++)if(t>=U[j].s)k=j;
+  const a0=U[0].ang;if(t<U[0].s)return a0;
+  const nx=k+1<U.length?U[k+1]:null,p=nx?eIO(clamp((t-U[k].s)/Math.max(.05,nx.s-U[k].s))):0;
+  return nx?lerp(U[k].ang,nx.ang,p):U[k].ang;
+}
+
+/* ---------- scene render ---------- */
+function renderScene(sc,t){
+  if(t<sc.s-.6||t>sc.out+.6){if(sc.shown){sc.el.style.display='none';sc.shown=false}return}
+  if(!sc.shown){sc.el.style.display='';sc.shown=true}
+  const x=t-sc.out;
+  let tf,op=1,bl=0;
+  if(sc.exit==='cam'){
+    const c=camAt(sc,t);let z=c.z,a=c.a;
+    if(x>0){const e=eInC(clamp(x/.42));z*=1-.75*e;a+=45*e*(sc.i%2?1:-1);op=1-e;bl=12*e}
+    tf=`scale(${f3(z)}) rotate(${a.toFixed(2)}deg) translate(${f1(-c.x)}px,${f1(-c.y)}px)`;
+  }else if(sc.st==='wheel'){
+    const in_=eBack(clamp((t-sc.s+.5)/.5),1.4);let a=-wheelAngle(sc,t),z=.4+.6*in_;
+    if(x>0){const e=eInC(clamp(x/.45));a-=300*e;z*=1-.8*e;op=1-e}
+    tf=`translateY(40px) scale(${f3(z)}) rotate(${a.toFixed(2)}deg)`;
+  }else{
+    const pr=clamp((t-sc.s)/Math.max(.6,sc.out-sc.s));let z=1+.07*pr,r=(sc.i%2?1:-1)*(1.5-3*pr);
+    if(sc.st==='shout')z+=.3*(1-eOutC(clamp((t-sc.s+.1)/.45)));
+    if(sc.st==='wave')r+=3*Math.sin(t*2.2);
+    tf=`scale(${f3(z)}) rotate(${r.toFixed(2)}deg)`;
+  }
+  sc.el.style.transform=tf;sc.el.style.opacity=op;sc.el.style.filter=bl>.4?`blur(${f1(bl)}px)`:'';
+  let ak=0;sc.chunks.forEach((c,k)=>{if(t>=c.s-.05)ak=k});
+  if(sc.st==='zoom')sc.chunks.forEach((c,k)=>{
+    const end=k<sc.chunks.length-1?sc.chunks[k+1].s-.04:sc.out,y=t-end;
+    if(t<c.s-.3||y>.32){c.g.style.display='none';return}
+    c.g.style.display='';
+    if(y>0){const p=clamp(y/.3);c.g.style.transform=`scale(${f3(1+4.5*eInC(p))})`;c.g.style.opacity=1-p;c.g.style.filter=`blur(${f1(p*14)}px)`}
+    else{c.g.style.transform=`scale(${f3(1+.05*Math.max(0,t-c.s))})`;c.g.style.opacity=1;c.g.style.filter=''}
+  });
+  const int=PAL[SECT[secAt(t)][1]].int,surf=sc.fl.has('surf');
+  for(const u of sc.units){
+    const o=entry(u,t);if(!o){hideU(u);continue}
+    if(t>u.s+.35){
+      const bp=pulse(t-u.k*.025),amp=(u.ch===ak?24:10)*(.6+.4*int);
+      o.ly-=amp*bp;if(u.ch===ak){o.sy*=1+.08*bp;o.sx*=1-.05*bp}
+      if(sc.st==='wave'){const A=surf?34:18;o.ly+=A*Math.sin(t*5.5-u.x*.012);o.dr+=(surf?9:5)*Math.cos(t*5.5-u.x*.012)}
+      if(sc.st==='hoist'){o.sx*=1+.06*Math.sin(t*4+u.y*.01);o.dr+=2*Math.sin(t*3+u.k)}
+      if(u.big){o.dx+=6*nz(t*31,u.k);o.dy+=6*nz(t*29,u.k+5)}
+    }
+    if(sc.exit!=='cam'&&sc.exit!=='wheel'&&sc.exit!=='zoom')exitFx(sc.exit,sc.out,u,t,o);
+    const now=t>=u.s&&t<u.e+.04;
+    if(now!==u.now){u.el.classList.toggle('now',now);u.now=now}
+    if(now){o.sx*=1.12;o.sy*=1.12}
+    applyU(u,o);
+  }
+}
+function renderTitle(tt,t){
+  if(t<tt.a-.1||t>tt.b+.1){if(tt.shown){tt.el.style.display='none';tt.shown=false}return}
+  if(!tt.shown){tt.el.style.display='';tt.shown=true}
+  const pb=pulse(t),bi=beatIdx(t),g=bi-(bi%8);
+  tt.el.style.transform=`translateY(-80px) scale(${f3(1+.04*Math.sin((t-tt.a)*.8)+.04*pb)}) rotate(${(3*Math.sin((t-tt.a)*1.2)).toFixed(2)}deg)`;
+  for(const u of tt.units){
+    const o=entry(u,t);if(!o){hideU(u);continue}
+    if(t>u.s+.3){o.ly-=36*pulse(t-u.k*.05);o.ly+=14*Math.sin(t*5-u.x*.01);
+      if(g>=0&&BT[g]>u.s+.3)o.ry=360*eIO(clamp((t-BT[g]-u.k*.05)/.55))}
+    exitFx(tt.v===1?'sink':'explode',tt.ex,u,t,o);
+    applyU(u,o);
+  }
+}
+
+/* ---------- background: sky, sun, clouds, gulls, sea ---------- */
+let PP=[],RG=[],STARS=[],CLOUDS=[],GULLS=[];
+const CLOUD_SVG='<svg viewBox="0 0 360 150" width="360" height="150"><path d="M40 130 Q0 130 10 100 Q20 70 60 80 Q70 30 130 40 Q170 0 220 35 Q280 20 290 70 Q350 70 340 110 Q335 135 300 130 Z" fill="#fff"/></svg>';
+function buildFx(){
+  for(let j=0;j<150;j++){const d=document.createElement('div');d.className='p';d.style.display='none';fxL.appendChild(d);PP.push(d)}
+  for(let j=0;j<5;j++){const d=document.createElement('div');d.className='rg';d.style.display='none';fxL.appendChild(d);RG.push(d)}
+  for(let j=0;j<70;j++){const d=document.createElement('div');d.className='star';d.style.transform=`translate(${f1(H(j,31)*1080)}px,${f1(H(j,32)*1150)}px) scale(${f3(.5+H(j,33)*1.3)})`;$('stars').appendChild(d);STARS.push(d)}
+  for(let j=0;j<6;j++){const d=document.createElement('div');d.className='cloud';d.innerHTML=CLOUD_SVG;$('clouds').appendChild(d);CLOUDS.push(d)}
+  for(let j=0;j<4;j++){const d=document.createElement('div');d.className='gull';d.innerHTML='<svg viewBox="0 0 70 30" width="70" height="30"><path d="M2 20 Q18 2 35 18 Q52 2 68 20" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/></svg>';$('gulls').appendChild(d);GULLS.push(d)}
+}
+const HZ=1235; // horizon
+function wavePath(base,A,k,sp,ph,t){
+  let d=`M0 1920 L0 ${f1(base)}`;
+  for(let x=0;x<=1080;x+=30){const y=base+A*Math.sin(x*k+t*sp+ph)+A*.45*Math.sin(x*k*2.3-t*sp*1.3+ph*2);d+=` L${x} ${f1(y)}`}
+  return d+' L1080 1920 Z';
+}
+function renderBg(t,P,A,pb){
+  skyEl.style.background=`linear-gradient(180deg,${rgb(P.sky1)} 0%,${rgb(P.sky2)} ${HZ/19.2}%)`;
+  let sunY=P.sun;if(A&&A.fl.has('sun'))sunY=Math.max(sunY,lerp(sunY,.8,eOutC(clamp((t-A.s)/1.6))));
+  const sy=lerp(HZ+120,300,sunY);
+  sunEl.style.transform=`translate(${540}px,${f1(sy)}px) scale(${f3(1+.05*pb)})`;sunEl.style.opacity=f3(clamp(sunY*5));
+  sunEl.style.background=`radial-gradient(circle,#fffbe6 0%,${rgb(mix([255,230,120],P.acc,.35))} 38%,${rgb(P.acc,.35)} 55%,${rgb(P.acc,0)} 70%)`;
+  STARS.forEach((d,j)=>{d.style.opacity=f3(P.stars*(.4+.6*Math.abs(Math.sin(t*(1+H(j,34)*2)+j))))});
+  CLOUDS.forEach((d,j)=>{const sp=18+14*H(j,41),x=((H(j,42)*1600-t*sp)%1600+1600)%1600-360,y=150+H(j,43)*700,s=.6+.8*H(j,44);
+    d.style.transform=`translate(${f1(x)}px,${f1(y)}px) scale(${f3(s)})`;d.style.opacity=f3(P.cloud*.9)});
+  GULLS.forEach((d,j)=>{const sp=60+40*H(j,51),x=((H(j,52)*1500+t*sp)%1500+1500)%1500-200,y=260+H(j,53)*500+20*Math.sin(t*1.5+j);
+    d.style.transform=`translate(${f1(x)}px,${f1(y)}px) scaleY(${f3(.6+.4*Math.sin(t*9+j*2))}) scale(${f3(.7+.5*H(j,54))})`;d.style.opacity=f3(P.gull)});
+  const cols=[mix(P.sea1,[255,255,255],.25),P.sea1,P.sea2],ph=[0,1.7,3.1];
+  WV.forEach((w,j)=>{w.setAttribute('d',wavePath(HZ+j*150,18+j*10+14*pb,.008-j*.0015,1.6+j*.5,ph[j],t));w.setAttribute('fill',rgb(cols[j]));
+    w.setAttribute('stroke','rgba(255,255,255,.75)');w.setAttribute('stroke-width',j===0?5:8)});
+}
+function lastImp(t){let lo=0,hi=IMP.length-1,b=-1;while(lo<=hi){const m=(lo+hi)>>1;if(IMP[m].t<=t){b=m;lo=m+1}else hi=m-1}return b}
+function activeScene(t){let a=null;for(const sc of S)if(t>=sc.s-.05&&t<sc.out+.25)a=sc;return a}
+function renderFx(t,P,A,pb){
+  const en=energy(t),i1=lastImp(t);
+  let sx=0,sy=0,sr=0,punch=0,fl=0,ab=0,n=0,rn=0;
+  for(let i=i1;i>=0;i--){
+    const m=IMP[i],a=t-m.t;if(a>1.2)break;
+    const d=m.s*Math.exp(-a*8);sx+=30*d*nz(a*52,m.t);sy+=30*d*nz(a*47,m.t+3);sr+=2*d*nz(a*41,m.t+7);
+    punch+=.07*m.s*Math.exp(-a*13);fl=Math.max(fl,m.fl*m.s*Math.exp(-a*16));ab=Math.max(ab,d);
+    if(m.s>=.7&&a<.6&&rn<RG.length){const r=RG[rn++],p=a/.6,rad=80+1300*eOutC(p);r.style.display='';
+      r.style.width=r.style.height=2*rad+'px';r.style.transform=`translate(${f1(m.x-rad)}px,${f1(m.y-rad)}px)`;
+      r.style.borderWidth=f1(16*(1-p)+1)+'px';r.style.borderColor='#fff';r.style.opacity=1-p}
+    for(let j=0;j<m.n&&n<PP.length;j++){
+      const h1=H(j,m.t*7.1),h2=H(j+50,m.t*3.3),h3=H(j+99,m.t),life=1-a/(.7+.4*h3);
+      if(life<=0)continue;
+      const d2=PP[n++],ang=h1*Math.PI*2,sp=(500+1300*h2)*Math.sqrt(m.s),k=(1-Math.exp(-3.2*a))/3.2,
+        x=m.x+Math.cos(ang)*sp*k,y=m.y+Math.sin(ang)*sp*k-250*k+900*a*a,drop=j%3===0;
+      d2.style.display='';d2.style.background=drop?'#e8f8ff':rgb([P.acc,P.acc2,P.hi,[255,255,255]][j%4]);d2.style.opacity=Math.min(1,life*1.6);
+      d2.style.borderRadius=drop?'50%':'2px';
+      d2.style.transform=`translate(${f1(x)}px,${f1(y)}px) rotate(${f1(h3*1440*a+h1*360)}deg) scale(${f3((drop?1.1:.8+.9*h3)*life)})`;
+    }
+  }
+  for(;n<PP.length;n++)if(PP[n].style.display!=='none')PP[n].style.display='none';
+  for(;rn<RG.length;rn++)if(RG[rn].style.display!=='none')RG[rn].style.display='none';
+  sx+=5*Math.sin(t*1.7)+3*Math.sin(t*3.1);sy+=5*Math.sin(t*1.3+1);sr+=.6*Math.sin(t*.9);
+  world.style.transform=`translate(${f1(sx)}px,${f1(sy)}px) rotate(${sr.toFixed(2)}deg) scale(${f3(1+punch+.025*pb*P.int)})`;
+  flashEl.style.opacity=Math.min(.3,fl*.7);
+  let inv=0;if(A&&A.inv)inv=clamp((t-A.s+.08)/.08)*(1-clamp((t-A.out)/.15));
+  invEl.style.background=rgb(P.acc2);invEl.style.opacity=inv;
+  raysEl.style.opacity=Math.min(.5,(P.ray+.25*ab)*(1+en));raysEl.style.transform=`rotate(${f1(t*10)}deg) scale(${f3(1+.12*pb)})`;
+  let spd=0;if(A&&A.fl.has('speed'))spd=clamp((t-A.s+.1)/.2)*(1-clamp((t-A.out)/.2));
+  speedEl.style.opacity=f3(.55*spd);speedEl.style.transform=`rotate(${f1((Math.floor(t*30)*37)%360)}deg)`;
+}
+function render(t){
+  const P=palAt(t),pb=pulse(t),A=activeScene(t);
+  cv.style.setProperty('--acc',rgb(P.acc));cv.style.setProperty('--acc2',rgb(P.acc2));cv.style.setProperty('--hi',rgb(P.hi));cv.style.setProperty('--ink',rgb(P.ink));
+  renderBg(t,P,A,pb);
+  for(const sc of S)renderScene(sc,t);
+  for(const tt of TT)renderTitle(tt,t);
+  renderFx(t,P,A,pb);
+  progEl.style.width=(t/D.dur*100).toFixed(2)+'%';
+  fadeEl.style.opacity=clamp((t-(D.dur-1.4))/1.3);
+}
+
+/* ---------- boot ---------- */
+const ALL=D.lines.map(L=>L.w.map(w=>w[0]).join('')).join('')+CHO;
+window.DUR=D.dur;
+window.READY=(async()=>{
+  try{await Promise.all([document.fonts.load(FONT.kr,ALL),document.fonts.load(FONT.em,ALL),document.fonts.load(FONT.en,'SAILINGMYSEA!~\'')])}catch(e){console.warn(e)}
+  S=D.lines.map(makeScene);
+  TT=[[96.1,100.6,0],[134.8,D.dur,1]].map(([a,b,v])=>makeTitle(a,b,v));
+  buildImpacts();buildFx();
+  window.renderAt=render;render(0);
+})();
+
+if(new URLSearchParams(location.search).has('render'))document.body.classList.add('render');
+else{
+  const au=$('au'),pp=$('pp');
+  const loop=()=>{render(au.currentTime);$('fill').style.width=(au.currentTime/D.dur*100)+'%';
+    $('time').textContent=Math.floor(au.currentTime/60)+':'+String(Math.floor(au.currentTime%60)).padStart(2,'0');requestAnimationFrame(loop)};
+  pp.onclick=()=>{au.paused?au.play():au.pause()};au.onplay=()=>pp.textContent='❚❚';au.onpause=()=>pp.textContent='▶';
+  $('bar').onclick=e=>{const r=e.currentTarget.getBoundingClientRect();au.currentTime=(e.clientX-r.left)/r.width*D.dur};
+  document.addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();pp.click()}if(e.code==='ArrowRight')au.currentTime+=5;if(e.code==='ArrowLeft')au.currentTime-=5});
+  READY.then(()=>requestAnimationFrame(loop));
+}
+</script>
+</body>
+</html>

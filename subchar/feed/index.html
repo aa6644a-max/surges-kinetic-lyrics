@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sub Character Feed</title>
+<link rel="stylesheet" href="../puretype/style.css">
+</head>
+<body>
+<!-- YOUNHA "Sub character": the feed, one take. Build: python subchar/feed/build.py -> index_built.html
+     ?debug=1 shows time / section / lyric; ?render is used by work/render.mjs. -->
+<canvas id="cv" width="1080" height="1920"></canvas>
+<div id="bar" hidden><button id="play">▶</button><input id="rng" type="range"><span id="lab"></span></div>
+<script>window.D=/*DATA*/null;if(location.search.includes('render'))document.body.className='render'</script>
+<script src="../puretype/engine.js"></script>
+<script src="jelly.js"></script>
+
+<script src="shots1.js"></script>
+<script src="shots2.js"></script>
+<script src="shots3.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

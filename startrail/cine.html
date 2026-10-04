@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>STAR TRAIL Cinematic</title>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@100;300;600&family=Noto+Sans+KR:wght@100;300;700;900&display=swap" rel="stylesheet">
+<style>*{margin:0}html,body{height:100%;background:#000;overflow:hidden}#cv{position:absolute;left:50%;top:50%;width:1080px;height:1920px;transform-origin:0 0}</style>
+</head>
+<body>
+<canvas id="cv" width="1080" height="1920"></canvas>
+<script>
+const D=/*DATA*/null;
+const cv=document.getElementById('cv'),W=1080,H=1920,CX=540,CY=960;let g=cv.getContext('2d');const G0=g;
+function fit(){const s=Math.min(innerWidth/W,innerHeight/H);cv.style.transform=`scale(${s}) translate(-50%,-50%)`}addEventListener('resize',fit);fit();
+const clamp=(x,a=0,b=1)=>x<a?a:x>b?b:x,lerp=(a,b,x)=>a+(b-a)*x;
+const eOutC=x=>1-(1-x)**3,eInC=x=>x*x*x,eIO=x=>x<.5?4*x*x*x:1-(-2*x+2)**3/2,eOutX=x=>x>=1?1:1-2**(-10*x),eInX=x=>x<=0?0:2**(10*x-10);
+const eBk=(x,c=1.7)=>{x=clamp(x)-1;return 1+(c+1)*x*x*x+c*x*x};
+const R=(i,s=0)=>{const x=Math.sin(i*127.1+s*311.7+.5)*43758.5453;return x-Math.floor(x)};
+const P=(t,a,d)=>clamp((t-a)/d);
+const EN=(w,f)=>`${w} ${f}px "Josefin Sans"`,KR=(w,f)=>`${w} ${f}px "Noto Sans KR"`;
+const BLUE='#6FA8FF',GOLD='#FFD36B',NIGHT0='#05071A',NIGHT1='#0E1540';
+const BEAT=60/94,B0=6.92%BEAT;const pulse=t=>{const b=(t-B0)/BEAT;return b<0?0:Math.exp(-(b-Math.floor(b))*BEAT*7)};
+const Ln=D.lines;const U=(i,k)=>Ln[i].u[k];const uS=(i,k)=>Ln[i].u[k][1];
+
+/* ================= world layers (2.5D with a moving camera) ================= */
+// camera: x,y in world px, z zoom, r roll. Layers use parallax factor pf (0 = infinitely far).
+let CAM={x:0,y:0,z:1,r:0};
+function layer(pf,fn){g.save();g.translate(CX,CY);g.rotate(CAM.r*pf);const z=1+(CAM.z-1)*pf;g.scale(z,z);g.translate(-CAM.x*pf,-CAM.y*pf);fn();g.restore()}
+function sky(t){const gr=g.createLinearGradient(0,0,0,H);gr.addColorStop(0,NIGHT0);gr.addColorStop(1,NIGHT1);g.fillStyle=gr;g.fillRect(0,0,W,H)}
+function starfield(t,n,seed,spread,a,size=1){for(let i=0;i<n;i++){const x=(R(i,seed)-.5)*spread,y=(R(i,seed+1)-.5)*spread*1.6,r=(.5+2*R(i,seed+2)**3)*size;g.globalAlpha=a*(.25+.75*R(i,seed+3))*(.6+.4*Math.sin(t*(1+2*R(i,seed+4))+i));g.fillStyle='#fff';g.beginPath();g.arc(x,y,r,0,7);g.fill()}g.globalAlpha=1}
+function trails(t,a,cx=0,cy=-500,rot=0){if(a<=0)return;for(let i=0;i<200;i++){const r=40+1500*R(i,5)**.8,a0=R(i,6)*6.28+t*.04+rot,len=.15+.5*R(i,7);g.strokeStyle=`rgba(${i%6?'170,200,255':'111,168,255'},${a*(.08+.3*R(i,8))})`;g.lineWidth=.8+1.6*R(i,10);g.beginPath();g.arc(cx,cy,r,a0,a0+len);g.stroke()}}
+function flare(x,y,r,col,a=1,rays=1){if(a<=0)return;g.save();g.globalCompositeOperation='lighter';g.globalAlpha=a;
+  const gl=g.createRadialGradient(x,y,0,x,y,r*4);gl.addColorStop(0,'rgba(255,255,255,.95)');gl.addColorStop(.12,col);gl.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gl;g.fillRect(x-r*4,y-r*4,r*8,r*8);
+  if(rays){for(const [w,l,an] of [[3,r*14,0],[3,r*14,Math.PI/2],[1.5,r*7,Math.PI/4],[1.5,r*7,-Math.PI/4]]){const lg=g.createLinearGradient(x-l,y,x+l,y);lg.addColorStop(0,'rgba(0,0,0,0)');lg.addColorStop(.5,'rgba(255,255,255,.9)');lg.addColorStop(1,'rgba(0,0,0,0)');g.save();g.translate(x,y);g.rotate(an);g.translate(-x,-y);g.fillStyle=lg;g.fillRect(x-l,y-w*rays/2,l*2,w*rays);g.restore()}}
+  g.restore()}
+function dust(t,a){g.save();g.globalCompositeOperation='lighter';for(let i=0;i<26;i++){const x=((R(i,70)*1600+t*(20+40*R(i,71)))%1600)-800,y=((R(i,72)*2600-t*(30+50*R(i,73)))%2600+2600)%2600-1300,r=6+26*R(i,74);
+  const gl=g.createRadialGradient(x,y,0,x,y,r);gl.addColorStop(0,`rgba(170,200,255,${.18*a})`);gl.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gl;g.fillRect(x-r,y-r,r*2,r*2)}g.restore()}
+
+/* ================= kinetic glyphs ================= */
+// txt drawn glyph-by-glyph centred at (x,y); m(k,a,glyph) returns per-glyph transform. a = t - sung time of unit k.
+function glyphs(t,units,times,x,y,font,col,m,o={}){
+  g.save();g.font=font;g.textBaseline='middle';g.textAlign='center';
+  const items=[];const gap=o.gap??g.measureText(' ').width*1.2;units.forEach((u,k)=>{const cs=o.split===false?[u]:[...u];cs.forEach((c,j)=>items.push({c,k,j,w:g.measureText(c).width+(o.track||0)+(j===cs.length-1&&k<units.length-1?gap:0)}))});
+  const tot=items.reduce((a,b)=>a+b.w,0)-(o.track||0);let xx=x-(o.align==='left'?0:o.align==='right'?tot:tot/2);
+  items.forEach((it,n)=>{const ts=times[it.k]+(o.stagger||0)*it.j,a=t-ts;const r=m(it.k,a,it,n)||{};if((r.al??1)<=0){xx+=it.w;return}
+    const cw=g.measureText(it.c).width;g.save();g.translate(xx+cw/2+(r.dx||0),y+(r.dy||0));g.rotate(r.rot||0);g.scale(r.sx??r.s??1,r.sy??r.s??1);g.globalAlpha=clamp(r.al??1);
+    if(r.blur>.5)g.filter=`blur(${r.blur.toFixed(1)}px)`;const cc=r.col||col;if(r.glow){g.shadowColor=r.gcol||cc;g.shadowBlur=r.glow}g.fillStyle=cc;g.fillText(it.c,0,0);g.restore();xx+=it.w});
+  g.restore();return tot}
+const sing=(i,k,t)=>t>=U(i,k)[1]&&t<U(i,k)[2];
+// a standard "sung" highlight: brighter + glow while the unit is sung
+const lit=(a,base)=>a<0?base:(a<.35?1:1);
+
+/* ================= line designs (test range: lines 5-10) ================= */
+const SHOT=[];const shot=(a,b,fn,cam)=>SHOT.push({a,b,fn,cam});
+// L5 — "the faintest star": everything is out of focus and comes into focus word by word; a tiny dim 6
+shot(44.35,49.5,t=>{
+  layer(.15,()=>starfield(t,160,1,2400,.6));layer(.4,()=>trails(t,.35,0,-700));
+  const i=5,T=j=>uS(i,j);
+  layer(1,()=>{
+    const f1=(k,a)=>({al:clamp((a+.25)/.3)*.85,blur:14*(1-eOutC(clamp((a+.1)/.5))),dy:(1-eOutC(clamp((a+.2)/.6)))*20});
+    glyphs(t,['비록','지금은'],[T(0),T(2)],-120,-420,KR(300,64),'#DDE6FF',f1,{track:6});
+    // "흐린" stays blurry on purpose
+    glyphs(t,['흐린'],[T(5)],-200,-250,KR(700,120),'#9DB8F0',(k,a)=>({al:clamp((a+.2)/.3)*.7,blur:10+3*Math.sin(t*3),s:1+.02*Math.sin(t*2)}),{track:20});
+    // the dim 6 flickers like a faint star, 등성 small beside it
+    const a6=t-T(7);if(a6>-.2){const q=eOutC(clamp((a6+.2)/.6));g.save();g.globalAlpha=q*(.45+.2*Math.sin(t*7)*Math.sin(t*3.1));g.font=EN(100,420);g.textAlign='center';g.textBaseline='middle';g.fillStyle=BLUE;g.shadowColor=BLUE;g.shadowBlur=30;g.fillText('6',120,40);g.restore();
+      flare(240,-120,3+pulse(t)*2,'rgba(111,168,255,.6)',.5*q)}
+    glyphs(t,['등성'],[T(8)],300,190,KR(300,72),'#fff',(k,a)=>({al:clamp((a+.15)/.25),dy:(1-eOutC(clamp((a+.15)/.4)))*30}),{track:10});
+    glyphs(t,['이라','해도'],[T(10),T(12)],60,420,KR(300,58),'#DDE6FF',f1,{track:6});
+    // magnitude scale ticks
+    for(let m=1;m<=6;m++){const y=-300+m*70,on=m===6&&t>T(7);g.globalAlpha=on?1:.25;g.fillStyle=on?BLUE:'#fff';g.beginPath();g.arc(-420,y,(13-m*1.8),0,7);g.fill()}g.globalAlpha=1;
+  });
+},{x:[0,0],y:[-40,20],z:[1.0,1.12],r:[-.02,.01]});
+// L6 — new light streaks, the dark swallows the words, then one step forward at a time
+shot(49.5,55.0,t=>{
+  const i=6,T=j=>uS(i,j),dark=eIO(P(t,T(4)-.1,1.0))*(1-eOutC(P(t,T(10)-.1,.8)));
+  layer(.15,()=>starfield(t,160,11,2400,.6*(1-dark*.85)));
+  layer(1,()=>{
+    // "새로운 everys" arrives as a light streak from the left
+    const s0=(k,a)=>{const p=eOutX(clamp((a+.15)/.45));return {dx:(1-p)*-900,sx:1+(1-p)*1.5,al:clamp((a+.15)/.1)*(1-dark*.9),glow:24*(1-p)+8,gcol:BLUE}};
+    glyphs(t,['새로운'],[T(0)],-160,-520,KR(300,70),'#fff',s0,{track:8});
+    glyphs(t,['everys,'],[T(3)],110,-400,EN(100,150),'#fff',s0,{split:true,track:6,stagger:.03});
+    if(t>T(3)-.2&&t<T(3)+.6){const p=P(t,T(3)-.2,.8);g.fillStyle=`rgba(111,168,255,${.5*(1-p)})`;g.fillRect(-900+1800*eOutC(p)-400,-410,400,4)}
+    // "새까만 어둠 속" sinks into the dark: letters dim and drift down
+    glyphs(t,['새까만','어둠','속'],[T(4),T(7),T(9)],0,-120,KR(900,96),'#C8D4F5',(k,a,it)=>{const sink=clamp((t-T(9)-.2)/1.4);return {al:clamp((a+.1)/.2)*(1-.75*sink),dy:(1-eOutC(clamp((a+.1)/.4)))*-40+sink*40*R(it.c.charCodeAt(0),3),blur:sink*6}},{track:14});
+    // "한 발짝 내딛어": each syllable steps toward the camera and leaves a light ripple on the ground
+    const steps=[10,11,12,13,14,15];steps.forEach((k,n)=>{const a=t-T(k);if(a<-.1)return;const p=eBk(clamp((a+.1)/.35),2),x=-330+n*132,y=330-n*18,s=.6+.4*p+n*.06;
+      const rip=clamp(a/.9);g.strokeStyle=`rgba(111,168,255,${.7*(1-rip)})`;g.lineWidth=3;g.beginPath();g.ellipse(x,y+80,20+140*rip,6+30*rip,0,0,7);g.stroke();
+      g.save();g.globalAlpha=clamp((a+.1)/.15);g.translate(x,y-(1-p)*60);g.scale(s,s);g.font=KR(900,110);g.textAlign='center';g.textBaseline='middle';g.fillStyle=sing(i,k,t)?'#fff':'#DCE5FF';g.shadowColor=BLUE;g.shadowBlur=sing(i,k,t)?30:10;g.fillText(U(i,k)[0],0,0);g.restore()});
+  });
+  // the darkness closes in from the edges
+  if(dark>0){const gr=g.createRadialGradient(CX,CY,lerp(1400,260,dark),CX,CY,lerp(1600,700,dark));gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(1,`rgba(0,0,6,${.95*dark})`);g.fillStyle=gr;g.fillRect(0,0,W,H)}
+},{x:[-60,60],y:[0,60],z:[1.05,1.18],r:[.02,-.015]});
+// L7 — every syllable twinkles; "cliche" with a star on the i; whiteout at the end
+shot(55.0,57.0,t=>{
+  const i=7,T=j=>uS(i,j);layer(.15,()=>starfield(t,200,21,2400,.7));layer(.5,()=>trails(t,.25,0,-300,.3));
+  layer(1,()=>{
+    const pos=[[-330,-260],[-170,-330],[-10,-250],[170,-330],[330,-260]];
+    [0,1,2,3,4].forEach((k,n)=>{const a=t-T(k);if(a<-.1)return;const p=eBk(clamp((a+.1)/.3),2.4);g.save();g.translate(pos[n][0],pos[n][1]);g.scale(p,p);g.font=KR(700,120);g.textAlign='center';g.textBaseline='middle';g.fillStyle='#fff';g.shadowColor=BLUE;g.shadowBlur=24;g.fillText(U(i,k)[0],0,0);g.restore();
+      flare(pos[n][0]+48,pos[n][1]-52,2.5,'rgba(111,168,255,.8)',clamp(1-a/.6)*(a>0?1:0))});
+    const a=t-T(5);if(a>-.1){const p=eOutC(clamp((a+.1)/.5));g.save();g.globalAlpha=clamp((a+.1)/.2);g.font=EN(100,200);g.textAlign='center';g.textBaseline='alphabetic';g.fillStyle='#fff';g.shadowColor=BLUE;g.shadowBlur=20;
+      const txt='clıche';g.translate(0,160+(1-p)*40);g.fillText(txt,0,0);const pre=g.measureText('cl').width,full=g.measureText(txt).width,iw=g.measureText('ı').width;g.restore();
+      flare(-full/2+pre+iw/2,160-180-(1-eBk(clamp((a-.15)/.4),2.5))*120,6,'rgba(111,168,255,.9)',clamp((a-.1)/.1))}
+  });
+  const wo=P(t,56.75,.25);if(wo>0){g.fillStyle=`rgba(240,244,255,${eInC(wo)})`;g.fillRect(0,0,W,H)}
+},{x:[0,0],y:[-20,-60],z:[1.0,1.08],r:[0,0]});
+// L8 — "채우자 universe": the word multiplies until it fills the frame (camera pulls back)
+shot(57.0,59.75,t=>{
+  const i=8,T=j=>uS(i,j);const wo=1-P(t,57.0,.35);
+  layer(.15,()=>starfield(t,260,31,2600,.8));
+  layer(1,()=>{
+    const a=t-T(3),n=Math.floor(clamp(a/1.4)*48);
+    for(let k=0;k<n;k++){const row=Math.floor(k/4),col=k%4,x=(col-1.5)*260+(row%2)*130,y=-700+row*120;const q=clamp((a-k*.03)/.3);g.globalAlpha=.18+.3*R(k,9);g.font=EN(100,70);g.textAlign='center';g.textBaseline='middle';g.fillStyle=R(k,8)>.8?BLUE:'#fff';g.fillText('universe',x,y+(1-q)*20)}g.globalAlpha=1;
+    glyphs(t,['채우자'],[T(0)],0,-80,KR(900,190),'#fff',(k,a,it,n2)=>{const p=eBk(clamp((a+.1)/.35),2);return {s:p,al:clamp((a+.1)/.1),glow:30,gcol:BLUE}},{track:30});
+    if(a>-.1){const p=eOutC(clamp((a+.1)/.5));g.save();g.globalAlpha=clamp((a+.1)/.2);g.font=EN(300,130);g.textAlign='center';g.textBaseline='middle';g.fillStyle='#fff';g.shadowColor=BLUE;g.shadowBlur=30;g.letterSpacing=`${Math.round(10+40*(1-p))}px`;g.fillText('UNIVERSE',0,140);g.restore()}
+  });
+  if(wo>0){g.fillStyle=`rgba(240,244,255,${wo})`;g.fillRect(0,0,W,H)}
+},{x:[0,0],y:[0,0],z:[1.25,.92],r:[0,.02]});
+// L9 — chorus: shockwave on "노래해", particles gather into a star behind "별", then the words climb a beam of light
+shot(59.75,65.3,t=>{
+  const i=9,T=j=>uS(i,j);const climb=eIO(P(t,T(8)-.2,2.0));
+  layer(.15,()=>starfield(t,220,41,2600,.8));layer(.4,()=>trails(t,.4,0,-900,t*.1));
+  layer(1,()=>{
+    // 노래해 hit
+    const a0=t-T(0);const ring=clamp(a0/.8);if(a0>0){g.strokeStyle=`rgba(255,255,255,${.8*(1-ring)})`;g.lineWidth=10*(1-ring)+1;g.beginPath();g.arc(0,-560,60+700*eOutC(ring),0,7);g.stroke()}
+    glyphs(t,['노','래','해,'],[T(0),T(1),T(2)],0,-560,KR(900,200),'#fff',(k,a)=>{const p=eOutC(clamp((a+.06)/.18));return {s:1+1.6*(1-p),al:clamp((a+.06)/.06),glow:40,gcol:BLUE,dy:-climb*120}},{split:false,track:10,gap:0});
+    // star forming behind 별
+    const as=t-T(6);if(as>-.6){const p=clamp((as+.6)/.6);for(let k=0;k<60;k++){const an=R(k,50)*6.28,r0=500+400*R(k,51),r=lerp(r0,0,eIO(p)),x=Math.cos(an)*r,y=-20+Math.sin(an)*r;g.fillStyle=`rgba(255,255,255,${.8*(1-p*.5)})`;g.beginPath();g.arc(x,y,2+2*R(k,52),0,7);g.fill()}
+      if(as>0){const q=clamp(as/.6);g.save();g.globalAlpha=1-q*.4;g.fillStyle=BLUE;g.shadowColor=BLUE;g.shadowBlur=60;g.beginPath();for(let k=0;k<10;k++){const rr=k%2?110:280,an=-Math.PI/2+k*Math.PI/5;g.lineTo(Math.cos(an)*rr*eBk(q,2),-20+Math.sin(an)*rr*eBk(q,2))}g.closePath();g.globalAlpha=.35*(1-q*.3);g.fill();g.restore();flare(0,-20,10,'rgba(111,168,255,.9)',1-q*.5)}}
+    glyphs(t,['빛나는'],[T(3)],-150,-240-climb*80,KR(300,80),'#DCE5FF',(k,a,it,n)=>({al:clamp((a+.1)/.2),dy:(1-eOutC(clamp((a+.1)/.4)))*30}),{track:10,stagger:.2});
+    glyphs(t,['별이'],[T(6)],60,-20-climb*60,KR(900,170),'#fff',(k,a)=>({s:eBk(clamp((a+.05)/.3),2.5),al:clamp((a+.05)/.08),glow:40,gcol:BLUE}),{track:10});
+    // the words climb a beam of light toward the star
+    if(climb>0){const lg=g.createLinearGradient(0,700,0,-400);lg.addColorStop(0,'rgba(111,168,255,0)');lg.addColorStop(1,`rgba(111,168,255,${.35*climb})`);g.fillStyle=lg;g.fillRect(-18,-400,36,1100)}
+    [['모두의',[8,9,10],-150,560,KR(300,90)],['꿈에',[11,12],130,410,KR(300,96)],['닿도록',[13,14,15],-60,250,KR(900,118)]].forEach(([w,ks,x,y,font])=>{
+      glyphs(t,[...w],ks.map(k=>T(k)),x,y,font,'#DCE5FF',(k,a,it,n)=>{const kk=ks[k];const p=eOutC(clamp((a+.1)/.45));return {al:clamp((a+.1)/.12),dy:(1-p)*90,col:sing(i,kk,t)?'#fff':'#DCE5FF',glow:sing(i,kk,t)?30:8,gcol:BLUE}},{track:8,gap:0})});
+  });
+},{x:[0,0],y:[60,-240],z:[1.0,1.06],r:[.015,-.015]});
+// L10 — each English word shines brighter than the last; "우리" and "함께" meet in the middle
+shot(65.3,70.5,t=>{
+  const i=10,T=j=>uS(i,j);layer(.15,()=>starfield(t,220,51,2600,.8));layer(.4,()=>trails(t,.3,0,-600,-t*.1));
+  layer(1,()=>{
+    const words=['Make','each','other','shine','brighter,'];words.forEach((w,n)=>{const a=t-T(n);if(a<-.1)return;const p=eOutC(clamp((a+.1)/.4));const x=[-250,40,-150,120,0][n],y=-560+n*130;
+      g.save();g.globalAlpha=clamp((a+.1)/.15);g.translate(x,y+(1-p)*30);g.font=EN(n>=3?300:100,[90,90,100,140,150][n]);g.textAlign='center';g.textBaseline='middle';g.fillStyle='#fff';g.shadowColor=BLUE;g.shadowBlur=8+n*14;g.fillText(w,0,0);g.restore();if(n>=3)flare(x+[0,0,0,140,190][n],y-50,3+n,'rgba(111,168,255,.8)',.5*clamp(1-a/1))});
+    const am=t-T(5),meet=eIO(clamp((t-T(7)+.1)/.5));
+    if(am>-.1){g.save();g.globalAlpha=clamp((am+.1)/.15);g.font=KR(900,150);g.textAlign='center';g.textBaseline='middle';g.fillStyle='#fff';g.shadowColor=BLUE;g.shadowBlur=24;g.fillText('우리',lerp(-600,-170,eOutC(clamp((am+.1)/.5))),330);g.restore()}
+    const ah=t-T(7);if(ah>-.1){g.save();g.globalAlpha=clamp((ah+.1)/.15);g.font=KR(900,150);g.textAlign='center';g.textBaseline='middle';g.fillStyle='#fff';g.shadowColor=BLUE;g.shadowBlur=24;g.fillText('함께',lerp(600,170,eOutC(clamp((ah+.1)/.5))),330);g.restore()}
+    if(meet>0){g.strokeStyle=`rgba(111,168,255,${meet})`;g.lineWidth=4;g.beginPath();g.moveTo(-40,330);g.lineTo(40,330);g.stroke();flare(0,330,6,'rgba(111,168,255,.9)',meet*(1-clamp((t-T(8)-.8)/1)))}
+  });
+},{x:[0,0],y:[-30,30],z:[1.08,1.0],r:[-.01,.01]});
+
+/* ================= post: bloom, grain, vignette ================= */
+const BL=document.createElement('canvas');BL.width=270;BL.height=480;const bg2=BL.getContext('2d');
+const GR=document.createElement('canvas');GR.width=256;GR.height=256;{const c=GR.getContext('2d'),d=c.createImageData(256,256);for(let k=0;k<d.data.length;k+=4){const v=Math.random()*255;d.data[k]=d.data[k+1]=d.data[k+2]=v;d.data[k+3]=18}c.putImageData(d,0,0)}
+function post(t){bg2.clearRect(0,0,270,480);bg2.filter='blur(6px)';bg2.drawImage(cv,0,0,270,480);bg2.filter='none';g.save();g.globalCompositeOperation='lighter';g.globalAlpha=.55;g.drawImage(BL,0,0,W,H);g.restore();
+  const vg=g.createRadialGradient(CX,CY,500,CX,CY,1250);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.55)');g.fillStyle=vg;g.fillRect(0,0,W,H);
+  const ox=Math.floor(R(Math.floor(t*24),1)*256),oy=Math.floor(R(Math.floor(t*24),2)*256);g.save();g.globalCompositeOperation='overlay';for(let y=-oy;y<H;y+=256)for(let x=-ox;x<W;x+=256)g.drawImage(GR,x,y);g.restore()}
+
+function render(t){g.setTransform(1,0,0,1,0,0);g.globalAlpha=1;g.filter='none';sky(t);
+  const s=SHOT.find(x=>t>=x.a&&t<x.b)||SHOT[t<SHOT[0].a?0:SHOT.length-1];const p=eIO(clamp((t-s.a)/(s.b-s.a)));const c=s.cam;
+  CAM={x:lerp(c.x[0],c.x[1],p),y:lerp(c.y[0],c.y[1],p),z:lerp(c.z[0],c.z[1],p)*(1+.012*pulse(t)),r:lerp(c.r[0],c.r[1],p)};
+  s.fn(t);layer(1.6,()=>dust(t,1));post(t);
+  const fi=clamp((t-SHOT[0].a)/.4);if(fi<1){g.fillStyle=`rgba(0,0,0,${1-fi})`;g.fillRect(0,0,W,H)}}
+window.DUR=D.dur;
+window.READY=(async()=>{const ko=Ln.map(l=>l.u.map(u=>u[0]).join('')).join('');try{await Promise.all([document.fonts.load(EN(100,100),'abcdefghijklmnopqrstuvwxyzıABCDEFGHIJKLMNOPQRSTUVWXYZ6,'),document.fonts.load(EN(300,100),'UNIVERSEshinebrighter,'),document.fonts.load(KR(300,40),ko),document.fonts.load(KR(700,40),ko),document.fonts.load(KR(900,100),ko)])}catch(e){}
+  window.renderAt=render;render(SHOT[0].a)})();
+</script>
+</body>
+</html>

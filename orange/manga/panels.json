@@ -1,0 +1,382 @@
+{
+ "style": "Japanese sports manga panel art for an original high-school volleyball story: black ink on white paper, confident brush and G-pen lines, screentone dot shading and tone gradients, dramatic speed lines, impact bursts and glare drawn in ink, high contrast, cinematic composition; original artwork, not from any existing manga. Colour: strictly black, white and grey screentone, plus ONE spot colour, vivid orange (#FF6A13), used sparingly only where the prompt asks (the volleyball, the sunset sky, small accents). The volleyball is drawn with curved panels in orange and white. People are an original team shown WITHOUT faces: only hands, arms, legs, shoes, backs, silhouettes, the jaw or chin, or hair from behind; heads turned away or cropped out of the frame; never draw eyes, a nose or a full face. No text, no letters, no sound-effect lettering, no speech balloons, no panel borders, no numbers unless asked, no watermark. Fill the whole canvas edge to edge.",
+ "panels": [
+  {
+   "id": "m03_team_backs",
+   "size": "1024x1536",
+   "prompt": "Splash panel: six volleyball players of one team seen from behind, standing shoulder to shoulder at the edge of a bright court, orange jerseys (the only colour) with plain backs, one holding a volleyball against the hip, strong backlight with radiating speed lines, heroic low angle."
+  },
+  {
+   "id": "m01_gym_night",
+   "size": "1536x1024",
+   "prompt": "A dark empty school gymnasium at night, moonlight through tall windows making pale stripes on the wooden floor, one volleyball resting alone on the floor in a pool of moonlight, deep black shadows, quiet mood.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m01_phone",
+   "size": "1024x1536",
+   "prompt": "A smartphone lying on a wooden locker-room bench in the dark, its blank screen glowing and lighting the bench and a folded orange jersey next to it, everything else in deep black ink shadow.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m01_laces",
+   "size": "1024x1536",
+   "prompt": "Close-up of two hands tying the laces of a volleyball shoe in a dim locker room, dramatic side light, fine ink hatching.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m02_lights",
+   "size": "1536x1024",
+   "prompt": "Looking straight up at a gym ceiling: rows of big round lamps switching on one after another with star-shaped glare bursts and radiating light lines, steel trusses in black ink.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m02_court_lit",
+   "size": "1536x1024",
+   "prompt": "A high-angle wide view of the whole gymnasium suddenly lit: the volleyball court with crisp lines and the net in the centre, polished floor reflections, empty bleachers, bright and open.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m04_ticket",
+   "size": "1536x1024",
+   "prompt": "A hand holding up a tournament ticket in front of the gym entrance doors, the ticket plain blank paper with a perforated stub, light behind it, ink tones.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m04_phone_hands",
+   "size": "1024x1536",
+   "prompt": "Two hands holding a smartphone with thumbs typing, the screen a plain glowing rectangle, seen over the shoulder, a sports bag strap and an orange jersey in the background.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m04_shoes_line",
+   "size": "1024x1536",
+   "prompt": "Low angle close-up of volleyball shoes stepping onto the white boundary line of the court, the floor gleaming, tension in the ankles, speed lines.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m04_server",
+   "size": "1536x1024",
+   "prompt": "Over-the-shoulder view from behind a server standing at the service line holding a volleyball at the hip, the whole court and the net ahead, the opponents as distant dark silhouettes, the head cropped by the top edge.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m05_toss",
+   "size": "1024x1536",
+   "prompt": "Looking up from below: a volleyball tossed high in the air against the bright ceiling lamps, the server's raised arm reaching up into the frame from the bottom, radiating focus lines.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m05_hit",
+   "size": "1536x1024",
+   "prompt": "Impact: the server's open palm smashing the volleyball, the ball squashed on contact, explosive impact lines and ink splashes, extreme dynamic angle, only the forearm and shoulder.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m05_flight",
+   "size": "1536x1024",
+   "prompt": "From behind the server's back with the head cropped: the volleyball streaking over the net like a comet with an orange trail toward the opponents' court, speed lines.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m06_receive",
+   "size": "1536x1024",
+   "prompt": "Close-up of two forearms joined in a bump pass meeting the volleyball, knees bent, the floor below, motion lines, tense arms.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m06_set",
+   "size": "1536x1024",
+   "prompt": "Close-up of a setter's fingertips pushing the volleyball upward with a soft touch, seen from below against the lights, delicate lines.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m06_three_jump",
+   "size": "1536x1024",
+   "prompt": "Three players jumping at the net together, seen from behind as black silhouettes against the bright lights, arms raised, the net in the foreground.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m07_sunset",
+   "size": "1024x1536",
+   "prompt": "Through the gym's tall windows: a huge setting sun in orange sinking into the town horizon, the skyline biting into the bottom of the sun, long light beams across the dark gym floor, a volleyball silhouette on the windowsill in the foreground.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m07_glare",
+   "size": "1536x1024",
+   "prompt": "A raised hand shielding the eyes from blinding sunlight, only the hand and the back of the hair visible, big lens-flare circles and glare lines drawn in ink, a white-hot centre.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m08_sweat",
+   "size": "1024x1536",
+   "prompt": "Extreme close-up of a jaw and chin from the side with sweat drops sliding down and falling, the jersey collar, the face cropped above the mouth.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m08_squeak",
+   "size": "1024x1536",
+   "prompt": "Close-up of a shoe sole pivoting hard on the polished floor leaving a skid mark, a sweat drop splashing on the floor, sharp motion lines.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m08_shout",
+   "size": "1536x1024",
+   "prompt": "A player seen from behind shouting toward the court, shout lines radiating from the head, teammates as silhouettes ahead, concentric echo lines in the gym.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m09_highfive",
+   "size": "1536x1024",
+   "prompt": "Two hands meeting in a high five, palms smacking, a burst of impact lines and small sparkles, wristbands, gym lights behind.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m09_shoulders",
+   "size": "1024x1536",
+   "prompt": "Three teammates from behind with arms around each other's shoulders, laughing with shoulders shaking and heads tilted back, faces not visible, warm light.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m09_tear",
+   "size": "1024x1536",
+   "prompt": "A towel draped over a bowed head hiding the face completely, a wrist wiping under it, one tear drop falling onto the floor, quiet emotion.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m10_leap_sky",
+   "size": "1024x1536",
+   "prompt": "Tall panel: a spiker leaping high, seen from far below as a black silhouette against a vast orange sunset sky full of clouds, arm cocked back, the gym roof opening into the sky, birds flying.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m10_feathers",
+   "size": "1536x1024",
+   "prompt": "White feathers and a flock of small birds rising into a bright sky, light and airy, soft screentone clouds.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m11_hang",
+   "size": "1536x1024",
+   "prompt": "At the very top of a jump: the spiker's silhouette frozen in mid-air with the arm drawn back and the volleyball hanging right above the hand, time stopped, radial lines, the net far below.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m11_photo",
+   "size": "1536x1024",
+   "prompt": "The same frozen jump seen through a camera viewfinder: thin focus brackets in the corners, a shutter flash, the spiker's silhouette and the ball at the centre.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m12_spike_impact",
+   "size": "1024x1536",
+   "prompt": "Splash: the volleyball slamming into the opponents' floor after a spike, the floor cracking with exaggerated manga impact, shock-wave rings and flying splinters of light, a defender's outstretched arm too late at the edge.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m12_scoreboard",
+   "size": "1536x1024",
+   "prompt": "A gym scoreboard on the wall: a plain dark panel with four large empty digit windows, blank with no numbers, the bleachers below it, dramatic angle.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m13_back_1",
+   "size": "1024x1536",
+   "prompt": "A small volleyball player seen from behind wearing an orange jersey with a big number 1 on the back (the only text allowed), standing in front of a huge bright gym, narrow shoulders but a strong stance, a giant winged shadow on the wall behind.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m13_tape",
+   "size": "1536x1024",
+   "prompt": "Taped fingers and worn-out volleyball shoes on a bench, scuffed and frayed, quiet light.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m14_rain",
+   "size": "1536x1024",
+   "prompt": "Rain streaming down a gym window at dusk, the empty court reflected in the wet glass, a lone volleyball on the floor inside, melancholy.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m14_omikuji",
+   "size": "1024x1536",
+   "prompt": "A paper fortune slip tied to a branch at a shrine, fluttering in the wind, plain blank paper, soft light, a few cherry blossoms.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m15_run",
+   "size": "1536x1024",
+   "prompt": "Close-up of running feet in volleyball shoes, one foot pushing off the floor, heavy motion lines, sweat drops.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m15_run_back",
+   "size": "1536x1024",
+   "prompt": "A player sprinting away down the court seen from behind, leaning forward, speed lines converging to the far end.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m15_chest",
+   "size": "1536x1024",
+   "prompt": "A hand clutching the front of an orange jersey over the heart, tense knuckles, heat lines rising, close-up.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m16_dive",
+   "size": "1536x1024",
+   "prompt": "A player diving full length to the floor to save the ball, arms stretched, the volleyball just above the fingertips, seen from floor level, decisive moment, focus lines.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m16_pass_chain",
+   "size": "1024x1536",
+   "prompt": "A vertical chain of hands passing the volleyball upward from player to player: forearms at the bottom, fingertips in the middle, a spiking hand at the top, connected by a curving dotted trail.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m17_notebook",
+   "size": "1536x1024",
+   "prompt": "A notebook open on a bench with hand-drawn volleyball formations made only of circles and arrows (no words), a hand holding a pencil, an eraser and a ball beside it.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m17_lying",
+   "size": "1024x1536",
+   "prompt": "A player lying on the gym floor seen from above the head (only the hair and the top of the head, the face out of frame), arms spread, a volleyball resting on the chest, looking up at the ceiling lights, dreamy light.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m17_dream_arena",
+   "size": "1536x1024",
+   "prompt": "A huge packed national arena seen from the court: thousands of tiny abstract crowd dots in the stands, banners without writing, a bright court below, dreamlike glow.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m18_spike_low",
+   "size": "1024x1536",
+   "prompt": "Splash: an extreme low angle of a spiker exploding upward at the net, the arm swinging down, the volleyball streaking like an orange comet, ceiling lights flaring, maximum speed lines.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m18_crowd",
+   "size": "1536x1024",
+   "prompt": "The crowd in the stands cheering with arms raised, drawn only as black silhouettes and screentone, waving towels, energy lines.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m19_dig_dive",
+   "size": "1536x1024",
+   "prompt": "The libero diving low with one arm under the falling volleyball, the floor at eye level, a desperate save, dust and motion lines.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m19_ball_up",
+   "size": "1024x1536",
+   "prompt": "The volleyball rising again above the net after a save, small against a big bright ceiling, hope.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m19_hands_stack",
+   "size": "1024x1024",
+   "prompt": "Seen from directly above: a team's hands stacked together in the centre of a huddle, orange wristbands, the heads around cropped by the frame.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m20_board",
+   "size": "1536x1024",
+   "prompt": "A tactics whiteboard beside the bench with a court diagram and magnets, a hand holding a marker pen about to write, the board otherwise blank.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m20_hand_up",
+   "size": "1024x1536",
+   "prompt": "Point of view of a player who has fallen on the floor looking up: a teammate's hand reaching down to help, the teammate backlit as a black silhouette against the gym lights.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m20_stand",
+   "size": "1024x1536",
+   "prompt": "A player standing up again seen from behind, back straight, light pouring from the court ahead, a long shadow behind.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m21_lonely_ball",
+   "size": "1024x1536",
+   "prompt": "A vast dark empty gym, a single spotlight on the floor and one orange volleyball resting in the light (the only colour), lots of black space, silence.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m21_bench",
+   "size": "1536x1024",
+   "prompt": "An empty team bench at dusk with a towel and a water bottle left behind, long shadows, quiet melancholy.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m22_serve_bounce",
+   "size": "1536x1024",
+   "prompt": "A server's hand bouncing the volleyball on the floor at the service line, the shoes and the line, tension.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m22_toss_ready",
+   "size": "1024x1536",
+   "prompt": "From behind: the server raising the volleyball overhead before the toss, the court and a packed arena ahead, breathing out, light.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m22_jump_serve",
+   "size": "1536x1024",
+   "prompt": "A powerful jump serve at full extension, the volleyball launched with a shock wave, the server's arm and back as a silhouette, speed lines.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m23_tunnel",
+   "size": "1024x1536",
+   "prompt": "The team's feet walking down a long dark arena tunnel toward a bright opening, light spilling in, shoes and shadows.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m23_photos",
+   "size": "1536x1024",
+   "prompt": "Photos pinned on a locker door: snapshots of practices showing only backs, hands and the ball (no faces), a curling corner, warm memory.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m23_run_light",
+   "size": "1536x1024",
+   "prompt": "The team running forward into blinding light seen from behind, nobody looking back, speed lines toward the light.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m24_arena_enter",
+   "size": "1024x1536",
+   "prompt": "Splash: the team's backs at the exit of the tunnel stepping into a huge bright arena, a teal court ahead (teal allowed here), the crowd as a sea of tiny dots, banners without writing, overwhelming light.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m24_final_spike",
+   "size": "1024x1536",
+   "prompt": "Splash, the climax: the final spike from above the net, the spiker's silhouette in a huge arc, the volleyball blazing downward in orange with fire-like speed lines, everything else black and white.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m25_ball_floor",
+   "size": "1536x1024",
+   "prompt": "Extreme close-up of the volleyball touching the floor, the floor shaking, a small dust burst, everything still.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m25_celebrate",
+   "size": "1024x1536",
+   "prompt": "The team jumping in celebration seen from behind, arms raised high, confetti falling, joy.",
+   "ref": "m03_team_backs"
+  },
+  {
+   "id": "m26_dawn",
+   "size": "1024x1536",
+   "prompt": "A calm sunrise over a quiet school with the gym roof at the bottom, a soft orange dawn sky, a few birds, fresh morning.",
+   "ref": "m03_team_backs"
+  }
+ ]
+}

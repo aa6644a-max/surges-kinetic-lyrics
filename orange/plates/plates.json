@@ -1,0 +1,254 @@
+{
+ "note": "Background plates and prop cut-outs for SPYAIR \"Orange\" (the lyrics play volleyball). No people anywhere. gen_plates.py -> raw/<id>.png, prep_plates.py -> <id>.webp for orange/court.",
+ "style": "Japanese sports-anime feature-film background art, hand-painted look with crisp clean shapes and soft brush texture, original artwork (not from any existing anime). Warm, bright and energetic: glossy amber-orange wooden gym floor, white court lines, warm sunlight and ceiling lights, long soft light beams, gentle bloom and atmospheric haze, a little lens flare. Palette: sunset orange (#FF6A13), amber (#E3923A), cream white, deep navy shadows (#101B2D), with teal (#16B3A6) only where asked. Vertical composition for a phone screen. Absolutely no people, no players, no silhouettes of people, and no text, letters, numbers, logos, banners with writing or watermark.",
+ "keys": {
+  "green": "Paint ONLY the described subject, isolated on a perfectly flat pure chroma-green (#00FF00) background filling the rest of the canvas. No green tones inside the subject, no shadow on the background, crisp clean edges.",
+  "black": "Paint ONLY the described element, isolated on a pure black (#000000) background. Everything that is not the element must be pure black, with soft natural falloff at its edges and generous empty black margins on every side."
+ },
+ "plates": [
+  {
+   "id": "gym_lit",
+   "size": "1024x1536",
+   "anchor": true,
+   "prompt": "An empty high-school gymnasium set up for a volleyball match, seen from a low camera just behind one baseline looking toward the net: the glossy amber wooden floor reflects rows of bright ceiling lights, white court lines lead to the net in the middle distance, tall windows on the side let in warm late-afternoon sun beams across the floor, empty balcony rails above. Grand, bright, full of anticipation."
+  },
+  {
+   "id": "gym_dark",
+   "size": "1024x1536",
+   "ref": "gym_lit",
+   "prompt": "The same empty gymnasium from the same low baseline view, but before the lights are on: almost dark, deep navy shadows, only faint blue light from the high windows and a thin glint along the net tape and the floor lines. Quiet, waiting."
+  },
+  {
+   "id": "court_top",
+   "size": "1024x1536",
+   "ref": "gym_lit",
+   "prompt": "A perfectly top-down orthographic view straight down onto a volleyball court floor: glossy amber wooden planks running vertically, a white court outline with the centre line across the middle and the two attack lines, the net seen from above as a thin band across the middle, soft warm light pools from the ceiling lamps. Flat, symmetric, like a painted map of the court."
+  },
+  {
+   "id": "gym_sunset",
+   "size": "1024x1536",
+   "ref": "gym_lit",
+   "prompt": "Inside the gym at golden hour from the side of the court: huge windows along one wall, the low orange sun pours long diagonal light beams and window-frame shadows across the empty wooden court and the net; floating dust sparkles in the beams."
+  },
+  {
+   "id": "sky_horizon",
+   "size": "1024x1536",
+   "ref": "gym_lit",
+   "prompt": "A wide sunset sky over a low distant town horizon seen from a school rooftop fence line at the very bottom: the sun is a big soft orange disc sitting half below the flat horizon, layered peach, pink and lilac clouds with glowing rims above, warm haze. The horizon line is perfectly straight and low in the frame."
+  },
+  {
+   "id": "sky_up",
+   "size": "1024x1536",
+   "ref": "gym_lit",
+   "prompt": "Looking straight up into an evening sky from the ground: tall rounded cumulus clouds lit orange and pink from below rising toward a deep blue-lilac top, sun rays fanning upward from the bottom edge. Feeling of lifting off and flying."
+  },
+  {
+   "id": "sky_orange",
+   "size": "1024x1536",
+   "ref": "gym_lit",
+   "prompt": "A dramatic burning orange sky filled with big sculpted clouds, strong golden sun rays bursting from the centre, deep orange to warm gold, intense and triumphant, like the climax of a sports anime."
+  },
+  {
+   "id": "gym_ceiling",
+   "size": "1024x1536",
+   "ref": "gym_lit",
+   "prompt": "Looking straight up from the gym floor at the ceiling: steel trusses and rows of bright round ceiling lights with strong starburst glare, the top edge of the net and its antenna crossing the lower part of the frame at a steep angle, haze in the light."
+  },
+  {
+   "id": "net_close",
+   "size": "1024x1536",
+   "ref": "gym_lit",
+   "prompt": "A dramatic low close-up of a volleyball net from the side: the white net tape crossing the frame diagonally, the black square mesh sharp in the foreground and blurring away, the red and white antenna standing up on the right, bright ceiling lights flaring behind, warm floor glow below."
+  },
+  {
+   "id": "floor_close",
+   "size": "1024x1536",
+   "ref": "gym_lit",
+   "prompt": "An extreme low-angle close-up of the glossy wooden gym floor: black rubber shoe-squeak skid marks and a few drops of sweat in the foreground, a white court line running away toward a blurry bright net and lights in the distance, shallow depth of field."
+  },
+  {
+   "id": "stands",
+   "size": "1024x1536",
+   "ref": "gym_lit",
+   "prompt": "The empty spectator stands of a big arena seen from courtside: tiers of empty seats rising up, long plain orange and black cheering banners without any writing hanging from the balcony rail, a few megaphones and folded towels left on the rail, bright arena lights."
+  },
+  {
+   "id": "arena_teal",
+   "size": "1024x1536",
+   "ref": "gym_lit",
+   "prompt": "A big national-tournament arena from a high camera behind the baseline: a teal-coloured court with a surrounding orange free zone, bright white lights hanging in rows, huge dark stands all around, the net glowing in the centre, dramatic and grand. The court surface is teal (#16B3A6)."
+  },
+  {
+   "id": "board",
+   "size": "1024x1536",
+   "ref": "gym_lit",
+   "prompt": "A volleyball tactics whiteboard standing on the gym floor seen straight on, filling most of the frame: a clean white board with a printed court diagram in thin grey lines, a few round orange and white magnets placed on it, a marker tray at the bottom, blurry warm gym behind. No writing on the board."
+  },
+  {
+   "id": "bench_orange",
+   "size": "1024x1536",
+   "ref": "gym_lit",
+   "prompt": "A quiet close view of a wooden team bench at the edge of the court after the match: a folded white towel, a water bottle, and one real orange fruit with a single bite taken out of it resting on the bench, low evening sun from the side, long soft shadows, bittersweet and calm."
+  },
+  {
+   "id": "gym_after",
+   "size": "1024x1536",
+   "ref": "gym_lit",
+   "prompt": "The empty gym after everyone has gone, from the baseline view: most ceiling lights off, one volleyball resting alone on the floor near the net, the big door on the side open to an orange-to-purple dusk sky, a long warm light patch across the dark floor. Lonely but gentle."
+  },
+  {
+   "id": "locker",
+   "size": "1024x1536",
+   "ref": "gym_lit",
+   "prompt": "A small team locker room before the match: a sports bag open on a bench with a pair of orange-and-white volleyball shoes, knee pads and a folded orange jersey without any number or text, metal lockers behind, warm light from a small window."
+  },
+  {
+   "id": "dawn",
+   "size": "1024x1536",
+   "ref": "gym_lit",
+   "prompt": "A clear early-morning sky above a quiet school with the gym roof at the bottom: soft pale gold sunrise glow rising into light blue, a few thin bright clouds, fresh and hopeful, a new day."
+  },
+  {
+   "id": "p_ball",
+   "size": "1024x1024",
+   "ref": "gym_lit",
+   "key": "green",
+   "prompt": "A single volleyball, painted in the same anime style, with three curved panels in orange, white and deep navy, glossy highlight, seen slightly from above, centred."
+  },
+  {
+   "id": "p_orange",
+   "size": "1024x1024",
+   "ref": "gym_lit",
+   "key": "green",
+   "prompt": "A single ripe orange fruit with one bite taken out of it showing the juicy segments inside, a small green leaf on top, glossy, centred."
+  },
+  {
+   "id": "p_shoe",
+   "size": "1536x1024",
+   "ref": "gym_lit",
+   "key": "green",
+   "prompt": "One volleyball shoe seen from the side, white with bold orange and black stripes, laces tied, gum sole, dynamic and clean, centred. The background must be flat pure chroma green #00FF00, not black."
+  },
+  {
+   "id": "p_cloud_a",
+   "size": "1536x1024",
+   "ref": "gym_lit",
+   "key": "green",
+   "prompt": "One big soft rounded cumulus cloud lit warm orange and pink from below with a bright glowing rim, isolated."
+  },
+  {
+   "id": "p_cloud_b",
+   "size": "1536x1024",
+   "ref": "gym_lit",
+   "key": "black",
+   "prompt": "A long thin horizontal streak of evening cloud, peach and lilac, soft feathered edges, isolated."
+  },
+  {
+   "id": "p_flare",
+   "size": "1024x1024",
+   "ref": "gym_lit",
+   "key": "black",
+   "prompt": "A bright warm white-gold starburst light flare with long thin rays and a soft glowing core, like a gym ceiling lamp seen directly."
+  },
+  {
+   "id": "p_dust",
+   "size": "1024x1536",
+   "ref": "gym_lit",
+   "key": "black",
+   "prompt": "Many tiny warm glowing dust sparkles and bokeh dots of different sizes floating in a light beam, scattered across the frame."
+  },
+  {
+   "id": "p_vball",
+   "size": "1024x1024",
+   "ref": "gym_lit",
+   "key": "green",
+   "prompt": "A single volleyball with the classic yellow-and-blue design of an official Japanese match ball: curved swirling panels alternating bright yellow and royal blue, glossy highlight and soft shading, painted in the same anime style, seen slightly from above, centred. No logos, no text, no letters, no numbers on the ball."
+  },
+  {
+   "id": "sky_clean",
+   "size": "1024x1536",
+   "ref": "gym_lit",
+   "prompt": "A clean, wide sunset sky with almost no clouds: a smooth gradient from soft clear blue at the top through lilac and pink to a warm peach-orange glow near the bottom, only a few very faint thin haze streaks. Mostly empty open sky, calm and luminous."
+  },
+  {
+   "id": "cl_far",
+   "size": "1536x1024",
+   "ref": "ref_cloud",
+   "key": "black",
+   "prompt": "A wide horizontal band of distant soft clouds at golden hour, hazy and low in contrast, pale peach and pink tops, soft lilac undersides, gentle and airy."
+  },
+  {
+   "id": "cl_mid",
+   "size": "1536x1024",
+   "ref": "ref_cloud",
+   "key": "black",
+   "prompt": "A big fluffy cumulus cloud bank at golden hour, bright cream-gold tops lit by the low sun, soft peach-pink and lilac shadows underneath, soft feathered edges, floating across the middle of the frame."
+  },
+  {
+   "id": "cl_near",
+   "size": "1536x1024",
+   "ref": "ref_cloud",
+   "key": "black",
+   "prompt": "Large soft wisps of nearby cloud and mist at golden hour, very soft feathered edges, translucent and glowing warm white-peach, drifting across the frame, partly see-through."
+  },
+  {
+   "id": "cl_puff",
+   "size": "1536x1024",
+   "ref": "ref_cloud",
+   "key": "black",
+   "prompt": "Three or four separate soft round cloud puffs of different sizes at sunset, translucent warm peach and cream with soft violet shading, isolated with plenty of space between them."
+  },
+  {
+   "id": "w_gym_lit",
+   "size": "1024x1536",
+   "ref": "court_top",
+   "prompt": "A perfectly top-down orthographic bird's-eye view looking straight down, drawn like a detailed floor-plan map painted in anime background-art style: no perspective at all, no vanishing point, walls and furniture seen from directly above. An entire empty high-school gymnasium. Layout of the portrait canvas: one volleyball court in the exact centre, long axis vertical, taking about 30% of the canvas width and 40% of its height; glossy amber wooden planks running vertically; crisp white court lines (outer rectangle, the centre line, two attack lines) and the net stretched horizontally across the exact middle of the court with a navy post at each end and a soft shadow. A wide free zone of the same wood all around. Along the left edge: the wall with a row of tall windows seen from above; warm low sunset light pours in as long diagonal light beams and window-frame shadows across the floor. Along the top edge: rows of empty bleacher seats seen from above with a large plain dark rectangular scoreboard panel in the middle (blank, no digits). Along the right edge at mid height: a long wooden team bench with folded towels and water bottles. Bottom-left corner: a small locker corner with grey square floor tiles, a row of lockers against the left wall seen from above and a low bench. Bottom edge: a wide double-door entrance with a doormat. Bottom-centre between the court and the entrance: plain wood (the serving area)."
+  },
+  {
+   "id": "w_gym_dark",
+   "size": "1024x1536",
+   "ref": "w_gym_lit",
+   "prompt": "A perfectly top-down orthographic bird's-eye view looking straight down, drawn like a detailed floor-plan map painted in anime background-art style: no perspective at all, no vanishing point, walls and furniture seen from directly above. Exactly the same gymnasium, same layout, same top-down view and same composition as the reference image, but at night with every ceiling light off: almost dark, deep navy-blue shadows, the wood barely visible, faint cold moonlight through the left windows as pale blue stripes on the floor, a tiny warm glow only in the bottom-left locker corner. Keep every object exactly where it is in the reference."
+  },
+  {
+   "id": "s_shoes_top",
+   "size": "1024x1024",
+   "key": "green",
+   "ref": "w_gym_lit",
+   "prompt": "A pair of volleyball shoes seen perfectly from directly above (top-down, no perspective), lying side by side and slightly splayed, white with bold orange and deep navy accents, laces loosened, painted in the same anime background-art style as the reference with the same warm low sunlight coming from the left, a short soft contact shadow only under the shoes. Centred, about 60% of the canvas."
+  },
+  {
+   "id": "s_bag_top",
+   "size": "1536x1024",
+   "key": "green",
+   "ref": "w_gym_lit",
+   "prompt": "A deep navy sports duffel bag seen perfectly from directly above (top-down, no perspective), unzipped, a folded orange towel and a clear water bottle lying on top of it, painted in the same anime background-art style as the reference with the same warm low sunlight from the left, a short soft contact shadow only under the bag. Centred, about 70% of the canvas width. IMPORTANT: the whole background around the bag must be one flat pure chroma-green colour #00FF00 from edge to edge — no black, no dark vignette, no glow, no gradient, no floor."
+  },
+  {
+   "id": "w_arena_lit",
+   "size": "1024x1536",
+   "ref": "w_gym_lit",
+   "prompt": "A perfectly top-down orthographic bird's-eye view looking straight down, drawn like a detailed floor-plan map painted in anime background-art style: no perspective at all, no vanishing point, walls and furniture seen from directly above. A big national-tournament volleyball arena, same painting style and warm light as the reference. Layout of the portrait canvas: one volleyball court in the exact centre, long axis vertical, taking about 30% of the canvas width and 40% of its height, painted teal (#16B3A6) with crisp white lines (outer rectangle, centre line, two attack lines) and the net stretched horizontally across the exact middle with a navy post at each end; a wide glossy orange wooden free zone around the court. Around the free zone on all four sides: tiers of arena seats seen from above, packed with a crowd painted only as tiny abstract coloured dots (no visible people), plain orange and white banners without any writing on the barrier around the free zone, two team benches on the right side, a plain dark blank scoreboard panel above the top stands, and at the bottom centre a dark entrance tunnel opening through the stands. Bright white arena lights make soft pools of light on the court."
+  },
+  {
+   "id": "w_corridor",
+   "size": "1024x1536",
+   "ref": "w_gym_lit",
+   "prompt": "A perfectly top-down orthographic bird's-eye view looking straight down, drawn like a detailed floor-plan map painted in anime background-art style: no perspective at all, no vanishing point, walls and furniture seen from directly above. A long straight indoor corridor inside a sports arena, running vertically through the whole canvas from the top edge to the bottom edge with no end visible: a dark navy-blue polished floor with a subtle square tile pattern, a thin white guide line along each side and a dashed yellow centre line, the corridor walls as thin strips along the left and right edges of the canvas with a few closed doors and low benches seen from above, warm round ceiling lamps making soft pools of light on the floor at regular intervals. Calm and slightly dark: cool navy with warm lamp light, same painting style as the reference."
+  },
+  {
+   "id": "s_jersey_top",
+   "size": "1024x1024",
+   "key": "green",
+   "ref": "w_gym_lit",
+   "prompt": "A short-sleeved orange volleyball jersey lying flat, seen from directly above (top-down, no perspective), back side up, white collar and white side trims, the back completely blank with no number and no text, a few soft folds, painted in the same anime style and warm low light from the left as the reference, a short soft contact shadow only. Centred, about 70% of the canvas. IMPORTANT: the whole background around the subject must be one flat pure chroma-green colour #00FF00 from edge to edge — no black, no dark vignette, no glow, no gradient, no floor."
+  },
+  {
+   "id": "s_board_top",
+   "size": "1536x1024",
+   "key": "green",
+   "ref": "w_gym_lit",
+   "prompt": "A rectangular whiteboard with a thin aluminium frame, seen perfectly straight on (flat, no perspective), its white surface clean except a printed volleyball court diagram in thin grey lines across the upper half (an outer rectangle split by a centre line), a marker tray along the bottom edge with two markers, painted in the same anime style as the reference. The board fills about 85% of the canvas width and keeps its whole frame inside the canvas. IMPORTANT: the whole background around the subject must be one flat pure chroma-green colour #00FF00 from edge to edge — no black, no dark vignette, no glow, no gradient, no floor."
+  }
+ ]
+}

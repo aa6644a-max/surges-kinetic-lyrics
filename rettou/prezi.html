@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>劣等感 Zoom Canvas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@900&family=Noto+Sans+KR:wght@500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;box-sizing:border-box}html,body{height:100%;background:#000;overflow:hidden}
+#cv{position:absolute;left:50%;top:50%;width:1080px;height:1920px;transform-origin:0 0}
+#ui{position:fixed;left:16px;right:16px;bottom:16px;display:flex;gap:12px;align-items:center;font:13px/1 system-ui;color:#ccc}
+#ui button{background:#FF3B4E;color:#fff;border:0;border-radius:999px;width:44px;height:44px;font-size:18px}
+.render #ui{display:none}
+</style>
+</head>
+<body>
+<canvas id="cv" width="1080" height="1920"></canvas>
+<div id="ui"><button id="pp">▶</button><span id="time">0.0</span></div>
+<audio id="au" src="song.mp3" preload="auto"></audio>
+<script>
+const D=/*DATA*/null;
+const cv=document.getElementById('cv'),g=cv.getContext('2d');
+const W=1080,H=1920,SX=540,SY=880;
+function fit(){const s=Math.min(innerWidth/W,innerHeight/H);cv.style.transform=`scale(${s}) translate(-50%,-50%)`}
+addEventListener('resize',fit);fit();
+const clamp=(x,a=0,b=1)=>x<a?a:x>b?b:x,lerp=(a,b,x)=>a+(b-a)*x;
+const eIO=x=>x<.5?4*x*x*x:1-(-2*x+2)**3/2,eOutC=x=>1-(1-x)**3;
+const eBack=(x,c=1.8)=>{x=clamp(x);x-=1;return 1+(c+1)*x*x*x+c*x*x};
+const R=(i,s=0)=>{const x=Math.sin(i*127.1+s*311.7+.5)*43758.5453;return x-Math.floor(x)};
+const B0=.302,BT=60/143.6,pulse=t=>{const b=(t-B0)/BT;return b<0?0:Math.exp(-(b-Math.floor(b))*BT*7)};
+const C={bg:'#0E1130',bg2:'#05060F',grid:'rgba(247,241,228,.10)',ink:'#F7F1E4',red:'#FF3B4E',org:'#FF8C42',apr:'#FFB26B',mint:'#3FE0C5',navy:'#1E2350'};
+const JP=f=>`900 ${f}px "Noto Sans JP"`,KR=f=>`500 ${f}px "Noto Sans KR"`;
+const rot=(x,y,a)=>{const c=Math.cos(a),s=Math.sin(a);return [x*c-y*s,x*s+y*c]};
+const Ln=D.lines;
+
+/* ---------- the canvas: giant 劣等感 + frames of lyrics placed on it ---------- */
+const GIANT=[{ch:'劣',x:-3300,y:0},{ch:'等',x:0,y:0},{ch:'感',x:3300,y:0}],GF=3200;
+// section frames: [firstLine, lastLine, cx, cy, rotationDeg, fontSize, label, colour]
+const SECT=[
+  [0,4,-3500,-1150,-8,120,'01',C.ink],
+  [5,8,-2350,950,7,105,'02',C.apr],
+  [9,12,-900,-1300,-14,105,'03',C.mint],
+  [13,14,-250,650,90,125,'04',C.org],
+  [15,18,3350,-1050,-5,120,'05',C.ink],
+  [19,22,1450,1250,14,115,'06',C.apr],
+  [23,26,3620,1180,0,52,'07',C.red],
+  [27,30,-3900,1750,-6,105,'08',C.mint],
+  [31,32,650,2250,-90,110,'09',C.ink],
+  [33,40,2500,2450,8,100,'10',C.apr],
+  [41,42,4900,300,-22,115,'11',C.mint],
+  [43,46,0,-600,0,125,'12',C.org],
+  [47,51,-3600,-2750,3,110,'13',C.ink]];
+const LAY=[];let FR=[];
+function layout(){
+  SECT.forEach(([a,b,cx,cy,rd,f,lab,col],si)=>{
+    const r=rd*Math.PI/180,rows=[];let hmax=0;
+    for(let i=a;i<=b;i++){g.font=JP(f);const w=Ln[i].w.map(u=>g.measureText(u[0]).width),n=w.length;
+      // split long lines into two rows, at a space near the middle if there is one
+      let cut=n;if(n>9){cut=Math.round(n/2);let best=99;Ln[i].w.forEach((u,k)=>{if(u[3]&&Math.abs(k+1-n/2)<best&&k+1>2&&k+1<n-1){best=Math.abs(k+1-n/2);cut=k+1}})}
+      const parts=cut<n?[[0,cut],[cut,n]]:[[0,n]];
+      rows.push({i,w,parts:parts.map(([p,q])=>({p,q,tw:w.slice(p,q).reduce((x,y)=>x+y,0)}))})}
+    const lh=f*1.25,gapL=f*.95,tot=rows.reduce((a2,r2)=>a2+r2.parts.length*lh+gapL,0),maxw=Math.max(...rows.flatMap(r2=>r2.parts.map(q=>q.tw)));
+    let yy=-tot/2;
+    rows.forEach(row=>{const ph=row.parts.length*lh;const ly=yy+ph/2;yy+=ph+gapL;const [dx,dy]=rot(0,ly,r);
+      LAY[row.i]={x:cx+dx,y:cy+dy,r,f,w:Math.max(...row.parts.map(q=>q.tw)),ws:row.w,parts:row.parts,lh,sec:si,col}});
+    FR.push({cx,cy,r,w:maxw+f*1.6,h:tot+f*.9,lab,col,first:Ln[a].s,f});
+  });
+}
+/* ---------- camera keyframes ---------- */
+let K=[];
+const OVER={x:0,y:300,z:.085,r:0};
+function lineCam(i){const L=LAY[i];const z=Math.min(880/L.w,165/L.f);const [ox,oy]=rot(0,L.f*.3,L.r);return {x:L.x+ox,y:L.y+oy,z,r:-L.r}}
+function buildCam(){
+  K.push({t:0,d:.01,...OVER});
+  Ln.forEach((L,i)=>{
+    const prev=Ln[i-1],newSec=!prev||LAY[i].sec!==LAY[i-1].sec;
+    const gap=prev?L.s-prev.s:1.4;const d=newSec?Math.min(1.4,Math.max(.5,gap*.6)):clamp(gap*.45,.3,.75);
+    K.push({t:L.s-.05,d,...lineCam(i)});
+    if(i===4)K.push({t:17.2,d:1.8,...OVER,r:.08});                                   // instrumental: overview
+    if(i===4)K.push({t:27.9,d:2,x:-500,y:200,z:.13,r:-.06});
+    if(i===22)K.push({t:97.6,d:1.6,x:3300,y:300,z:.28,r:0});                         // break: look at 感
+    if(i===46)K.push({t:191.5,d:3.6,...OVER,z:.078,r:.04});                            // the reveal
+    if(i===51)K.push({t:212.6,d:2.2,...OVER,z:.07,r:0});
+  });
+  K.sort((a,b)=>a.t-b.t);
+}
+function camAt(t){
+  let i=0;for(let j=0;j<K.length;j++)if(K[j].t-K[j].d<=t)i=j;
+  const B=K[i],A=K[Math.max(0,i-1)];const p=eIO(clamp((t-(B.t-B.d))/B.d));
+  const dist=Math.hypot(B.x-A.x,B.y-A.y),zmin=Math.min(A.z,B.z);
+  const dip=clamp(dist*zmin/2600,0,.55)*Math.sin(Math.PI*p);
+  let dr=B.r-A.r;while(dr>Math.PI)dr-=2*Math.PI;while(dr<-Math.PI)dr+=2*Math.PI;
+  const z=Math.exp(lerp(Math.log(A.z),Math.log(B.z),p))*(1-dip);
+  // slow drift while holding so the canvas never freezes
+  const hold=p>=1?t-B.t:0;
+  return {x:lerp(A.x,B.x,p),y:lerp(A.y,B.y,p),z:z*(1+.012*pulse(t)+.004*hold),r:A.r+dr*p+.0015*Math.sin(t*.7)}
+}
+/* ---------- draw ---------- */
+function drawGrid(cam){
+  const step=cam.z<.2?1000:200;const a=cam.z<.2?.18:.12;
+  g.fillStyle=`rgba(247,241,228,${a})`;
+  const span=Math.max(W,H)/cam.z*.8;const x0=Math.floor((cam.x-span)/step)*step,y0=Math.floor((cam.y-span)/step)*step;
+  const rr=Math.max(2/cam.z,3);
+  for(let x=x0;x<cam.x+span;x+=step)for(let y=y0;y<cam.y+span;y+=step)g.fillRect(x-rr/2,y-rr/2,rr,rr);
+}
+function drawGiant(t,cam){
+  g.font=JP(GF);g.textAlign='center';g.textBaseline='middle';
+  const lit=clamp((t-190)/2);
+  GIANT.forEach((q,k)=>{g.fillStyle=k===2?`rgba(255,59,78,${.10+.25*lit})`:`rgba(247,241,228,${.07+.18*lit})`;g.fillText(q.ch,q.x,q.y);
+    g.lineWidth=6/cam.z;g.strokeStyle=k===2?'rgba(255,59,78,.35)':'rgba(247,241,228,.22)';g.strokeText(q.ch,q.x,q.y)});
+}
+function rrect(x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
+function drawFrames(t,cam){
+  FR.forEach(F=>{const p=clamp((t-(F.first-1))/.9);g.save();g.translate(F.cx,F.cy);g.rotate(F.r);
+    g.lineWidth=Math.max(3,2.5/cam.z);g.strokeStyle=F.col;g.globalAlpha=.25+.55*p;
+    const per=2*(F.w+F.h);g.setLineDash([per*p,per]);rrect(-F.w/2,-F.h/2,F.w,F.h,F.f*.4);g.stroke();g.setLineDash([]);
+    g.font=JP(F.f*.55);g.fillStyle=F.col;g.textAlign='left';g.textBaseline='bottom';g.globalAlpha=.5*p+.15;g.fillText(F.lab,-F.w/2+F.f*.3,-F.h/2-F.f*.15);
+    g.restore()});
+}
+function drawLines(t,cam){
+  // current line
+  let cur=-1;Ln.forEach((L,i)=>{if(t>=L.s-.1)cur=i});
+  Ln.forEach((L,i)=>{const P=LAY[i];
+    // cull: skip lines far from the camera
+    const dx=P.x-cam.x,dy=P.y-cam.y,view=Math.max(W,H)/cam.z;if(Math.hypot(dx,dy)>view+P.w)return;
+    const on=t>=L.s-.1,past=i<cur,act=i===cur;
+    g.save();g.translate(P.x,P.y);g.rotate(P.r);g.textBaseline='middle';g.textAlign='center';g.font=JP(P.f);
+    const top=-(P.parts.length-1)*P.lh/2;
+    P.parts.forEach((q,ri)=>{let x=-q.tw/2;const y=top+ri*P.lh;
+    for(let k=q.p;k<q.q;k++){const u=L.w[k],w=P.ws[k];const a=t-u[1]+.06;
+      if(a<0){g.globalAlpha=.07;g.fillStyle=C.ink;g.fillText(u[0],x+w/2,y)}
+      else{const s=.5+.5*eBack(a/.18,2.2),now=t>=u[1]&&t<u[2]+.05;g.save();g.translate(x+w/2,y);g.scale(s,s);g.globalAlpha=past?.55:1;
+        g.fillStyle=now?C.red:(act?C.ink:P.col);g.fillText(u[0],0,0);g.restore()}
+      x+=w}});
+    if(on){g.globalAlpha=(past?.45:.85)*clamp((t-L.s+.1)/.3);g.font=KR(P.f*.42);g.fillStyle=C.ink;g.fillText(L.ko,0,top+(P.parts.length-1)*P.lh+P.f*.85,Math.min(P.w*1.5,940/cam.z))}
+    g.restore()});
+}
+function render(t){
+  g.setTransform(1,0,0,1,0,0);
+  const gr=g.createRadialGradient(SX,SY,100,SX,SY,1400);gr.addColorStop(0,C.bg);gr.addColorStop(1,C.bg2);g.fillStyle=gr;g.fillRect(0,0,W,H);
+  const cam=camAt(t);
+  g.setTransform(1,0,0,1,SX,SY);g.scale(cam.z,cam.z);g.rotate(cam.r);g.translate(-cam.x,-cam.y);
+  drawGrid(cam);drawGiant(t,cam);drawFrames(t,cam);drawLines(t,cam);
+  g.setTransform(1,0,0,1,0,0);
+  // intro / outro fades
+  const fi=1-clamp((t-.2)/1.2),fo=clamp((t-(D.dur-1.4))/1.3);const f=Math.max(fi*.9,fo);if(f>0){g.fillStyle=`rgba(0,0,0,${f})`;g.fillRect(0,0,W,H)}
+}
+window.DUR=D.dur;
+window.READY=(async()=>{try{await Promise.all([document.fonts.load(JP(100),Ln.map(l=>l.w.map(u=>u[0]).join('')).join('')+'劣等感0123456789'),document.fonts.load(KR(44),Ln.map(l=>l.ko).join(''))])}catch(e){}
+  layout();buildCam();window.renderAt=render;render(0)})();
+if(new URLSearchParams(location.search).has('render'))document.body.classList.add('render');
+else{const au=document.getElementById('au'),pp=document.getElementById('pp');const loop=()=>{render(au.currentTime);document.getElementById('time').textContent=au.currentTime.toFixed(1);requestAnimationFrame(loop)};
+  pp.onclick=()=>au.paused?au.play():au.pause();READY.then(()=>requestAnimationFrame(loop))}
+</script>
+</body>
+</html>

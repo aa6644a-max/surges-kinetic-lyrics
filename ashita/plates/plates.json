@@ -1,0 +1,42 @@
+{
+ "note": "Scene plates for 明日の夜空哨戒班 (option B). gen_plates.py sends each prompt to Codex CLI image generation, prep_plates.py keys/resizes raw/<id>.png into <id>.webp for cine.html. Original characters only.",
+ "style": "Cinematic anime feature-film background painting, hand-painted look with soft brush texture, original artwork. Palette: deep indigo and navy night, cool cyan moonlight (#8FE3FF), warm orange city and window lights (#FFB547). Clouds are painted with soft, broad, rounded brush strokes and smooth feathered edges, never jagged, crinkled or fractal-looking. Volumetric light, atmospheric perspective, gentle bloom, fine detail, subtle film grain. Vertical composition for a phone screen. Absolutely no text, letters, signs with writing, logos or watermark.",
+ "keys": {
+  "green": "Paint ONLY the described subject, isolated on a perfectly flat pure chroma-green (#00FF00) background filling the rest of the canvas. No green tones inside the subject, no shadow on the background, crisp clean edges.",
+  "black": "Paint ONLY the described element, isolated on a pure black (#000000) background. Everything that is not the element must be pure black, with soft natural falloff at its edges and generous empty black margins on every side."
+ },
+ "plates": [
+  {"id": "s01_sky", "size": "1024x1536", "anchor": true,
+   "prompt": "Night sky seen from a city rooftop: a large bright full moon in the upper right, thin silver-blue clouds lit by the moon, many small stars, the sky getting slightly lighter and bluer toward the horizon at the bottom. Sky only, no buildings."},
+  {"id": "s01_city", "size": "1024x1536", "key": "green", "ref": "s01_sky",
+   "prompt": "A dense Japanese city skyline at night seen from a rooftop, filling the lower 45% of the image: layered silhouettes of apartment blocks and office buildings in deep navy, thousands of small warm orange lit windows, a few red aircraft warning lights, soft haze between layers. The upper 55% is empty chroma green."},
+  {"id": "s01_roof", "size": "1024x1536", "key": "green", "ref": "s01_sky",
+   "prompt": "Foreground: the edge of a concrete school/apartment rooftop across the lower 30% of the image, with a low metal safety railing, a water tank and a vent pipe on the right, rim-lit in cool moonlight. We stand on the rooftop floor looking outward past the parapet toward the sky. A small lone teenage boy in a hoodie sits on top of the parapet at left-center, facing away from us toward the city, seen from behind: we see only his back, head and shoulders, hands resting on the ledge beside his hips. His legs hang down the OUTER side of the building, out of view; no legs or shoes are visible on the wall face facing us. A dark silhouette with a faint cyan rim light. Everything above the rooftop is empty chroma green."},
+  {"id": "s02_sky", "size": "1024x1536", "ref": "s01_sky",
+   "prompt": "Looking up from a rooftop into a vast deep night sky, the moon now small and high, swirling faint cirrus clouds forming a slow spiral around the upper-middle of the frame, a calm empty dark area in the center of the upper half, stars. Sky only."},
+  {"id": "s02_roof", "size": "1024x1536", "key": "green", "ref": "s01_sky",
+   "prompt": "Low-angle foreground: the top of a rooftop stairwell and railing across the bottom 25% of the image, and a small teenage boy in a hoodie standing on it, head tilted back looking up at the sky, seen from behind and below, a dark silhouette with cool cyan rim light, hood down, short messy hair. Everything else is empty chroma green."},
+  {"id": "s04_hands", "size": "1024x1536", "ref": "s01_sky",
+   "prompt": "Close-up at night on a rooftop: two hands reaching toward each other and just about to touch in the middle of the frame, one from the lower left in a dark hoodie sleeve, one from the upper right in a light sleeve with an orange scarf end fluttering. A tiny glow of light where the fingertips nearly meet. Behind them a soft out-of-focus bokeh of city lights and the night sky. Shallow depth of field, cinematic."},
+  {"id": "cl_mid", "size": "1536x1024", "key": "black",
+   "prompt": "A wide horizontal band of fluffy cumulus clouds at night, lit from above by cool silver-blue moonlight, dark blue-grey undersides, floating across the middle of the frame."},
+  {"id": "cl_near", "size": "1536x1024", "key": "black",
+   "prompt": "A few large soft wisps of nearby cloud and mist at night, very soft edges, silver-blue moonlit highlights, drifting across the frame, partly transparent-looking."},
+  {"id": "s06_sea", "size": "1536x1024", "ref": "s01_sky",
+   "prompt": "Wide panorama high above a sea of clouds at night: an endless rolling cloud floor in the lower half glowing silver-blue under the moonlight, the full moon low on the left, a deep indigo starry sky above with the faint Milky Way. Seamless horizontally tileable (left and right edges match). No land."},
+  {"id": "s07_rain", "size": "1024x1536", "ref": "s01_sky",
+   "prompt": "A lonely narrow city street at night in the rain: wet asphalt reflecting warm orange streetlight and cyan shop lights, a single tall streetlight on the right casting a cone of light, power lines overhead, closed shop shutters, blurred distant traffic lights. A small teenage boy in a hoodie stands alone under the streetlight holding a transparent umbrella, seen from a distance, silhouette. Melancholic, blue-grey mood."},
+  {"id": "s09_city", "size": "1536x1024", "ref": "s01_sky",
+   "prompt": "Wide panorama flying low over a night city, bird's-eye view looking forward and down over rooftops, streets glowing with warm orange light trails from traffic, a river reflecting lights, strong sense of speed and depth. Seamless horizontally tileable."},
+  {"id": "s10_glass", "size": "1024x1536", "ref": "s01_sky",
+   "prompt": "Extreme low angle looking straight up between tall buildings at the night sky: dark building walls converging toward a bright indigo sky in the center with stars, the sky looks like a smooth glass dome with a faint reflective sheen. Dramatic perspective."},
+  {"id": "s11_dawn", "size": "1536x1024",
+   "prompt": "Wide panorama above a sea of clouds at the moment before sunrise: the cloud floor glowing pink and orange, a thin blazing gold line of the sun on the horizon at the right, the sky shading from deep violet at the top through magenta to warm peach near the horizon, the last stars fading. Seamless horizontally tileable. Same painting style as the reference."},
+  {"id": "cl_dawn", "size": "1536x1024", "key": "black",
+   "prompt": "A wide horizontal band of fluffy clouds at sunrise, bright golden-peach tops lit by the rising sun, soft violet shadows underneath, floating across the middle of the frame."},
+  {"id": "s12_sky", "size": "1024x1536", "ref": "s11_dawn",
+   "prompt": "Sunrise over a Japanese city seen from a rooftop: the sun just rising at the bottom center behind the skyline haze, sky from deep violet at the top through pink to bright warm gold near the horizon, a few glowing clouds, one faint lingering star high up. Sky and distant hazy skyline only."},
+  {"id": "s12_roof", "size": "1024x1536", "key": "green", "ref": "s11_dawn",
+   "prompt": "Foreground: a rooftop edge with a low railing across the bottom 25% of the image, backlit by the sunrise. Two small teenage figures stand side by side at the railing looking at the sunrise, seen from behind as dark silhouettes with warm golden rim light: on the left a boy in a hoodie, on the right a girl with long hair and an orange scarf blowing in the wind. Everything else is empty chroma green."}
+ ]
+}

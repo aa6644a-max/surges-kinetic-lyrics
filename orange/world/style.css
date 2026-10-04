@@ -1,0 +1,24 @@
+/* ORANGE (Y2K collage) page shell. Every family is a local file in orange/fonts, never a web fallback. */
+@font-face { font-family: "Pretendard Variable"; src: url("../fonts/PretendardVariable.woff2") format("woff2"); font-weight: 45 920; font-display: block }
+@font-face { font-family: "Dela Gothic One"; src: url("../fonts/DelaGothicOne-Regular.ttf") format("truetype"); font-display: block }
+@font-face { font-family: "Anton"; src: url("../fonts/Anton-Regular.ttf") format("truetype"); font-display: block }
+@font-face { font-family: "Yusei Magic"; src: url("../fonts/YuseiMagic-Regular.ttf") format("truetype"); font-display: block }
+@font-face { font-family: "Unbounded"; src: url("../fonts/Unbounded-Variable.ttf") format("truetype"); font-weight: 200 900; font-display: block }
+@font-face { font-family: "M PLUS Rounded 1c"; src: url("../fonts/MPLUSRounded1c-ExtraBold.ttf") format("truetype"); font-weight: 800; font-display: block }
+@font-face { font-family: "M PLUS Rounded 1c"; src: url("../fonts/MPLUSRounded1c-Medium.ttf") format("truetype"); font-weight: 500; font-display: block }
+@font-face { font-family: "Klee One"; src: url("../fonts/KleeOne-SemiBold.ttf") format("truetype"); font-weight: 600; font-display: block }
+@font-face { font-family: "Permanent Marker"; src: url("../fonts/PermanentMarker-Regular.ttf") format("truetype"); font-display: block }
+@font-face { font-family: "Noto Color Emoji"; src: url("../fonts/NotoColorEmoji-Regular.ttf") format("truetype"); font-display: block }
+* { margin: 0; box-sizing: border-box }
+html, body { height: 100%; background: #000; overflow: hidden; font: 14px "Pretendard Variable", sans-serif; color: #ddd }
+#cv { position: absolute; left: 50%; top: calc(50% - 28px); width: 1080px; height: 1920px; transform-origin: 50% 50% }
+body.render #cv { left: 0; top: 0 }
+#bar { position: fixed; left: 0; right: 0; bottom: 0; height: 56px; display: flex; gap: 12px; align-items: center; padding: 0 16px; background: #0d0b14 }
+#bar[hidden] { display: none }
+#bar button { width: 44px; height: 36px; border: 1px solid #333; background: #16131e; color: #fff; border-radius: 6px }
+#rng { flex: 1 }
+#lab { width: 70px; text-align: right }
+/* manga typography for the world version */
+@font-face { font-family: "Shippori Antique B1"; src: url("../fonts/ShipporiAntiqueB1-Regular.ttf") format("truetype"); font-display: block }
+@font-face { font-family: "Potta One"; src: url("../fonts/PottaOne-Regular.ttf") format("truetype"); font-display: block }
+@font-face { font-family: "Bangers"; src: url("../fonts/Bangers-Regular.ttf") format("truetype"); font-display: block }

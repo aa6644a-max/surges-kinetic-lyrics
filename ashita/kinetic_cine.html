@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ashita Night Flight</title>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@100;300;600&family=Noto+Sans+JP:wght@300;700;900&family=Noto+Sans+KR:wght@300;500;700&display=swap" rel="stylesheet">
+<style>*{margin:0}html,body{height:100%;background:#000;overflow:hidden}#cv{position:absolute;left:50%;top:50%;width:1080px;height:1920px;transform-origin:0 0}</style>
+</head>
+<body>
+<canvas id="cv" width="1080" height="1920"></canvas>
+<script src="../shared/cine.js"></script>
+<script>
+/* 明日の夜空哨戒班 — one continuous night flight (single camera path, no cuts) */
+const D={"dur":180.0,"lines":[{"i":0,"t":"気分次第です僕は","ko":"기분 내키는 대로인 나는","u":[["気",1.24,1.32,0,0],["分",1.32,1.52,0,0],["次",1.52,1.65,0,0],["第",1.65,1.81,0,0],["で",1.81,2.13,0,0],["す",2.13,2.29,0,0],["僕",2.29,2.65,0,0],["は",2.65,2.93,0,0]],"s":1.24,"e":2.93},{"i":1,"t":"敵を選んで戦う少年","ko":"적을 골라서 싸우는 소년","u":[["敵",2.98,3.26,0,0],["を",3.26,3.62,0,0],["選",3.62,3.82,0,0],["ん",3.82,3.9,0,0],["で",3.9,4.27,0,0],["戦",4.27,4.63,0,0],["う",4.63,5.03,0,0],["少",5.03,5.24,0,0],["年",5.24,5.51,0,0]],"s":2.98,"e":5.51},{"i":2,"t":"叶えたい未来も無くて","ko":"이루고 싶은 미래도 없어서","u":[["叶",5.56,5.88,0,0],["え",5.88,6.12,0,0],["た",6.12,6.37,0,0],["い",6.37,6.65,0,0],["未",6.65,6.89,0,0],["来",6.89,7.13,0,0],["も",7.13,7.45,0,0],["無",7.45,7.66,0,0],["く",7.66,7.82,0,0],["て",7.82,8.17,0,0]],"s":5.56,"e":8.17},{"i":3,"t":"夢に描かれるのを待ってた","ko":"꿈이 그려지길 기다리고 있었어","u":[["夢",8.22,8.42,0,0],["に",8.42,8.67,0,0],["描",8.67,8.99,0,0],["か",8.99,9.11,0,0],["れ",9.11,9.31,0,0],["る",9.31,9.55,0,0],["の",9.55,9.67,0,0],["を",9.67,9.73,0,0],["待",9.71,10.0,0,0],["っ",10.0,10.06,0,0],["て",10.04,10.2,0,0],["た",10.2,10.35,0,0]],"s":8.22,"e":10.35},{"i":4,"t":"そのくせ未来が怖くて","ko":"그런 주제에 미래가 무서워서","u":[["そ",10.4,11.0,0,0],["の",11.0,11.37,0,0],["く",11.37,11.45,0,0],["せ",11.45,11.81,0,0],["未",11.81,11.93,0,0],["来",11.93,12.17,0,0],["が",12.17,12.45,0,0],["怖",12.45,12.77,0,0],["く",12.77,12.85,0,0],["て",12.85,13.13,0,0]],"s":10.4,"e":13.13},{"i":5,"t":"明日を嫌って過去に願って","ko":"내일을 싫어하고 과거에 빌고","u":[["明",13.18,13.3,0,0],["日",13.3,13.54,0,0],["を",13.54,13.7,0,0],["嫌",13.7,14.06,0,0],["っ",14.06,14.14,0,0],["て",14.14,14.5,0,0],["過",14.5,14.58,0,0],["去",14.58,14.79,0,0],["に",14.79,15.07,0,0],["願",15.07,15.31,0,0],["っ",15.31,15.43,0,0],["て",15.43,15.74,0,0]],"s":13.18,"e":15.74},{"i":6,"t":"もう如何しようも無くなって叫ぶんだ","ko":"더 이상 어쩔 수 없어서 외치는 거야","u":[["も",15.79,15.87,0,0],["う",15.87,16.11,0,0],["如",16.11,16.27,0,0],["何",16.27,16.39,0,0],["し",16.39,16.48,0,0],["よ",16.48,16.56,0,0],["う",16.56,16.68,0,0],["も",16.68,16.92,0,0],["無",16.92,17.12,0,0],["く",17.12,17.32,0,0],["な",17.32,17.44,0,0],["っ",17.44,17.52,0,0],["て",17.52,17.76,0,0],["叫",17.76,18.08,0,0],["ぶ",18.08,18.29,0,0],["ん",18.29,18.41,0,0],["だ",18.41,18.8,0,0]],"s":15.79,"e":18.8},{"i":7,"t":"「明日よ！明日よ！もう来ないでよ！」って","ko":"「내일아! 내일아! 더는 오지 말아줘!」라고","u":[["「明",18.85,18.91,0,0],["日",18.89,19.05,0,0],["よ！",19.05,19.33,0,0],["明",19.33,19.41,0,0],["日",19.41,19.65,0,0],["よ！",19.65,19.94,0,0],["も",19.94,20.02,0,0],["う",20.02,20.3,0,0],["来",20.3,20.42,0,0],["な",20.42,20.66,0,0],["い",20.66,20.82,0,0],["で",20.82,21.06,0,0],["よ！」",21.06,21.34,0,0],["っ",21.34,21.4,0,0],["て",21.38,21.62,0,0]],"s":18.85,"e":21.62},{"i":8,"t":"そんな僕を置いて","ko":"그런 날 내버려 두고","u":[["そ",21.67,21.87,0,0],["ん",21.87,21.95,0,0],["な",21.95,22.63,0,0],["僕",22.63,23.03,0,0],["を",23.03,23.19,0,0],["置",23.19,23.25,0,0],["い",23.23,23.56,0,0],["て",23.56,24.31,0,0]],"s":21.67,"e":24.31},{"i":9,"t":"月は沈み陽は昇る","ko":"달은 지고 해는 떠올라","u":[["月",24.36,24.53,0,0],["は",24.53,24.69,0,0],["沈",24.69,24.93,0,0],["み",24.93,25.18,0,0],["陽",25.18,25.42,0,0],["は",25.42,25.67,0,0],["昇",25.67,25.99,0,0],["る",25.99,26.23,0,0]],"s":24.36,"e":26.23},{"i":10,"t":"けどその夜は違ったんだ","ko":"하지만 그 밤은 달랐어","u":[["け",26.28,26.44,0,0],["ど",26.44,26.81,0,0],["そ",26.81,26.93,0,0],["の",26.93,27.22,0,0],["夜",27.22,27.38,0,0],["は",27.38,27.71,0,0],["違",27.71,27.99,0,0],["っ",27.99,28.16,0,0],["た",28.16,28.22,0,0],["ん",28.2,28.26,0,0],["だ",28.24,28.43,0,0]],"s":26.28,"e":28.43},{"i":11,"t":"君は僕の手を","ko":"너는 나의 손을","u":[["君",28.48,29.41,0,0],["は",29.41,30.41,0,0],["僕",30.5,31.35,0,0],["の",31.35,31.75,0,0],["手",31.75,31.99,0,0],["を",31.99,33.76,0,0]],"s":28.48,"e":33.76},{"i":12,"t":"空へ舞う　世界の彼方","ko":"하늘로 흩날리는 세계의 저편","u":[["空",33.81,34.25,0,0],["へ",34.25,34.54,0,0],["舞",34.54,34.66,0,0],["う",34.66,35.22,0,0],["世",35.22,35.43,0,1],["界",35.43,35.83,0,0],["の",35.83,36.23,0,0],["彼",36.23,36.52,0,0],["方",36.52,37.07,0,0]],"s":33.81,"e":37.07},{"i":13,"t":"闇を照らす魁星","ko":"어둠을 비추는 괴성","u":[["闇",37.12,37.32,0,0],["を",37.32,37.48,0,0],["照",37.48,37.68,0,0],["ら",37.68,37.84,0,0],["す",37.84,38.12,0,0],["魁",38.12,38.28,0,0],["星",38.28,39.64,0,0]],"s":37.12,"e":39.64},{"i":14,"t":"『君と僕もさ、また明日へ向かっていこう』","ko":"『너와 나도 말이야, 다시 내일을 향해서 가자』","u":[["『君",39.69,40.45,0,0],["と",40.45,40.77,0,0],["僕",40.77,41.09,0,0],["も",41.09,41.33,0,0],["さ、",41.33,41.61,0,0],["ま",41.61,41.73,0,0],["た",41.73,42.05,0,0],["明",42.05,42.17,0,0],["日",42.17,42.41,0,0],["へ",42.41,42.61,0,0],["向",42.61,42.81,0,0],["か",42.81,42.97,0,0],["っ",42.97,43.05,0,0],["て",43.05,43.3,0,0],["い",43.3,43.46,0,0],["こ",43.46,43.62,0,0],["う』",43.62,44.17,0,0]],"s":39.69,"e":44.17},{"i":15,"t":"夢で終ってしまうのならば","ko":"꿈으로 끝나 버리는 것이라면","u":[["夢",44.22,44.54,0,0],["で",44.54,44.82,0,0],["終",44.82,44.98,0,0],["っ",44.98,45.26,0,0],["て",45.26,45.66,0,0],["し",45.66,45.82,0,0],["ま",45.82,45.94,0,0],["う",45.94,46.18,0,0],["の",46.18,46.38,0,0],["な",46.38,46.58,0,0],["ら",46.58,46.82,0,0],["ば",46.82,47.22,0,0]],"s":44.22,"e":47.22},{"i":16,"t":"「昨日を変えさせて」","ko":"「어제를 바꾸게 해줘」","u":[["「昨",47.27,47.39,0,0],["日",47.39,47.71,0,0],["を",47.71,47.77,0,0],["変",47.75,48.19,0,0],["え",48.19,48.25,0,0],["さ",48.23,48.35,0,0],["せ",48.35,49.35,0,0],["て」",49.39,49.62,0,0]],"s":47.27,"e":49.62},{"i":17,"t":"なんて言わないから","ko":"라고는 말하지 않을 테니까","u":[["な",49.67,49.95,0,0],["ん",49.95,50.01,0,0],["て",49.99,50.47,0,0],["言",50.47,50.63,0,0],["わ",50.63,50.83,0,0],["な",50.83,50.99,0,0],["い",50.99,51.48,0,0],["か",51.48,51.6,0,0],["ら",51.6,51.87,0,0]],"s":49.67,"e":51.87},{"i":18,"t":"また明日も君とこうやって笑わせて","ko":"다시 내일도 너랑 이렇게 해서 웃게 해줘","u":[["ま",51.92,52.04,0,0],["た",52.04,52.28,0,0],["明",52.28,52.4,0,0],["日",52.4,52.64,0,0],["も",52.64,52.92,0,0],["君",52.92,53.2,0,0],["と",53.2,53.52,0,0],["こ",53.52,53.6,0,0],["う",53.6,53.8,0,0],["や",53.8,53.96,0,0],["っ",53.96,54.04,0,0],["て",54.04,54.48,0,0],["笑",54.48,54.76,0,0],["わ",54.76,54.92,0,0],["せ",54.92,55.16,0,0],["て",55.16,57.16,0,0]],"s":51.92,"e":57.16},{"i":19,"t":"あれから世界は変わったって","ko":"그 후로 세상이 변했다고","u":[["あ",85.33,85.45,0,0],["れ",85.45,85.69,0,0],["か",85.69,85.81,0,0],["ら",85.81,86.26,0,0],["世",86.26,86.39,0,0],["界",86.39,86.63,0,0],["は",86.63,87.0,0,0],["変",87.0,87.16,0,0],["わ",87.16,87.28,0,0],["っ",87.28,87.4,0,0],["た",87.4,87.73,0,0],["っ",87.73,87.81,0,0],["て",87.81,88.17,0,0]],"s":85.33,"e":88.17},{"i":20,"t":"本気で思ったって","ko":"진심으로 생각하려해도","u":[["本",88.22,88.42,0,0],["気",88.42,88.59,0,0],["で",88.59,88.71,0,0],["思",88.71,88.91,0,0],["っ",88.91,88.99,0,0],["た",88.99,89.32,0,0],["っ",89.32,89.38,0,0],["て",89.36,89.42,0,0]],"s":88.22,"e":89.42},{"i":21,"t":"期待したって変えようとしたって","ko":"기대해도 바뀌려고 해도","u":[["期",89.24,90.24,0,0],["待",90.49,90.77,0,0],["し",90.77,90.93,0,0],["た",90.93,91.13,0,0],["っ",91.13,91.25,0,0],["て",91.25,91.54,0,0],["変",91.54,91.66,0,0],["え",91.66,91.82,0,0],["よ",91.82,91.94,0,0],["う",91.94,92.1,0,0],["と",92.1,92.38,0,0],["し",92.38,92.54,0,0],["た",92.54,92.78,0,0],["っ",92.78,92.9,0,0],["て",92.9,93.34,0,0]],"s":89.24,"e":93.34},{"i":22,"t":"未来は残酷で","ko":"미래는 잔혹하고","u":[["未",93.39,93.55,0,0],["来",93.55,93.79,0,0],["は",93.79,94.27,0,0],["残",94.27,94.43,0,0],["酷",94.43,94.76,0,0],["で",94.76,94.95,0,0]],"s":93.39,"e":94.95},{"i":23,"t":"それでもいつだって君と見ていた","ko":"그래도 언제나 너랑 바라봤던","u":[["そ",95.0,95.28,0,0],["れ",95.28,95.48,0,0],["で",95.48,95.64,0,0],["も",95.64,95.97,0,0],["い",95.97,96.13,0,0],["つ",96.13,96.41,0,0],["だ",96.41,96.61,0,0],["っ",96.61,96.69,0,0],["て",96.69,97.05,0,0],["君",97.05,97.33,0,0],["と",97.33,97.66,0,0],["見",97.66,97.86,0,0],["て",97.86,98.02,0,0],["い",98.02,98.18,0,0],["た",98.18,98.61,0,0]],"s":95.0,"e":98.61},{"i":24,"t":"世界は本当に綺麗だった","ko":"세계는 정말로 아름다웠어","u":[["世",98.66,98.78,0,0],["界",98.78,99.07,0,0],["は",99.07,99.51,0,0],["本",99.51,99.67,0,0],["当",99.67,99.87,0,0],["に",99.87,100.23,0,0],["綺",100.23,100.35,0,0],["麗",100.35,100.64,0,0],["だ",100.64,100.88,0,0],["っ",100.88,100.94,0,0],["た",100.92,100.98,0,0]],"s":98.66,"e":100.98},{"i":25,"t":"忘れてないさ","ko":"잊어버리지 않았어","u":[["忘",101.0,101.9,0,0],["れ",101.9,102.14,0,0],["て",102.14,102.39,0,0],["な",102.39,102.55,0,0],["い",102.55,102.79,0,0],["さ",102.79,103.07,0,0]],"s":101.0,"e":103.07},{"i":26,"t":"思い出せるように仕舞ってるの","ko":"언제든지 떠올릴 수 있게 잘 간직하고 있어","u":[["思",103.12,103.32,0,0],["い",103.32,103.53,0,0],["出",103.53,103.77,0,0],["せ",103.77,104.06,0,0],["る",104.06,104.34,0,0],["よ",104.34,104.46,0,0],["う",104.46,104.54,0,0],["に",104.54,104.79,0,0],["仕",104.79,104.95,0,0],["舞",104.95,105.07,0,0],["っ",105.07,105.13,0,0],["て",105.11,105.2,0,0],["る",105.2,105.36,0,0],["の",105.36,105.42,0,0]],"s":103.12,"e":105.42},{"i":27,"t":"君がいてもいなくても翔べるなんて妄想","ko":"네가 있든 없든 날 수 있다니 망상이야","u":[["君",105.38,106.15,0,0],["が",106.15,106.35,0,0],["い",106.35,106.47,0,0],["て",106.47,106.63,0,0],["も",106.63,106.75,0,0],["い",106.75,106.81,0,0],["な",106.79,106.91,0,0],["く",106.91,106.97,0,0],["て",106.95,107.03,0,0],["も",107.03,107.15,0,0],["翔",107.15,107.35,0,0],["べ",107.35,107.47,0,0],["る",107.47,107.71,0,0],["な",107.71,107.84,0,0],["ん",107.84,107.92,0,0],["て",107.92,108.16,0,0],["妄",108.16,108.22,0,0],["想",108.2,108.71,0,0]],"s":105.38,"e":108.71},{"i":28,"t":"独りじゃ歩くことさえ僕は","ko":"혼자선 걷는 것조차 나는","u":[["独",108.76,109.0,0,0],["り",109.0,109.24,0,0],["じ",109.24,109.3,0,0],["ゃ",109.28,109.45,0,0],["歩",109.45,109.65,0,0],["く",109.65,109.85,0,0],["こ",109.85,109.91,0,0],["と",109.89,110.13,0,0],["さ",110.13,110.21,0,0],["え",110.21,110.49,0,0],["僕",110.49,110.73,0,0],["は",110.73,111.05,0,0]],"s":108.76,"e":111.05},{"i":29,"t":"しないまま藍色の風に吐いた幻想","ko":"하지 않은 채 남색 바람에 내뱉은 환상","u":[["し",111.1,111.26,0,0],["な",111.26,111.42,0,0],["い",111.42,111.66,0,0],["ま",111.66,111.72,0,0],["ま",111.7,111.9,0,0],["藍",111.9,112.02,0,0],["色",112.02,112.18,0,0],["の",112.18,112.34,0,0],["風",112.34,112.66,0,0],["に",112.66,112.83,0,0],["吐",112.83,112.95,0,0],["い",112.95,113.07,0,0],["た",113.07,113.35,0,0],["幻",113.35,113.51,0,0],["想",113.51,114.95,0,0]],"s":111.1,"e":114.95},{"i":30,"t":"壊してくれって願って踠いたって Eh…","ko":"부숴 달라고 기도하고 발버둥쳐도 Eh…","u":[["壊",115.0,115.06,0,0],["し",115.04,115.1,0,0],["て",115.08,115.14,0,0],["く",115.12,115.18,0,0],["れ",115.16,115.22,0,0],["っ",115.2,115.26,0,0],["て",115.24,115.32,0,0],["願",115.32,115.52,0,0],["っ",115.52,115.6,0,0],["て",115.6,115.84,0,0],["踠",115.84,116.24,0,0],["い",116.24,116.4,0,0],["た",116.4,116.72,0,0],["っ",116.72,116.88,0,0],["て",116.88,117.77,0,0],["Eh…",117.77,118.8,1,1]],"s":115.0,"e":118.8},{"i":31,"t":"『願ったんなら叶えてしまえや』って Eh…","ko":"『바란다면 이뤄버려』라고 Eh…","u":[["『願",118.85,119.29,0,0],["っ",119.29,119.45,0,0],["た",119.45,119.73,0,0],["ん",119.73,119.85,0,0],["な",119.85,120.01,0,0],["ら",120.01,120.21,0,0],["叶",120.21,120.57,0,0],["え",120.57,120.73,0,0],["て",120.73,121.01,0,0],["し",121.01,121.14,0,0],["ま",121.14,121.3,0,0],["え",121.3,121.38,0,0],["や』",121.38,121.7,0,0],["っ",121.7,121.78,0,0],["て",121.78,122.78,0,0],["Eh…",122.82,123.81,1,1]],"s":118.85,"e":123.81},{"i":32,"t":"君は言って","ko":"너는 말했지","u":[["君",123.86,124.42,0,0],["は",124.42,125.42,0,0],["言",126.59,126.75,0,0],["っ",126.75,126.91,0,0],["て",126.91,128.78,0,0]],"s":123.86,"e":128.78},{"i":33,"t":"また明日の夜に","ko":"또 내일 밤에","u":[["ま",128.83,128.95,0,0],["た",128.95,129.44,0,0],["明",129.44,129.64,0,0],["日",129.64,130.44,0,0],["の",130.44,130.72,0,0],["夜",130.72,131.72,0,0],["に",131.96,132.19,0,0]],"s":128.83,"e":132.19},{"i":34,"t":"逢いに行こうと思うが","ko":"만나러 가려고 생각하지만","u":[["逢",132.24,132.44,0,0],["い",132.44,132.6,0,0],["に",132.6,133.04,0,0],["行",133.04,133.1,0,0],["こ",133.08,133.32,0,0],["う",133.32,133.65,0,0],["と",133.65,133.85,0,0],["思",133.85,134.13,0,0],["う",134.13,134.19,0,0],["が",134.17,134.36,0,0]],"s":132.24,"e":134.36},{"i":35,"t":"どうかな君はいないかな","ko":"어떨까, 너는 없으려나","u":[["ど",134.41,134.61,0,0],["う",134.61,134.73,0,0],["か",134.73,134.85,0,0],["な",134.85,135.05,0,0],["君",135.05,135.33,0,0],["は",135.33,135.61,0,0],["い",135.61,135.77,0,0],["な",135.77,135.93,0,0],["い",135.93,136.13,0,0],["か",136.13,136.25,0,0],["な",136.25,136.48,0,0]],"s":134.41,"e":136.48},{"i":36,"t":"それでもいつまでも僕ら一つだから","ko":"그래도 언제까지고 우리는 하나니까","u":[["そ",136.53,136.61,0,0],["れ",136.61,136.77,0,0],["で",136.77,136.89,0,0],["も",136.89,137.13,0,0],["い",137.13,137.25,0,0],["つ",137.25,137.41,0,0],["ま",137.41,137.54,0,0],["で",137.54,137.66,0,0],["も",137.66,137.9,0,0],["僕",137.9,138.26,0,0],["ら",138.26,138.42,0,0],["一",138.42,138.54,0,0],["つ",138.54,138.7,0,0],["だ",138.7,138.86,0,0],["か",138.86,139.02,0,0],["ら",139.02,139.08,0,0]],"s":136.53,"e":139.08},{"i":37,"t":"またね Sky Arrow 笑っていよう","ko":"또 보자 Sky Arrow 웃으며 있자","u":[["ま",138.88,139.4,0,0],["た",139.4,139.56,0,0],["ね",139.56,139.77,0,0],["Sky",139.77,140.61,1,1],["Arrow",140.61,141.61,1,1],["笑",142.1,142.54,0,1],["っ",142.54,142.94,0,0],["て",142.94,143.38,0,0],["い",143.38,143.44,0,0],["よ",143.42,143.51,0,0],["う",143.51,143.74,0,0]],"s":138.88,"e":143.74},{"i":38,"t":"未来を少しでも君といたいから叫ぼう","ko":"미래를 조금이라도 너와 있고 싶으니 외쳐보자","u":[["未",143.79,143.95,0,0],["来",143.95,144.27,0,0],["を",144.27,144.59,0,0],["少",144.59,144.75,0,0],["し",144.75,144.99,0,0],["で",144.99,145.07,0,0],["も",145.07,145.4,0,0],["君",145.4,145.64,0,0],["と",145.64,145.88,0,0],["い",145.88,146.04,0,0],["た",146.04,146.2,0,0],["い",146.2,146.4,0,0],["か",146.4,146.48,0,0],["ら",146.48,146.68,0,0],["叫",146.68,147.0,0,0],["ぼ",147.0,147.2,0,0],["う",147.2,147.4,0,0]],"s":143.79,"e":147.4},{"i":39,"t":"\"今日の日をいつか思い出せ未来の僕ら！\"","ko":"\"오늘의 날을 언젠가 떠올려 줘, 미래의 우리들아!\"","u":[["\"今",147.45,147.53,0,0],["日",147.53,147.65,0,0],["の",147.65,147.89,0,0],["日",147.89,148.01,0,0],["を",148.01,148.25,0,0],["い",148.25,148.33,0,0],["つ",148.33,148.49,0,0],["か",148.49,148.73,0,0],["思",148.73,148.85,0,0],["い",148.85,149.01,0,0],["出",149.01,149.14,0,0],["せ",149.14,149.42,0,0],["未",149.42,149.62,0,0],["来",149.62,149.82,0,0],["の",149.82,150.06,0,0],["僕",150.06,150.46,0,0],["ら！\"",150.46,152.41,0,0]],"s":147.45,"e":152.41}]};
+var SUB_BOX=1;   // dark band behind the Korean subtitle so it reads over the painted plates
+CINE.init(document.getElementById('cv'),D);
+ACC='#8FE3FF';const ORG='#FFB547';B0=1.24%BEAT;
+const L=i=>Ln[i];
+// ---------- the one camera path (absolute time, world coords; up = negative y) ----------
+const K=[
+ [0,   -80,-260,1.18,.0],
+ [T(0,0),0,-280,1.15,.0],
+ [T(4,0),520,-360,1.12,.02],          // drifting along the rooftop through the verse
+ [T(7,0)-.3,640,-980,1.2,.0,eIOs],     // pre-chorus: tilt up toward the moon
+ [T(8,0),640,-1000,1.28,-.03],         // the shout
+ [T(9,0),600,-820,.95,.0],             // the world leaves me behind (pull back)
+ [T(10,0),600,-760,.98,.0],
+ [T(11,4)-.1,600,-880,1.1,.0],         // "that night was different": slow push, stillness
+ [T(11,4)+.2,600,-1000,1.12,.0,eInC],  // the hands touch -> lift-off
+ [T(13,0),900,-3300,1.0,-.06,eIO],     // through the clouds
+ [T(14,0),1500,-4300,1.02,.0],         // above the clouds, the leading star ahead
+ [T(18,0),3600,-4700,1.04,.04],
+ [61,4400,-4800,1.0,-.02],
+ [66,6200,-5000,1.06,.14],             // instrumental: the chase — banking left and right
+ [70,8200,-4600,1.0,-.16],
+ [74,10200,-5100,1.08,.12],
+ [77.5,11400,-4900,.94,0],             // break: we hover over the sea of clouds
+ [85.2,11800,-4900,.9,.0],
+ [98,13600,-4200,1.0,-.04],            // verse 2: gliding down toward the cloud tops
+ [105.3,14600,-3900,1.02,.03],
+ [108,16200,-3200,1.0,-.1],            // fast section: diving in and out of the clouds
+ [111,17800,-3900,1.04,.1],
+ [115,19400,-3100,1.0,-.12],
+ [118.8,21000,-3800,1.06,.08],
+ [123.8,22200,-4400,1.0,0],            // "you said it" — climbing back above the clouds
+ [128.8,23000,-4600,1.0,0],
+ [132,25200,-4900,1.04,-.08,eInC],     // climax: the flight accelerates
+ [135,27600,-5300,1.0,.1],
+ [138.8,30400,-5600,1.06,-.08],
+ [143.8,33400,-6600,1.02,.08],         // Sky Arrow: the steep climb into the dawn
+ [147.4,36000,-7200,1.06,-.06],
+ [152.5,38600,-7900,1.1,.02],
+ [165,39400,-8200,.86,0],              // the vocalise: pull back over the dawn
+ [180,39800,-8300,.8,0]];
+function cam(t){const c=camAt(K,t);return {x:c[1],y:c[2],z:c[3],r:c[4]}}
+function camVel(t){const a=cam(t-.04),b=cam(t+.04);return {x:(b.x-a.x)/.08,y:(b.y-a.y)/.08}}
+// ---------- world ----------
+let DK=0;
+function skyAt(t){const alt=clamp(-CAM.y/4600);DK=eIO(P(t,T(37,3)-1,6));const gr=g.createLinearGradient(0,0,0,H);gr.addColorStop(0,mix(mix('#070B26','#03051A',alt),'#1B1F5C',DK));gr.addColorStop(.6,mix(mix('#101A55','#0A0F33',alt),'#7A4F8C',DK));gr.addColorStop(1,mix(mix('#26306E','#1B2560',alt),'#F29A7A',DK));g.fillStyle=gr;g.fillRect(0,0,W,H);
+  if(DK>0){const sun=g.createRadialGradient(CX,H+120,40,CX,H+120,1100);sun.addColorStop(0,`rgba(255,236,214,${.75*DK})`);sun.addColorStop(.3,`rgba(255,160,90,${.6*DK})`);sun.addColorStop(1,'rgba(255,181,71,0)');g.fillStyle=sun;g.fillRect(0,H-1100,W,1100+120)}}
+function moonLayer(t){ // far layer; the moon sinks during "月は沈み", the sky warms at "陽は昇る"
+  const s0=T(9,1),set=eIO(P(t,s0,1.8)),rise=eIO(P(t,T(9,4),2.2))*(1-P(t,T(11,4)+1,3));
+  layer(.08,()=>{const mx=780,my=lerp(-1900,-400,set);const gl=g.createRadialGradient(mx,my,80,mx,my,420);gl.addColorStop(0,`rgba(220,235,255,${.35*(1-set)})`);gl.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gl;g.fillRect(mx-420,my-420,840,840);g.globalAlpha=1-clamp((set-.85)/.15);g.fillStyle='#EAF2FF';g.beginPath();g.arc(mx,my,110,0,7);g.fill();g.globalAlpha=1;
+    if(rise>0){const gl2=g.createRadialGradient(200,-150,20,200,-150,1100);gl2.addColorStop(0,rgba(ORG,.45*rise));gl2.addColorStop(1,rgba(ORG,0));g.fillStyle=gl2;g.fillRect(-900,-1250,2200,2200)}});
+}
+function city(t){ // skyline far and near; the rooftop the camera starts on
+  for(const [pf,col,seed,base] of [[.45,'#070A26',3,200],[.75,'#04061A',7,120]])layer(pf,()=>{g.fillStyle=col;g.beginPath();g.moveTo(-2600,base+3000);g.lineTo(-2600,base);let x=-2600;while(x<5200){const w=50+100*R(Math.floor(x),seed),h=80+320*R(Math.floor(x),seed+1)**2;g.lineTo(x,base-h);g.lineTo(x+w,base-h);x+=w}g.lineTo(5200,base+3000);g.fill();
+    for(let k=0;k<260;k++){if(R(k,seed+5)>.5)continue;g.fillStyle=`rgba(255,${200+40*R(k,9)|0},140,${.3+.4*R(k,8)*(.7+.3*Math.sin(t*.7+k))})`;g.fillRect(-2600+R(k,seed+6)*7800,base-20-R(k,seed+7)*300,5,6)}});
+  layer(1,()=>{g.fillStyle='#02030E';g.fillRect(-1200,0,4000,1600);g.strokeStyle=rgba(ACC,.3);g.lineWidth=3;g.beginPath();g.moveTo(-1200,0);g.lineTo(2800,0);g.stroke();
+    for(let k=0;k<8;k++){const x=-600+k*380;g.fillStyle='#050716';g.fillRect(x,-70,10,70);g.fillRect(x-60,-74,130,8)}});
+}
+function clouds(t,pf,y0,a,col,seed,scale){if(a<=0)return;layer(pf,()=>{for(let k=0;k<26;k++){const x=-800+R(k,seed)*6800,y=y0+(R(k,seed+2)-.5)*420,rx=(260+360*R(k,seed+3))*scale,ry=rx*.26;const gl=g.createRadialGradient(x,y,0,x,y,rx);gl.addColorStop(0,rgba(col,a*(.45+.45*R(k,seed+4))));gl.addColorStop(1,rgba(col,0));g.save();g.translate(x,y);g.scale(1,ry/rx);g.fillStyle=gl;g.beginPath();g.arc(0,0,rx,0,7);g.fill();g.restore()}})}
+function windLines(t,v){const sp=Math.hypot(v.x,v.y);const a=clamp((sp-300)/2200);if(a<=0)return;const ang=Math.atan2(-v.y,-v.x);g.save();g.globalCompositeOperation='lighter';
+  for(let k=0;k<70;k++){const ph=(t*1.8+R(k,40))%1,x=R(k,41)*W,y=R(k,42)*H,l=(120+500*R(k,43))*a;const px=x+Math.cos(ang)*ph*900,py=y+Math.sin(ang)*ph*900;g.strokeStyle=rgba(ACC,a*(.15+.45*R(k,44))*Math.sin(ph*Math.PI));g.lineWidth=1+2.5*R(k,45);g.beginPath();g.moveTo(px,py);g.lineTo(px+Math.cos(ang)*l,py+Math.sin(ang)*l);g.stroke()}g.restore()}
+// the two lights: mine (cyan) and yours (orange). Before the touch they approach; afterwards they fly
+// like a pair of fighters — helixes, crossings, loops, chases — sampled as trails from the same function.
+const SEG=[ // [t0, mode] ; modes blend over 1.2 s
+ [0,'helix'],[37.1,'weave'],[58,'dogfight'],[64.2,'write'],[70.8,'dogfight'],[77.5,'hover'],[85.2,'weave'],[105.3,'chase'],[123.8,'weave'],[136.5,'merge'],[138.8,'arrow'],[143.8,'helix'],[152.5,'dogfight'],[165,'hover']];
+function modePos(m,t,who){const s=who?1:-1,ph=who?Math.PI:0;
+  switch(m){
+    case 'helix':{const w=3.2*(1+1.2*BOOST(t));return {x:Math.cos(w*t+ph)*260,y:-420+Math.sin(w*2*t)*40,z:Math.sin(w*t+ph)}}
+    case 'weave':{const w=1.6;return {x:Math.sin(w*t+ph*.6)*380,y:-380+Math.sin(2*w*t+who)*220,z:Math.cos(w*t+ph*.6)}}
+    case 'dogfight':{const w=2.1,a={x:Math.sin(w*t)*420+Math.sin(3.7*t)*160,y:-300+Math.sin(1.3*w*t)*380+Math.cos(2.9*t)*120};
+      if(!who)return {...a,z:Math.sin(2.3*t)};const d=.38,b={x:Math.sin(w*(t-d))*420+Math.sin(3.7*(t-d))*160,y:-300+Math.sin(1.3*w*(t-d))*380+Math.cos(2.9*(t-d))*120};
+      return {x:b.x+Math.cos(6*t)*90,y:b.y+Math.sin(6*t)*90,z:Math.cos(2.3*t)}}
+    case 'chase':{const w=2.8;return {x:Math.sin(w*t+who*.9)*360+s*60,y:-200+Math.sin(w*1.7*t+who)*320,z:Math.sin(w*t)}}
+    case 'write':{const p=clamp((t-64.4)/5.8);return {x:lerp(-360,360,p)+(who?18:-18),y:-520+Math.sin(t*11+who*2)*120+(who?30:-30),z:0}}
+    case 'hover':{return {x:s*140+Math.sin(t*.7+who)*50,y:-420+Math.cos(t*.9+who)*40,z:0}}
+    case 'merge':{return {x:s*18+Math.sin(t*4)*6,y:-420,z:0}}
+    case 'arrow':{const p=clamp((t-138.8)/2.5);return {x:lerp(-360,420,eIOs(p))+s*14,y:lerp(300,-760,eIOs(p))+s*10,z:0}}
+  }}
+function pairPos(t,who){let k=0;for(let j=0;j<SEG.length;j++)if(t>=SEG[j][0])k=j;const cur=modePos(SEG[k][1],t,who);if(k===0)return cur;
+  const bl=eIOs(clamp((t-SEG[k][0])/1.2));if(bl>=1)return cur;const prev=modePos(SEG[k-1][1],t,who);return {x:lerp(prev.x,cur.x,bl),y:lerp(prev.y,cur.y,bl),z:lerp(prev.z,cur.z,bl)}}
+function lights(t){const a=t-T(11,0),touch=T(11,4);if(a<-.3)return;
+  if(t<touch){const p=eIO(clamp((t-T(11,0))/(touch-T(11,0))));layer(1,()=>{const y=-880;flare(lerp(170,560,p),y,6+2*pulse(t),rgba(ACC,.9),clamp((a+.3)/.4));flare(lerp(1030,640,p),y,6+2*pulse(t),rgba(ORG,.9),clamp((a+.3)/.4));
+    g.strokeStyle=rgba('#FFFFFF',.35*p);g.lineWidth=2;g.beginPath();g.moveTo(lerp(170,560,p),y);g.quadraticCurveTo(600,y-120*p,lerp(1030,640,p),y);g.stroke()});return}
+  const b=t-touch;if(b<.5){g.fillStyle=`rgba(255,255,255,${.8*(1-b/.5)})`;g.fillRect(0,0,W,H)}
+  const fade=(1-P(t,168,4))*LA(t);if(fade<=0)return;const rise=eOutC(clamp(b/.8));
+  g.save();g.globalCompositeOperation='lighter';
+  for(const who of [0,1]){const col=who?ORG:ACC;let prev=null;
+    for(let k=0;k<=36;k++){const tt=t-k*.028;if(tt<touch)break;const p=pairPos(tt,who),sc=1+.25*p.z,x=CX+p.x*rise,y=CY+p.y*rise+k*14;   // trail streams back as we fly
+      if(prev){g.strokeStyle=rgba(col,.55*(1-k/36)*fade);g.lineWidth=(7*(1-k/36)+1)*sc;g.beginPath();g.moveTo(prev[0],prev[1]);g.lineTo(x,y);g.stroke()}prev=[x,y]}}
+  g.restore();
+  const A=pairPos(t,0),Bp=pairPos(t,1);for(const [p,col] of [[A,ACC],[Bp,ORG]])flare(CX+p.x*rise,CY+p.y*rise,(5+2*p.z)*(1+.3*pulse(t)),rgba(col,.95),fade,.8+.3*p.z);
+  const d=Math.hypot(A.x-Bp.x,A.y-Bp.y);if(d<70){const q=1-d/70;flare(CX+(A.x+Bp.x)/2*rise,CY+(A.y+Bp.y)/2*rise,10*q,'rgba(255,255,255,.9)',q*fade,1.2)}}
+// the leading star (魁星) waits above the clouds and then leads the way
+function leadStar(t){const a=t-T(13,4)+.6;if(a<0)return;layer(1,()=>{const c=cam(t);const x=c.x+320*Math.sin(t*.23+1)+Math.sin(t*.8)*80,y=c.y-560+220*Math.cos(t*.19)+Math.cos(t*.6)*40;
+  for(let k=0;k<40;k++){const q=k/40;g.fillStyle=rgba(ORG,.45*(1-q)*clamp(a/.8)*(1-DK)*LA(t));g.beginPath();g.arc(x-q*700,y+q*260,14*(1-q)+2,0,7);g.fill()}flare(x,y,12+3*pulse(t),rgba(ORG,.95),clamp(a/.6)*(1-DK)*LA(t),1.4)})}
+// ---------- painted plates (generated scene art, plates/*.webp) under the code layers ----------
+// Every scene is a stack of plates [id, parallax, opts] that drift with the one camera path (clamped so
+// the edges never show, or tiled with opts.wrap), crossfading at t0 over f seconds. Scenes whose plates
+// are missing fall back to the code-drawn world, so the page renders with or without art.
+const PL={img:{},off:/noplates/.test(location.search)};
+const PIDS=['s01_sky','s01_city','s01_roof','s02_sky','s02_roof','s04_hands','cl_mid','cl_near','s06_sea','s07_rain','s09_city','s10_glass','s11_dawn','cl_dawn','s12_sky','s12_roof'];
+const has=id=>!!PL.img[id];
+const SHATTER=L(33).s-.03;
+const SC=[
+ {n:'roof',t0:0,f:0,L:[['s01_sky',.08],['s01_city',.3],['s01_roof',.75]]},
+ {n:'clock',t0:T(4,0)-.6,f:1.4,L:[['s02_sky',.1],['s02_roof',.7]]},
+ {n:'lapse',t0:T(8,0)-.4,f:1.2,op:0,L:[['s01_city',.3],['s02_roof',.7]]},          // code sky runs the moon-set / sunrise
+ {n:'hands',t0:T(11,0)-.5,f:.9,L:[['s04_hands',.2,{push:.1}]]},
+ {n:'rise',t0:T(11,4)+.05,f:0,op:0,L:[['cl_mid',.5,{wrap:'y'}],['cl_near',.9,{wrap:'y',a:.8}]]},
+ {n:'sea',t0:T(13,2),f:1.6,L:[['s06_sea',.12,{wrap:'x',mirror:1}],['cl_near',1.1,{wrap:'x',a:.45,over:1}]]},
+ {n:'rain',t0:84.4,f:1.6,L:[['s07_rain',.15,{push:.08}]]},
+ {n:'photo',t0:L(25).s-.15,f:.25,L:[]},
+ {n:'wind',t0:L(27).s-.3,f:.5,L:[['s09_city',.25,{wrap:'x',mirror:1}],['cl_near',1.3,{wrap:'x',a:.3,over:1}]]},
+ {n:'glass',t0:T(30,0)-.5,f:1,L:[['s10_glass',.12,{push:.12}]]},
+ {n:'dawn',t0:SHATTER,f:0,dim:1,L:[['s11_dawn',.1,{wrap:'x',mirror:1}],['cl_dawn',.6,{wrap:'x'}],['cl_near',1.2,{wrap:'x',a:.3,over:1}]]},
+ {n:'home',t0:152.2,f:2.6,L:[['s12_sky',.06],['s12_roof',.6]]}];
+SC.forEach((s,k)=>{s.t1=SC[k+1]?SC[k+1].t0+SC[k+1].f:D.dur;s.op=s.op??1;const m=cam((s.t0+s.t1)/2);s.cx=m.x;s.cy=m.y;let dx=1,dy=1;
+  for(let q=0;q<=40;q++){const c=cam(lerp(s.t0,s.t1,q/40));dx=Math.max(dx,Math.abs(c.x-s.cx));dy=Math.max(dy,Math.abs(c.y-s.cy))}s.dx=dx;s.dy=dy});
+const ready=s=>s.n==='photo'?has('s01_sky'):s.L.length&&s.L.every(l=>has(l[0]));
+function sceneA(s,t){return t<s.t0||t>=s.t1?0:s.f?clamp((t-s.t0)/s.f):1}
+function sceneAlpha(n,t){const k=SC.findIndex(s=>s.n===n),s=SC[k];if(!ready(s))return 0;const nx=SC[k+1];return sceneA(s,t)*(nx&&ready(nx)&&!nx.op?1-sceneA(nx,t):1)*(nx&&t>=nx.t0+nx.f?0:1)}
+function plate(id,pf,o,s,t,al){const im=PL.img[id];if(!im||al<=0)return;
+  const r=CAM.r*Math.min(1,pf),cr=Math.abs(Math.cos(r)),sr=Math.abs(Math.sin(r)),rw=W*cr+H*sr,rh=W*sr+H*cr;   // screen footprint after the roll
+  const push=1+(o.push||0)*eIOs(clamp((t-s.t0)/(s.t1-s.t0)));
+  let S=Math.max(W/im.width,H/im.height)*1.04*(1+(CAM.z-1)*pf*.7)*push;
+  if(o.wrap!=='x')S=Math.max(S,rw*1.01/im.width);if(o.wrap!=='y')S=Math.max(S,rh*1.01/im.height);
+  const iw=im.width*S,ih=im.height*S;let ox=-(CAM.x-s.cx)*pf,oy=-(CAM.y-s.cy)*pf;
+  if(o.wrap!=='x'){const m=(iw-rw)/2;ox*=Math.min(1,.95*m/(s.dx*pf))}
+  if(o.wrap!=='y'){const m=(ih-rh)/2;oy*=Math.min(1,.95*m/(s.dy*pf))}
+  g.save();g.globalAlpha=al*(o.a??1);g.translate(CX,CY);g.rotate(r);
+  const draw=(x,y,fx)=>{if(fx){g.save();g.translate(x+iw,y);g.scale(-1,1);g.drawImage(im,0,0,iw,ih);g.restore()}else g.drawImage(im,x,y,iw,ih)};
+  if(o.wrap==='x'){const x0=ox-iw/2,i0=Math.floor((-rw/2-x0)/iw),i1=Math.floor((rw/2-x0)/iw);for(let i=i0;i<=i1;i++)draw(x0+i*iw,oy-ih/2,o.mirror&&Math.abs(i)%2)}
+  else if(o.wrap==='y'){const gap=ih*1.1,y0=oy-ih/2,i0=Math.floor((-rh/2-y0)/gap)-1,i1=Math.floor((rh/2-y0)/gap);for(let i=i0;i<=i1;i++)draw(ox-iw/2+(i%2?iw*.18:0),y0+i*gap,i%2)}
+  else draw(ox-iw/2,oy-ih/2,0);
+  g.restore()}
+function plates(t,over){for(const s of SC){if(!ready(s))continue;const a=sceneAlpha(s.n,t);if(a<=0)continue;
+  for(const [id,pf,o={}] of s.L)if(!!o.over===over)plate(id,pf,o,s,t,a);
+  if(!over&&s.dim){g.fillStyle=`rgba(6,8,34,${.5*(1-DK)*a})`;g.fillRect(0,0,W,H)}
+  if(!over&&s.op){g.fillStyle=`rgba(3,4,16,${.14*a})`;g.fillRect(0,0,W,H)}}}   // push the art back behind the type
+const LA=t=>PL.off?1:1-Math.max(sceneAlpha('rain',t),sceneAlpha('photo',t));   // the two lights are absent in the lonely scenes
+// scene overlays drawn in code on top of the art
+function clockFx(t){const a=sceneAlpha('clock',t)+sceneAlpha('lapse',t)*(1-P(t,T(8,0),1.2));if(a<=0)return;   // a clock in the sky, running backward
+  const t0=T(4,0)-.6,sp=t-t0,wild=P(t,T(7,0),1),ang=-(sp*.35+sp*sp*.05+wild*wild*40),hr=ang/12;
+  g.save();g.globalCompositeOperation='lighter';g.translate(CX-(CAM.x-SC[1].cx)*.1,700-(CAM.y-SC[1].cy)*.1);const R0=360;g.globalAlpha=a*.55;
+  g.strokeStyle='rgba(190,225,255,.8)';g.lineWidth=5;g.beginPath();g.arc(0,0,R0,0,7);g.stroke();g.lineWidth=2;g.beginPath();g.arc(0,0,R0-26,0,7);g.stroke();
+  for(let k=0;k<60;k++){const q=k*Math.PI/30,l=k%5?12:36;g.lineWidth=k%5?2:5;g.beginPath();g.moveTo(Math.sin(q)*(R0-l-6),-Math.cos(q)*(R0-l-6));g.lineTo(Math.sin(q)*(R0-6),-Math.cos(q)*(R0-6));g.stroke()}
+  for(let k=0;k<12;k++){g.strokeStyle=rgba(ACC,.4*(1-k/12));g.lineWidth=9;g.beginPath();g.moveTo(0,0);const q=ang+k*.07;g.lineTo(Math.sin(q)*R0*.84,-Math.cos(q)*R0*.84);g.stroke()}   // backward motion trail
+  g.strokeStyle='#fff';g.lineWidth=10;g.beginPath();g.moveTo(0,0);g.lineTo(Math.sin(ang)*R0*.84,-Math.cos(ang)*R0*.84);g.stroke();
+  g.lineWidth=15;g.beginPath();g.moveTo(0,0);g.lineTo(Math.sin(hr)*R0*.52,-Math.cos(hr)*R0*.52);g.stroke();g.fillStyle='#fff';g.beginPath();g.arc(0,0,12,0,7);g.fill();g.restore()}
+function rainFx(t){const a=sceneAlpha('rain',t)*(1-P(t,L(24).s-.3,2.4));if(a<=0)return;   // the rain stops at "the world was beautiful"
+  g.save();g.strokeStyle='rgba(190,210,245,.34)';g.lineCap='round';
+  for(let k=0;k<320;k++){const sp=1700+900*R(k,62),l=36+50*R(k,63),x=((R(k,60)*1.2*W+t*sp*.12)%(W*1.2))-W*.1,y=((R(k,61)*(H+300)+t*sp)%(H+300))-150;
+    g.globalAlpha=a*(.35+.65*R(k,64));g.lineWidth=1+1.6*R(k,65);g.beginPath();g.moveTo(x,y);g.lineTo(x-l*.12,y-l);g.stroke()}
+  g.strokeStyle='rgba(220,230,255,.5)';g.lineWidth=1.5;for(let k=0;k<40;k++){const ph=(t*1.7+R(k,70))%1,x=R(k,71)*W,y=1520+R(k,72)*380;g.globalAlpha=a*(1-ph)*.8;g.beginPath();g.ellipse(x,y,6+34*ph,2+8*ph,0,0,7);g.stroke()}
+  g.restore();const warm=P(t,L(24).s-.3,2.4)*sceneAlpha('rain',t);if(warm>0){const gl=g.createRadialGradient(CX,H,50,CX,H,1500);gl.addColorStop(0,rgba(ORG,.35*warm));gl.addColorStop(1,rgba(ORG,0));g.fillStyle=gl;g.fillRect(0,0,W,H)}}
+let PH=null;function photoOf(){if(PH)return PH;PH=document.createElement('canvas');PH.width=560;PH.height=600;const c=PH.getContext('2d');   // "that night", kept like a photograph
+  for(const id of ['s01_sky','s01_city','s01_roof']){const im=PL.img[id];if(!im)continue;const s=Math.max(560/im.width,600/im.height)*1.05;c.drawImage(im,(560-im.width*s)/2,(600-im.height*s)/2,im.width*s,im.height*s)}
+  c.globalCompositeOperation='lighter';c.lineCap='round';for(const [col,o] of [[ACC,0],[ORG,26]]){c.strokeStyle=col;c.shadowColor=col;c.shadowBlur=14;c.lineWidth=5;c.beginPath();c.moveTo(60+o,540);c.bezierCurveTo(160,260-o,340+o,420,500,70+o);c.stroke()}return PH}
+function photoFx(t){const a=sceneAlpha('photo',t);if(a<=0)return;const s=SC.find(s=>s.n==='photo'),u=t-s.t0;
+  const bg=g.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#140D0A');bg.addColorStop(1,'#3A2616');g.save();g.globalAlpha=a;g.fillStyle=bg;g.fillRect(0,0,W,H);
+  g.globalCompositeOperation='lighter';for(let k=0;k<26;k++){const x=R(k,80)*W,y=R(k,81)*H,r=30+90*R(k,82);const gl=g.createRadialGradient(x,y,0,x,y,r);gl.addColorStop(0,rgba(k%3?ORG:'#FFE2B0',.12+.1*Math.sin(t+k)));gl.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gl;g.fillRect(x-r,y-r,r*2,r*2)}g.globalCompositeOperation='source-over';
+  const fly=eInC(P(t,L(26).e-.5,.8)),sc=lerp(1.12,1,eOutC(clamp(u/1.2)));g.translate(CX+fly*1300,560-fly*300);g.rotate(-.05+fly*.8);g.scale(sc,sc);
+  g.shadowColor='rgba(0,0,0,.6)';g.shadowBlur=40;g.fillStyle='#F4ECDD';g.fillRect(-320,-340,640,760);g.shadowBlur=0;g.drawImage(photoOf(),-280,-300,560,600);
+  g.fillStyle=`rgba(244,236,221,${1-eOutC(clamp((u-.2)/1.6))})`;g.fillRect(-280,-300,560,600);   // the photo develops
+  g.font=KR(300,34);g.fillStyle='#6A5646';g.textAlign='center';g.fillText('그날 밤',0,370);g.restore();
+  const fl=1-clamp(u/.3);if(fl>0&&u>=0){g.fillStyle=`rgba(255,250,240,${.8*fl})`;g.fillRect(0,0,W,H)}}   // shutter flash
+const CRK=[...Array(26)].map((_,k)=>{const pts=[[0,0]];let x=0,y=0,an=k/26*6.283+R(k,90)*.2;for(let s=0;s<7;s++){an+=(R(k,91+s)-.5)*.7;const l=60+160*R(k,99+s);x+=Math.cos(an)*l;y+=Math.sin(an)*l;pts.push([x,y])}return pts});
+const HITS=()=>[T(30,0),T(30,7),T(30,15),T(31,0),T(31,6),T(31,15),T(32,0),T(32,2)];
+function crackAmt(t){return HITS().reduce((s,h)=>s+eOutX(clamp((t-h)/.3))/8,0)}
+const GO=[CX,700];
+function cracks(c,amt,a){c.save();c.globalCompositeOperation='lighter';c.lineJoin='round';
+  for(let k=0;k<CRK.length;k++){const n=Math.max(0,Math.floor(amt*8*(0.6+.4*R(k,98)))),pts=CRK[k].slice(0,Math.min(8,n+1));if(pts.length<2)continue;
+    for(const [w,al] of [[7,.18],[2,.85]]){c.strokeStyle=`rgba(210,235,255,${al*a})`;c.lineWidth=w;c.beginPath();c.moveTo(GO[0],GO[1]);for(const [x,y] of pts)c.lineTo(GO[0]+x,GO[1]+y);c.stroke()}}
+  for(let r=1;r<=3;r++){if(amt<r*.3)continue;c.strokeStyle=`rgba(210,235,255,${.4*a})`;c.lineWidth=1.5;c.beginPath();c.arc(GO[0],GO[1],80*r+R(r,5)*30,R(r,6)*6,R(r,6)*6+4);c.stroke()}c.restore()}
+let SNAP=null;function glassSnap(){if(SNAP)return SNAP;SNAP=document.createElement('canvas');SNAP.width=W;SNAP.height=H;const g0=g,C0=CAM,s=SC.find(s=>s.n==='glass');
+  g=SNAP.getContext('2d');const c=cam(SHATTER);CAM={x:c.x,y:c.y,z:c.z,r:c.r};plate('s10_glass',.12,{push:.12},s,SHATTER,1);g.fillStyle='rgba(3,4,16,.14)';g.fillRect(0,0,W,H);cracks(g,1,1);g=g0;CAM=C0;return SNAP}
+const SHARDS=(()=>{const cols=7,rows=12,P2=[];for(let j=0;j<=rows;j++)for(let i=0;i<=cols;i++){const ed=i===0||j===0||i===cols||j===rows;P2.push([i*W/cols+(ed?0:(R(i,j+200)-.5)*120),j*H/rows+(ed?0:(R(j,i+300)-.5)*120)])}
+  const at2=(i,j)=>P2[j*(cols+1)+i],out=[];for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){const a=at2(i,j),b=at2(i+1,j),c=at2(i+1,j+1),d=at2(i,j+1);out.push([a,b,c],[a,c,d])}return out})();
+function glassFx(t){const a=sceneAlpha('glass',t);if(a>0&&t<SHATTER)cracks(g,crackAmt(t),a);
+  const u=t-SHATTER;if(u<0||u>2.4||!has('s10_glass'))return;const im=glassSnap();
+  for(let k=0;k<SHARDS.length;k++){const tri=SHARDS[k],mx=(tri[0][0]+tri[1][0]+tri[2][0])/3,my=(tri[0][1]+tri[1][1]+tri[2][1])/3,dx=mx-GO[0],dy=my-GO[1],d=Math.hypot(dx,dy)+1;
+    const q=clamp((u-d/5000)/(1.6+R(k,7)*.6));if(q>=1)continue;const v=(500+1100*R(k,8))*eOutC(q),z=1+1.8*eInC(q)*R(k,9);
+    g.save();g.globalAlpha=1-eInC(q);g.translate(mx+dx/d*v,my+dy/d*v+500*q*q);g.rotate((R(k,10)-.5)*5*q);g.scale(z,z);g.translate(-mx,-my);
+    g.beginPath();g.moveTo(...tri[0]);g.lineTo(...tri[1]);g.lineTo(...tri[2]);g.closePath();g.save();g.clip();g.drawImage(im,0,0);g.restore();
+    g.strokeStyle=`rgba(230,245,255,${.7*(1-q)})`;g.lineWidth=2;g.stroke();g.restore()}
+  if(u<.25){g.fillStyle=`rgba(255,255,255,${.7*(1-u/.25)})`;g.fillRect(0,0,W,H)}}
+function sceneFx(t){if(PL.off)return;if(has('s02_sky'))clockFx(t);if(has('s07_rain'))rainFx(t);if(has('s01_sky'))photoFx(t);glassFx(t)}
+function loadPlates(){if(PL.off)return Promise.resolve();return Promise.all(PIDS.map(id=>new Promise(r=>{const im=new Image();im.onload=()=>{PL.img[id]=im;r()};im.onerror=()=>r();im.src='plates/'+id+'.webp'})))}
+// ---------- lyric placement: each line hangs in the world where the camera will be ----------
+function at(t,i,dx=0,dy=0){const c=cam((L(i).s+L(i).e)/2);if(i>=14){const n=cam(t),k=i>=33?0:.1;return [lerp(n.x,c.x,k)+dx*(i>=33?.3:1),lerp(n.y,c.y,i>=33?0:.5)+dy]}return [c.x+dx,c.y+dy]}
+function row(t,i,ks,x,y,f,style,o={}){return words(t,i,ks,x,y,JP(o.w||700,f),style,o)}
+const outOf=i=>Ln[i+1]?Math.min(Ln[i+1].s-.4,L(i).e+2.2):L(i).e+1.5;
+function subOf(t,i,x,y,o={}){sub(t,L(i).ko,L(i).s,o.out??outOf(i),x,y,o)}
+function lyrics(t){
+  // verse on the rooftop — small, cool, handheld
+  layer(1,()=>{let [x,y]=at(t,0,-60,-140);row(t,0,[0,1,2,3,4,5],x-60,y,86,'focus',{w:300,out:outOf(0)});row(t,0,[6,7],x+180,y+120,120,'rise',{out:outOf(0)});subOf(t,0,x,y+230);
+    [x,y]=at(t,1,0,-120);row(t,1,[0,1,2,3,4],x-70,y,96,'rise',{w:300,out:outOf(1)});row(t,1,[5,6,7,8],x+70,y+130,120,'rise',{out:outOf(1)});subOf(t,1,x,y+240);
+    [x,y]=at(t,2,0,-120);row(t,2,[0,1,2,3],x-80,y,110,'rise',{out:outOf(2)});row(t,2,[4,5,6,7,8,9],x+100,y+130,90,'focus',{w:300,out:outOf(2)});subOf(t,2,x,y+240);
+    [x,y]=at(t,3,0,-120);row(t,3,[0,1,2,3,4,5],x-80,y,100,'rise',{w:300,out:outOf(3)});row(t,3,[6,7,8,9,10,11],x+70,y+130,110,'drop',{dist:120,out:outOf(3)});subOf(t,3,x,y+240);
+    // pre-chorus: the words climb with the camera, tension builds
+    [x,y]=at(t,4,0,-60);row(t,4,[0,1,2,3],x-80,y,90,'rise',{w:300,out:outOf(4)});row(t,4,[4,5,6,7,8,9],x+110,y+120,120,'jitter',{out:outOf(4)});subOf(t,4,x,y+230);
+    [x,y]=at(t,5,0,-160);row(t,5,[0,1,2,3,4,5],x-70,y,110,'rise',{out:outOf(5)});row(t,5,[6,7,8,9,10,11],x+70,y+130,110,'rise',{out:outOf(5)});subOf(t,5,x,y+240);
+    [x,y]=at(t,6,0,-220);row(t,6,[0,1,2,3,4,5,6,7],x,y-60,84,'rise',{w:300,out:outOf(6)});row(t,6,[8,9,10,11,12],x-60,y+70,96,'rise',{w:300,out:outOf(6)});row(t,6,[13,14,15,16],x+140,y+210,150,'stamp',{hotGlow:50,out:outOf(6)});subOf(t,6,x,y+330)});
+  // the shout — screen space, huge, one phrase per hit
+  {const i=7;[[0,1,2],[3,4,5],[6,7,8,9,10,11,12,13,14]].forEach((ks,n)=>{const t0=T(i,ks[0]),t1=n<2?T(i,ks[0]+3)-.45:outOf(i);const a=t-t0;if(a<-.1||t>t1+.3)return;ring(CX,CY,clamp(a/.7),1000,22);
+      g.save();g.translate(CX,CY-80);g.rotate(n===1?.05:n===0?-.06:0);words(t,i,ks,0,0,JP(900,n<2?200:112),'pop',{hotGlow:70,maxW:960,out:t1});g.restore()});
+    sub(t,L(i).ko,L(i).s,outOf(i),CX,CY+180,{f:44,a:.9})}
+  layer(1,()=>{let [x,y]=at(t,8,0,0);row(t,8,[0,1,2],x-70,y-60,90,'rise',{w:300,out:outOf(8)});row(t,8,[3,4,5,6,7],x+80,y+70,120,'rise',{out:outOf(8),exit:'down'});subOf(t,8,x,y+190);
+    // the moon sets, the sun rises — words follow the motion
+    [x,y]=at(t,9,0,-60);row(t,9,[0,1,2,3],x-80,y,110,'drop',{dist:160,out:outOf(9)});row(t,9,[4,5,6,7],x+80,y+140,110,'rise',{dist:160,out:outOf(9),hot:'#FFE2B0',gcol:ORG});subOf(t,9,x,y+260);
+    // stillness — "but that night was different"
+    [x,y]=at(t,10,0,-80);row(t,10,[0,1],x-230,y-80,80,'focus',{w:300,out:outOf(10)});row(t,10,[2,3,4,5],x,y+30,130,'focus',{out:outOf(10)});row(t,10,[6,7,8,9,10],x+70,y+170,110,'rise',{out:outOf(10)});subOf(t,10,x,y+290)});
+  // you took my hand — the words meet like the two lights
+  {const i=11,[x0,y0]=[600,-760];layer(1,()=>{row(t,i,[0,1],x0-220,y0+80,110,'rise',{hot:'#FFE2B0',gcol:ORG,out:T(i,4)+.6});row(t,i,[2,3],x0+220,y0+80,110,'rise',{out:T(i,4)+.6});row(t,i,[4,5],x0,y0+230,170,'pop',{hotGlow:60,out:outOf(i)})});sub(t,L(i).ko,L(i).s,outOf(i),CX,CY+560,{})}
+  // lift-off: the words ride the wind as we rise through the clouds
+  layer(1,()=>{let i=12,[x,y]=at(t,i,0,0);row(t,i,[0,1,2,3],x-70,y-120,170,'wind',{dir:1,out:outOf(i),exit:'wind'});row(t,i,[4,5,6,7,8],x+80,y+90,100,'wind',{dir:-1,w:300,out:outOf(i),exit:'wind'});subOf(t,i,x,y+220);
+    i=13;[x,y]=at(t,i,-60,40);row(t,i,[0,1,2,3,4],x-40,y-260,86,'rise',{w:300,out:outOf(i)});row(t,i,[5,6],x,y-40,300,'pop',{hot:'#FFE2B0',gcol:ORG,hotGlow:80,glow:30,out:outOf(i)});subOf(t,i,x,y+170)});
+  // above the clouds, following the leading star
+  layer(1,()=>{let i=14,[x,y]=at(t,i,0,-40);row(t,i,[0,1,2,3,4],x-60,y-80,100,'rise',{w:300,maxW:900,out:outOf(i)});row(t,i,[5,6,7,8,9,10,11,12,13,14,15,16],x,y+60,96,'rise',{maxW:940,out:outOf(i)});subOf(t,i,x,y+190);
+    i=15;[x,y]=at(t,i,0,-40);row(t,i,[0,1,2,3,4],x-70,y-60,110,'rise',{out:outOf(i)});row(t,i,[5,6,7,8,9,10,11],x+80,y+80,96,'rise',{w:300,out:outOf(i)});subOf(t,i,x,y+200);
+    // "let me change yesterday" — the words rewind, then dissolve (we will not ask for it)
+    i=16;[x,y]=at(t,i,0,-20);{const rw=P(t,T(i,7)-.1,.8),gone=P(t,T(i,7)+.5,.7);g.save();g.translate(x,y);g.scale(1-.15*rw,1);row(t,i,[0,1,2,3,4,5,6,7],0,0,108,'rise',{maxW:940,a:1-gone});g.restore();
+      if(rw>0&&rw<1){g.strokeStyle=rgba(ACC,.6*(1-rw));g.lineWidth=3;for(let k=0;k<3;k++){g.beginPath();g.arc(x,y,160+k*60,-Math.PI/2,-Math.PI/2-rw*Math.PI*1.6,true);g.stroke()}}}
+    subOf(t,i,x,y+140);
+    i=17;[x,y]=at(t,i,0,-20);row(t,i,[0,1,2],x-70,y,110,'rise',{out:outOf(i)});row(t,i,[3,4,5,6,7,8],x+100,y+130,110,'rise',{out:outOf(i)});subOf(t,i,x,y+250);
+    i=18;[x,y]=at(t,i,0,-60);row(t,i,[0,1,2,3,4],x-70,y-60,110,'rise',{out:outOf(i)});row(t,i,[5,6],x+160,y+60,120,'pop',{hot:'#FFE2B0',gcol:ORG,out:outOf(i)});row(t,i,[7,8,9,10,11,12,13,14,15],x,y+190,96,'rise',{w:300,out:outOf(i)});subOf(t,i,x,y+310)});
+}
+
+const W2=(o={})=>o;
+const SPEC=[
+ [19,[[[0, 1, 2, 3],-90,-70,90,300,'focus'],[[4, 5, 6, 7, 8, 9, 10, 11, 12],60,60,110,700,'rise']],190],
+ [20,[[[0, 1, 2, 3, 4, 5, 6, 7],0,0,130,700,'focus']],130],
+ [21,[[[0, 1, 2, 3, 4, 5],-90,-70,110,700,'rise'],[[6, 7, 8, 9, 10, 11, 12, 13, 14],60,70,110,900,'jitter']],200],
+ [22,[[[0, 1, 2],-160,-90,90,300,'rise'],[[3, 4, 5],40,50,200,900,'stamp',{hotGlow:60}]],210],
+ [23,[[[0, 1, 2, 3, 4, 5, 6, 7, 8],-60,-70,96,300,'rise'],[[9, 10, 11, 12, 13, 14],80,60,120,700,'rise']],190],
+ [24,[[[0, 1, 2, 3, 4, 5],-80,-70,110,700,'rise'],[[6, 7, 8, 9, 10],60,80,170,900,'twinkle',{hotGlow:60}]],230],
+ [25,[[[0, 1, 2, 3, 4, 5],0,0,150,700,'focus']],140],
+ [26,[[[0, 1, 2, 3, 4, 5, 6, 7],-70,-60,100,300,'rise'],[[8, 9, 10, 11, 12, 13],70,70,110,700,'rise']],190],
+ [27,[[[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],0,-90,96,700,'wind',{dir:1,exit:'wind'}],[[10, 11, 12, 13, 14, 15],-80,40,110,700,'wind',{dir:-1,exit:'wind'}],[[16, 17],140,170,170,900,'jitter',{hotGlow:50}]],300],
+ [28,[[[0, 1, 2, 3],-100,-60,120,700,'rise'],[[4, 5, 6, 7, 8, 9, 10, 11],60,70,100,300,'rise']],190],
+ [29,[[[0, 1, 2, 3, 4],-120,-110,90,300,'wind',{dir:1}],[[5, 6, 7, 8, 9, 10, 11, 12],40,20,110,700,'wind',{dir:1,exit:'wind'}],[[13, 14],120,170,170,900,'focus',{exit:'scatter'}]],300],
+ [30,[[[0, 1, 2, 3, 4, 5, 6],-60,-110,110,700,'jitter'],[[7, 8, 9, 10, 11, 12, 13, 14],40,20,110,700,'jitter'],[[15],0,180,200,300,'stamp',{hotGlow:60}]],320],
+ [31,[[[0, 1, 2, 3, 4, 5],-60,-110,120,900,'pop',{hot:'#FFE2B0',gcol:ORG}],[[6, 7, 8, 9, 10, 11, 12, 13, 14],60,30,120,900,'pop',{hot:'#FFE2B0',gcol:ORG}],[[15],0,200,200,300,'stamp',{hot:'#FFE2B0',gcol:ORG,hotGlow:60}]],340],
+ [32,[[[0, 1, 2, 3, 4],0,0,150,700,'focus',{hot:'#FFE2B0',gcol:ORG}]],150],
+ [33,[[[0, 1, 2, 3, 4, 5, 6],0,0,140,700,'rise']],140],
+ [34,[[[0, 1, 2, 3, 4, 5, 6, 7, 8, 9],0,0,120,700,'rise']],130],
+ [35,[[[0, 1, 2, 3],-100,-60,100,300,'focus'],[[4, 5, 6, 7, 8, 9, 10],60,60,110,300,'focus',{a:.8}]],180],
+ [36,[[[0, 1, 2, 3, 4, 5, 6, 7, 8],-60,-80,100,300,'rise'],[[9, 10, 11, 12, 13, 14, 15],60,60,140,900,'pop',{hotGlow:50}]],210],
+ [37,[[[0, 1, 2],-160,-150,120,900,'pop',{hot:'#FFE2B0',gcol:ORG}],[[3,4],40,0,150,300,'fly',{dir:-1,glow:20,gcol:ORG}],[[5, 6, 7, 8, 9, 10],60,170,120,700,'rise']],300],
+ [38,[[[0, 1, 2, 3, 4, 5, 6],-60,-110,110,700,'rise'],[[7, 8, 9, 10, 11, 12, 13],60,20,110,700,'rise'],[[14, 15, 16],0,190,210,900,'stamp',{hotGlow:70}]],330],
+ [39,[[[0, 1, 2, 3, 4],0,-230,130,900,'pop',{hot:'#FFE2B0',gcol:ORG,maxW:880}],[[5, 6, 7, 8, 9, 10, 11],0,-60,120,900,'pop',{hot:'#FFE2B0',gcol:ORG,maxW:880}],[[12, 13, 14, 15, 16],0,130,170,900,'stamp',{hot:'#FFF4D6',gcol:ORG,hotGlow:80,maxW:880}]],300]];
+function lyrics2(t){for(const [i,rows,sy] of SPEC){if(!Ln[i])continue;const o0=outOf(i);if(t<L(i).s-.5||t>o0+.6)continue;layer(1,()=>{const [x,y]=at(t,i,0,-60+(i===25||i===26?300*sceneAlpha('photo',Math.min(t,L(26).e-.6)):0));
+  for(const [ks,dx,dy,f,w,st,op] of rows)row(t,i,ks,x+dx*(i>=33?.3:1),y+dy,f,st,{w,out:o0,maxW:i>=33?820:900,...(op||{})});subOf(t,i,x,y+sy);
+  if(i===22||i===30||i===38){const a=t-T(i,rows[rows.length-1][0][0]);ring(x,y+rows[rows.length-1][2],clamp(a/.8),900,18)}
+  if(i===39){const a=t-T(i,12);ring(x,y+130,clamp(a/1),1300,24,'#FFF4D6');ring(x,y+130,clamp((a-.2)/1.2),1300,14,ORG)}})}}
+function outro(t){const a=t-156;if(a<0)return;const q=clamp(a/2)*(1-P(t,176,2));g.save();g.globalAlpha=q;g.font=JP(900,110);g.textAlign='center';g.textBaseline='middle';g.fillStyle='#fff';g.shadowColor=ORG;g.shadowBlur=40;g.letterSpacing='12px';g.fillText('明日の夜空哨戒班',CX,CY-120);
+  g.shadowBlur=0;g.font=EN(300,34);g.letterSpacing='14px';g.fillStyle=rgba('#FFFFFF',.8);g.fillText('ASHITA NO YOZORA SHOUKAIHAN',CX,CY-10);g.font=KR(300,40);g.letterSpacing='8px';g.fillText('내일의 밤하늘 초계반',CX,CY+60);g.restore()}
+
+// ---------- instrumental (1:01–1:17): skywriting, echo words rushing past, guitar-hit flashes ----------
+const SW=document.createElement('canvas');SW.width=1080;SW.height=560;{const c=SW.getContext('2d');c.font=JP(900,300);c.textAlign='center';c.textBaseline='middle';c.lineJoin='round';
+  c.strokeStyle='rgba(255,255,255,.95)';c.lineWidth=16;c.shadowColor='#8FE3FF';c.shadowBlur=40;c.strokeText('明日へ',540,290);c.lineWidth=6;c.strokeStyle='#FFE2B0';c.shadowBlur=0;c.strokeText('明日へ',540,290)}
+const ECHO=['空','夜','星','明日','翔'];
+function instrumental(t){if(t<61||t>77.6)return;
+  // skywriting: revealed left-to-right behind the two lights, then it drifts away and dissolves
+  const p=clamp((t-64.4)/5.8),fade=1-P(t,72.5,2.2);if(p>0&&fade>0){const drift=Math.max(0,t-70.3)*120;g.save();g.globalAlpha=fade;g.beginPath();g.rect(0,0,p*W+40,H);g.clip();
+    g.globalCompositeOperation='lighter';g.drawImage(SW,-drift,CY-520-280);g.restore()}
+  // beat-synced echo words fly at the camera from the vanishing point
+  for(let k=0;k<ECHO.length;k++){const t0=71+k*1.276,a=t-t0;if(a<0||a>1.2)continue;const q=a/1.2,sc=.15+5*eInC(q),al=Math.sin(q*Math.PI)*.35;
+    g.save();g.translate(CX+(k%2?1:-1)*80*q,CY-200+80*q);g.scale(sc,sc);g.globalAlpha=al;g.font=JP(900,260);g.textAlign='center';g.textBaseline='middle';g.lineWidth=4;g.strokeStyle=k%2?ORG:ACC;g.strokeText(ECHO[k],0,0);g.restore()}
+  // guitar hits
+  const fl=pulse(t)*.12*(1-P(t,76,1.5));if(fl>0){g.fillStyle=`rgba(200,235,255,${fl})`;g.fillRect(0,0,W,H)}
+  for(const b of [61,64.2,67.3,70.8,74]){ring(CX,CY-300,clamp((t-b)/.9),900,14,b%2?ORG:'#FFFFFF')}}
+// ---------- climax (2:09–2:33): speed, punches, bursts ----------
+const BOOST=t=>eIOs(P(t,128.4,2.2))*(1-eIOs(P(t,152.6,2.5)));
+function warp(t,B){if(B<=0)return;g.save();g.globalCompositeOperation='lighter';for(let k=0;k<90;k++){const an=R(k,90)*6.28,ph=(t*(1.2+1.8*B)+R(k,91))%1,r0=120+ph*1400,r1=r0+(100+700*B)*ph;
+  g.strokeStyle=`rgba(${k%4?'200,235,255':'255,210,150'},${B*ph*.7})`;g.lineWidth=1+3*ph*B;g.beginPath();g.moveTo(CX+Math.cos(an)*r0,CY+Math.sin(an)*r0*1.2);g.lineTo(CX+Math.cos(an)*r1,CY+Math.sin(an)*r1*1.2);g.stroke()}g.restore()}
+function burst(t,t0,big=1,col='#FFFFFF'){const a=t-t0;if(a<0||a>2.2)return;g.save();g.globalCompositeOperation='lighter';
+  for(let k=0;k<20;k++){const an=k*Math.PI/10+R(k,5)*.25,len=(700+900*R(k,6))*eOutX(clamp(a/.5))*big,w=(4+9*R(k,7))*(1-clamp(a/1.6))*big;if(w<=0)continue;const lg=g.createLinearGradient(CX,CY,CX+Math.cos(an)*len,CY+Math.sin(an)*len);lg.addColorStop(0,'rgba(255,255,255,.9)');lg.addColorStop(.3,rgba(k%3?ACC:ORG,.55));lg.addColorStop(1,'rgba(0,0,0,0)');g.strokeStyle=lg;g.lineWidth=w;g.beginPath();g.moveTo(CX,CY);g.lineTo(CX+Math.cos(an)*len,CY+Math.sin(an)*len);g.stroke()}
+  g.restore();for(let r=0;r<3;r++)ring(CX,CY,clamp((a-r*.12)/1.1),1300*big,16-r*4,r===1?ORG:col);
+  for(let k=0;k<50*big;k++){const an=R(k,11)*6.28,v=400+1200*R(k,12),q=clamp(a/1.6),x=CX+Math.cos(an)*v*eOutC(q),y=CY+Math.sin(an)*v*eOutC(q)+260*q*q,sz=(6+20*R(k,13))*(1+q);g.save();g.translate(x,y);g.rotate(q*7*(R(k,14)-.5));g.globalAlpha=1-q;g.fillStyle=k%3?rgba(ACC,.9):rgba(ORG,.9);g.beginPath();g.moveTo(-sz,-sz*.3);g.lineTo(sz*.6,-sz*.5);g.lineTo(sz*.2,sz*.6);g.closePath();g.fill();g.restore()}
+  if(a<.25){g.fillStyle=`rgba(255,255,255,${.45*Math.min(1,big)*(1-a/.25)})`;g.fillRect(0,0,W,H)}}
+function climax(t){const B=BOOST(t);warp(t,B);if(B>0){const fl=pulse(t)*.1*B;if(fl>0){g.fillStyle=`rgba(255,240,220,${fl})`;g.fillRect(0,0,W,H)}}
+  if(Ln[39]){burst(t,T(36,11),.8,ACC);burst(t,T(37,3),1,'#FFFFFF');burst(t,T(38,14),1.1,ORG);burst(t,T(39,0),.9,'#FFFFFF');burst(t,T(39,12),1.4,'#FFF4D6')}
+  // Sky Arrow: a bolt of light cuts the frame diagonally
+  if(Ln[37]){const a=t-T(37,3);if(a>0&&a<1.4){const p=eOutX(clamp(a/.35));g.save();g.globalCompositeOperation='lighter';const lg=g.createLinearGradient(-200,H+100,W+200,-100);lg.addColorStop(0,'rgba(255,255,255,0)');lg.addColorStop(.85,`rgba(255,255,255,${1-a/1.4})`);lg.addColorStop(1,'rgba(255,255,255,0)');g.strokeStyle=lg;g.lineWidth=18*(1-a/1.4)+2;g.beginPath();g.moveTo(-200,H+100);g.lineTo(lerp(-200,W+200,p),lerp(H+100,-100,p));g.stroke();g.restore()}}}
+// ---------- frame ----------
+function render(t){CINE.begin();const c=cam(t),B=BOOST(t),IB=(t>61&&t<77)?.6:0;CAM={x:c.x,y:c.y,z:c.z*(1+(.012+.035*B+.02*IB)*pulse(t)),r:c.r+(B*.03+IB*.04)*Math.sin(t*2.1)};
+  // handheld on the ground, a big hit for the shout, steady once airborne
+  const hand=t<T(11,4)?5:1.5;shake(t,hand,8);shake(t,(7*B+4*IB)*pulse(t));if(t>=T(7,0)-.05&&t<outOf(7)){for(const k of [0,3,6]){const a=t-T(7,k);if(a>0&&a<.4)shake(t,40*(1-a/.4))}}
+  skyAt(t);stars(t,.08,220,1,(.6+.4*clamp(-CAM.y/3000))*(1-.8*DK));moonLayer(t);stars(t,.25,90,2,.8);
+  const art=!PL.off&&has('s01_city'),sky2=!PL.off&&has('s06_sea');
+  if(!art)city(t);if(!sky2){clouds(t,.7,-2500,.35,mix('#9FB4E8','#FFC99A',DK),11,1.3);clouds(t,.9,-3000,.55,mix('#8EA3DC','#FFB78A',DK),21,1.6)}
+  if(!PL.off){plates(t,false);sceneFx(t)}
+  instrumental(t);climax(t);lights(t);leadStar(t);lyrics(t);lyrics2(t);outro(t);
+  if(!sky2){clouds(t,1.25,-3400,.55,mix('#B8C8F0','#FFD9B0',DK),31,2.0);clouds(t,1.5,-4100,.4,mix('#5C6EB8','#E69A86',DK),41,2.6)}else plates(t,true);
+  windLines(t,camVel(t));layer(1.6,()=>dust(t,1));post(t);
+  const fi=clamp(t/.6);if(fi<1){g.fillStyle=`rgba(0,0,0,${1-fi})`;g.fillRect(0,0,W,H)}const fo=P(t,176.5,3);if(fo>0){g.fillStyle=`rgba(0,0,0,${fo})`;g.fillRect(0,0,W,H)}}
+window.DUR=D.dur;
+window.READY=(async()=>{await loadPlates();const jp=Ln.map(l=>l.u.map(u=>u[0]).join('')).join(''),ko=Ln.map(l=>l.ko).join('');try{await Promise.all([document.fonts.load(JP(300,100),jp),document.fonts.load(JP(700,100),jp),document.fonts.load(JP(900,100),jp),document.fonts.load(KR(300,40),ko),document.fonts.load(KR(500,40),ko)])}catch(e){}window.renderAt=render;render(0)})();
+</script>
+</body>
+</html>

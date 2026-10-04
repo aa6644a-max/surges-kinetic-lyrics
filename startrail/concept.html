@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>STAR TRAIL Concept</title>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@100;300;600&family=Noto+Sans+KR:wght@100;300;900&display=swap" rel="stylesheet">
+<style>html,body{margin:0;background:#000}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="cv" width="1080" height="1920"></canvas>
+<script>
+// Concept stills for STAR TRAIL: renderAt(k) draws concept frame k (0..5)
+const cv=document.getElementById('cv'),g=cv.getContext('2d'),W=1080,H=1920;
+const C={night:'#0A0E2A',night2:'#111845',blue:'#6FA8FF',white:'#FFFFFF',dawn0:'#140F2E',dawn:'#C9A0FF',gold:'#FFD36B'};
+const R=(i,s=0)=>{const x=Math.sin(i*127.1+s*311.7+.5)*43758.5453;return x-Math.floor(x)};
+const EN=(w,f)=>`${w} ${f}px "Josefin Sans"`,KR=(w,f)=>`${w} ${f}px "Noto Sans KR"`;
+function bgNight(){const gr=g.createLinearGradient(0,0,0,H);gr.addColorStop(0,C.night);gr.addColorStop(1,C.night2);g.fillStyle=gr;g.fillRect(0,0,W,H)}
+function stars(n,seed,a=1){for(let i=0;i<n;i++){const r=.6+2.2*R(i,seed)**3;g.globalAlpha=a*(.25+.75*R(i,seed+1));g.fillStyle='#fff';g.beginPath();g.arc(R(i,seed+2)*W,R(i,seed+3)*H,r,0,7);g.fill()}g.globalAlpha=1}
+function sparkle(x,y,r,col,a=1){g.save();g.globalAlpha=a;const gl=g.createRadialGradient(x,y,0,x,y,r*3);gl.addColorStop(0,col);gl.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gl;g.fillRect(x-r*3,y-r*3,r*6,r*6);
+  g.fillStyle='#fff';g.beginPath();g.moveTo(x,y-r*2.2);g.quadraticCurveTo(x,y,x+r*2.2,y);g.quadraticCurveTo(x,y,x,y+r*2.2);g.quadraticCurveTo(x,y,x-r*2.2,y);g.quadraticCurveTo(x,y,x,y-r*2.2);g.fill();g.restore()}
+function micro(col,a=.55){ // Pink-Venom-style micro typography in the corners
+  g.save();g.globalAlpha=a;g.fillStyle=col;g.font=EN(300,22);g.textAlign='left';g.fillText('STELLIVE — STAR TRAIL',60,110);g.fillText('KINETIC TYPOGRAPHY / 2026',60,140);
+  g.textAlign='right';g.fillText('RA 02h 31m 49s',W-60,110);g.fillText('DEC +89° 15′ 51″',W-60,140);
+  g.textAlign='left';g.fillText('188 BPM',60,H-110);g.textAlign='right';g.fillText('9 : 16',W-60,H-110);g.restore()}
+function glowText(txt,x,y,font,col,blur,a=1){g.save();g.font=font;g.textAlign='center';g.textBaseline='middle';g.globalAlpha=a;g.shadowColor=col;g.shadowBlur=blur;g.fillStyle=col;g.fillText(txt,x,y);g.shadowBlur=0;g.restore()}
+function spaced(txt,x,y,font,col,sp,a=1){g.save();g.font=font;g.fillStyle=col;g.globalAlpha=a;g.textBaseline='middle';const ws=[...txt].map(c=>g.measureText(c).width);const tot=ws.reduce((p,q)=>p+q,0)+sp*(txt.length-1);let xx=x-tot/2;[...txt].forEach((c,i)=>{g.textAlign='left';g.fillText(c,xx,y);xx+=ws[i]+sp});g.restore()}
+
+const SCENES=[
+// 0 — title over long-exposure star trails around Polaris
+()=>{bgNight();const px=540,py=700;
+  for(let i=0;i<260;i++){const r=30+1300*R(i,5)**.8,a0=R(i,6)*6.28,len=.35+.5*R(i,7);g.strokeStyle=i%7?`rgba(170,200,255,${.12+.4*R(i,8)})`:`rgba(111,168,255,${.5+.4*R(i,9)})`;g.lineWidth=.8+1.8*R(i,10);g.beginPath();g.arc(px,py,r,a0,a0+len);g.stroke()}
+  sparkle(px,py,7,'rgba(111,168,255,.9)');
+  g.fillStyle='rgba(10,14,42,.0)';spaced('STAR TRAIL',W/2,1270,EN(100,132),'#fff',14);
+  g.fillStyle=C.blue;g.fillRect(W/2-60,1350,120,2);spaced('STELLIVE',W/2,1400,EN(300,34),C.blue,16);
+  g.strokeStyle='rgba(255,255,255,.25)';g.lineWidth=1;g.beginPath();g.moveTo(80,1560);g.lineTo(W-80,1560);g.stroke();micro('#fff')},
+// 1 — magnitude 6: the faintest star, a ghost "1" waiting behind it
+()=>{bgNight();stars(160,20,.5);
+  g.strokeStyle='rgba(111,168,255,.14)';g.lineWidth=1;for(let r=120;r<1400;r+=120){g.beginPath();g.arc(540,900,r,0,7);g.stroke()}for(let k=0;k<12;k++){const a=k*Math.PI/6;g.beginPath();g.moveTo(540,900);g.lineTo(540+Math.cos(a)*1500,900+Math.sin(a)*1500);g.stroke()}
+  g.save();g.globalAlpha=.10;g.font=KR(100,900);g.textAlign='center';g.textBaseline='middle';g.fillStyle=C.gold;g.translate(610,900);g.rotate(.35);g.fillText('1',0,0);g.restore();
+  glowText('6',540,880,EN(100,760),'rgba(111,168,255,.55)',40);
+  g.font=KR(300,64);g.fillStyle='rgba(255,255,255,.75)';g.textAlign='left';g.fillText('등성',760,1180);
+  for(let m=1;m<=6;m++){const y=560+m*90,r=16-m*2.2;g.globalAlpha=m===6?1:.35;g.fillStyle=m===6?C.blue:'#fff';g.beginPath();g.arc(940,y,r,0,7);g.fill();g.font=EN(300,24);g.textAlign='right';g.fillText(String(m),905,y+8)}g.globalAlpha=1;
+  g.font=EN(300,26);g.fillStyle='rgba(255,255,255,.55)';g.textAlign='center';g.fillText('MAGNITUDE 6.0  —  THE FAINTEST STAR',540,1480);micro('#fff')},
+// 2 — 2.5D glass card floating in the dark, turning in space
+()=>{bgNight();stars(120,40,.6);
+  const card=document.createElement('canvas');card.width=760;card.height=1000;const c=card.getContext('2d');
+  c.fillStyle='rgba(255,255,255,.07)';c.fillRect(0,0,760,1000);c.strokeStyle='rgba(111,168,255,.9)';c.lineWidth=4;c.strokeRect(2,2,756,996);
+  c.strokeStyle='rgba(255,255,255,.12)';c.lineWidth=1;for(let y=80;y<1000;y+=80){c.beginPath();c.moveTo(40,y);c.lineTo(720,y);c.stroke()}
+  c.font=EN(100,150);c.fillStyle='#fff';c.textAlign='center';c.textBaseline='middle';c.shadowColor=C.blue;c.shadowBlur=30;c.fillText('luminous',380,470);c.shadowBlur=0;
+  c.font=KR(300,40);c.fillStyle=C.blue;c.fillText('빛 나 는',380,600);c.font=EN(300,22);c.fillStyle='rgba(255,255,255,.5)';c.textAlign='left';c.fillText('CARD 03 / 12',40,50);c.textAlign='right';c.fillText('◐',720,50);
+  // fake perspective: strips shrink toward the right edge (card turned ~30°)
+  const x0=180,y0=460,w=720;for(let s=0;s<760;s+=4){const u=s/760,sc=1-.28*u,xx=x0+u*w,hh=1000*sc;g.drawImage(card,s,0,4,1000,xx,y0+(1000-hh)/2,w/760*4+1,hh)}
+  g.fillStyle='rgba(111,168,255,.25)';g.beginPath();g.ellipse(560,1560,380,26,0,0,7);g.fill();
+  for(let k=0;k<5;k++){g.fillStyle='rgba(255,255,255,.6)';g.beginPath();g.arc(300+k*140,1640+(k%2)*20,4+(k%3)*2,0,7);g.fill()}micro('#fff')},
+// 3 — constellation typography: the word is made of stars and lines
+()=>{bgNight();stars(220,60,.55);
+  const off=document.createElement('canvas');off.width=W;off.height=400;const o=off.getContext('2d');o.font=EN(600,190);o.textAlign='center';o.textBaseline='middle';o.fillStyle='#fff';o.fillText('UNIVERSE',W/2,200);
+  const d=o.getImageData(0,0,W,400).data,pts=[];for(let y=0;y<400;y+=9)for(let x=0;x<W;x+=9)if(d[(y*W+x)*4+3]>128&&R(x*7+y,3)>.55)pts.push([x,y+760]);
+  g.lineWidth=1.2;for(let i=0;i<pts.length;i++){let best=[],bd=[];for(let j=0;j<pts.length;j++){if(i===j)continue;const dd=Math.hypot(pts[i][0]-pts[j][0],pts[i][1]-pts[j][1]);if(dd<24)best.push(j)}
+    best.slice(0,2).forEach(j=>{g.strokeStyle='rgba(111,168,255,.55)';g.beginPath();g.moveTo(pts[i][0],pts[i][1]);g.lineTo(pts[j][0],pts[j][1]);g.stroke()})}
+  pts.forEach((p,i)=>{const r=1.5+3.5*R(i,4)**2;g.fillStyle='#fff';g.shadowColor=C.blue;g.shadowBlur=10;g.beginPath();g.arc(p[0],p[1],r,0,7);g.fill()});g.shadowBlur=0;
+  sparkle(W/2+360,780,6,'rgba(111,168,255,.9)');
+  g.font=KR(300,44);g.fillStyle='rgba(255,255,255,.85)';g.textAlign='center';g.fillText('채 우 자',W/2,1180);g.font=EN(300,24);g.fillStyle='rgba(255,255,255,.5)';g.fillText('CONSTELLATION  ·  UNI / VER / SE',W/2,1240);micro('#fff')},
+// 4 — colour-reversal cut: white card, the dot of the i becomes a star
+()=>{g.fillStyle='#F7F8FF';g.fillRect(0,0,W,H);
+  const gl=g.createRadialGradient(540,960,50,540,960,900);gl.addColorStop(0,'rgba(111,168,255,.18)');gl.addColorStop(1,'rgba(111,168,255,0)');g.fillStyle=gl;g.fillRect(0,0,W,H);
+  g.font=EN(100,190);g.fillStyle=C.night;g.textAlign='center';g.textBaseline='alphabetic';const txt='starlıght';g.fillText(txt,540,1030);
+  const pre=g.measureText('starl').width,full=g.measureText(txt).width,iw=g.measureText('ı').width,ix=540-full/2+pre+iw/2;sparkle(ix,860,11,'rgba(111,168,255,.95)');
+  g.strokeStyle=C.blue;g.lineWidth=2;g.beginPath();g.moveTo(200,1110);g.lineTo(880,1110);g.stroke();g.font=KR(300,40);g.fillStyle=C.night;g.fillText('조 용 히   떠 오 르 는',540,1190);micro(C.night,.6)},
+// 5 — dawn: magnitude 1, gold used only for the brightest star
+()=>{const gr=g.createLinearGradient(0,0,0,H);gr.addColorStop(0,C.dawn0);gr.addColorStop(.55,'#3A2466');gr.addColorStop(.78,C.dawn);gr.addColorStop(1,'#F3D9FF');g.fillStyle=gr;g.fillRect(0,0,W,H);stars(90,80,.5);
+  const hy=1500;g.fillStyle='rgba(255,255,255,.35)';g.fillRect(0,hy,W,2);const rf=g.createLinearGradient(0,hy,0,H);rf.addColorStop(0,'rgba(201,160,255,.55)');rf.addColorStop(1,'rgba(20,15,46,.9)');g.fillStyle=rf;g.fillRect(0,hy+2,W,H-hy);
+  for(let k=0;k<10;k++){const a=k*Math.PI/5+.2;g.strokeStyle=`rgba(255,211,107,${.25+.2*(k%2)})`;g.lineWidth=k%2?2:4;g.beginPath();g.moveTo(540,820);g.lineTo(540+Math.cos(a)*(700+300*(k%3)),820+Math.sin(a)*(700+300*(k%3)));g.stroke()}
+  glowText('1',540,820,KR(300,640),C.gold,80);glowText('1',540,820,KR(300,640),'#FFF4D6',10,.9);
+  g.font=KR(900,110);g.textAlign='center';g.fillStyle='#fff';g.fillText('등 성',540,1260);
+  g.font=EN(300,26);g.fillStyle='rgba(255,255,255,.7)';g.fillText('MAGNITUDE 1.0  —  THE BRIGHTEST STAR',540,1360);micro('#fff')}
+];
+function renderAt(t){const k=Math.max(0,Math.min(SCENES.length-1,Math.floor(t)));g.setTransform(1,0,0,1,0,0);g.globalAlpha=1;g.shadowBlur=0;SCENES[k]()}
+window.DUR=6;
+window.READY=(async()=>{try{await Promise.all([document.fonts.load(EN(100,100),'STARTRAILUNIVERSEstarlıghtluminous16'),document.fonts.load(EN(300,100),'STELLIVE MAGNITUDE'),document.fonts.load(EN(600,100),'UNIVERSE'),document.fonts.load(KR(300,40),'등성빛나는채우자조용히떠오르는'),document.fonts.load(KR(900,100),'등성'),document.fonts.load(KR(100,100),'1'),document.fonts.load(KR(300,100),'1')])}catch(e){}window.renderAt=renderAt;renderAt(0)})();
+</script>
+</body>
+</html>
