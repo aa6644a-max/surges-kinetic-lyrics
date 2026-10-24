@@ -1,12 +1,12 @@
 const { chromium } = require('playwright');
 const fs = require('fs'), path = require('path');
-const dir = __dirname, out = path.join(dir, 'frames');
-const FPS = 30, DUR = 22.2, only = process.argv[2] ? process.argv[2].split(',').map(Number) : null;
+const dir = __dirname; let out;
+const PAGE = process.argv[2] || 'reel.html', FRAMES = process.argv[3] || 'frames', FPS = 30, DUR = 22.2, only = process.argv[4] ? process.argv[4].split(',').map(Number) : null;
 (async () => {
-  fs.mkdirSync(out, { recursive: true });
+  out = path.join(dir, FRAMES); fs.mkdirSync(out, { recursive: true });
   const b = await chromium.launch();
   const p = await b.newPage({ viewport: { width: 1080, height: 1920 } });
-  await p.goto('file://' + path.join(dir, 'reel.html'));
+  await p.goto('file://' + path.join(dir, PAGE));
   await p.evaluate(() => document.fonts.ready);
   await p.waitForFunction(() => [...document.images].every(i => i.complete));
   const N = Math.round(FPS * DUR);
