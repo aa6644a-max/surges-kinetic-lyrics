@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>〈통제하다〉 단편영화 기획 — 한눈에 보기</title>
+<style>
+  :root{
+    --bg:#111214; --panel:#1a1c20; --panel2:#22252b; --line:#2f333a;
+    --text:#e9e7e2; --muted:#9a9ca3; --accent:#e5484d; --accent2:#f2b84b;
+    --blue:#5aa9e6; --green:#5cc28a; --purple:#a78bfa;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;line-height:1.6}
+  .wrap{max-width:1100px;margin:0 auto;padding:40px 20px 80px}
+  h1{font-size:2.2rem;margin:.2em 0;letter-spacing:-.02em}
+  h2{font-size:1.35rem;margin:56px 0 16px;padding-left:12px;border-left:4px solid var(--accent)}
+  h2 small{color:var(--muted);font-weight:400;font-size:.8rem;margin-left:8px}
+  h3{margin:0 0 6px;font-size:1.02rem}
+  p{margin:.3em 0}
+  .muted{color:var(--muted)}
+  .tag{display:inline-block;font-size:.75rem;padding:2px 9px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);margin:2px 3px 2px 0}
+  .tag.red{border-color:var(--accent);color:#ff9a9d}
+  .tag.yel{border-color:var(--accent2);color:var(--accent2)}
+  .grid{display:grid;gap:14px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+  .g4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .card.hl{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+  .q{font-size:.85rem;color:var(--accent2);margin-top:6px}
+  .q::before{content:"Q. ";font-weight:700}
+
+  /* hero */
+  .hero{background:linear-gradient(135deg,#1d1416,#141619 60%);border:1px solid var(--line);border-radius:18px;padding:34px 30px}
+  .hero .kicker{color:var(--accent);font-weight:700;letter-spacing:.15em;font-size:.8rem}
+  .bigq{margin-top:22px;padding:18px 22px;border-radius:12px;background:#0c0d0f;border:1px dashed var(--accent);font-size:1.25rem;font-weight:600}
+  .status{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px}
+  .status span{font-size:.8rem;padding:4px 10px;border-radius:6px;background:var(--panel2)}
+  .status .ok{color:var(--green)} .status .no{color:#ff9a9d}
+
+  /* flow */
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:0}
+  .step{flex:1 1 170px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;position:relative;margin:6px 18px 6px 0}
+  .step:not(:last-child)::after{content:"▶";position:absolute;right:-16px;top:50%;transform:translateY(-50%);color:var(--accent);font-size:.8rem}
+  .step .n{font-size:.75rem;color:var(--accent);font-weight:700}
+  .step.final{border-color:var(--accent2)}
+
+  /* timeline */
+  .tl{border-left:2px solid var(--line);margin-left:8px;padding-left:20px}
+  .tl div{position:relative;margin-bottom:12px}
+  .tl div::before{content:"";position:absolute;left:-27px;top:7px;width:12px;height:12px;border-radius:50%;background:var(--accent)}
+  .tl b{color:var(--accent2)}
+
+  /* bars */
+  .bar{display:flex;align-items:center;gap:10px;margin:8px 0}
+  .bar .lab{width:130px;font-size:.9rem}
+  .bar .trk{flex:1;background:var(--panel2);border-radius:6px;height:22px;overflow:hidden}
+  .bar .fill{height:100%;background:var(--accent);display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:.8rem;font-weight:700}
+  .bar .fill.dim{background:#5b3a3c}
+
+  /* rules */
+  .rule{display:flex;gap:12px;align-items:flex-start}
+  .rule .ic{font-size:1.4rem;line-height:1}
+  .warn{background:#2a1f12;border:1px solid #6b4d1e;color:#f6d39b;border-radius:10px;padding:10px 14px;font-size:.9rem;margin-top:12px}
+
+  /* idea map */
+  .group h3{display:flex;align-items:center;gap:8px}
+  .group h3 .dot{width:10px;height:10px;border-radius:50%}
+  .group ul{list-style:none;margin:8px 0 0;padding:0}
+  .group li{padding:7px 0;border-top:1px solid var(--line);font-size:.88rem}
+  .group li b{color:var(--text)}
+  .group li span{color:var(--muted);display:block;font-size:.8rem}
+
+  /* table */
+  table{width:100%;border-collapse:collapse;font-size:.9rem}
+  th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  th{color:var(--muted);font-weight:600;font-size:.8rem}
+  .lv{display:inline-flex;gap:3px}
+  .lv i{width:14px;height:8px;border-radius:2px;background:var(--panel2)}
+  .lv i.on{background:var(--accent)}
+
+  /* story arc */
+  .arc{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+  .arc .b{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:.85rem;text-align:center}
+  .arc .b strong{display:block;color:var(--accent2);margin-bottom:4px;font-size:.78rem;letter-spacing:.05em}
+  .arc .b.twist{border-color:var(--accent);background:#221416}
+  @media(max-width:720px){.arc{grid-template-columns:1fr 1fr}}
+
+  /* compare SF -> real */
+  .vs{display:grid;grid-template-columns:1fr 60px 1fr;gap:10px;align-items:center}
+  .vs .mid{text-align:center;color:var(--accent);font-size:1.6rem}
+  @media(max-width:720px){.vs{grid-template-columns:1fr}.vs .mid{transform:rotate(90deg)}}
+
+  .quote{border-left:3px solid var(--accent2);padding:6px 14px;margin:8px 0;font-style:italic;color:#d8d4cb}
+  .check li{list-style:none;margin:6px 0}
+  .check li::before{content:"☐ ";color:var(--accent2)}
+  .check{padding-left:0}
+  .ends{display:flex;gap:10px;flex-wrap:wrap}
+  .ends .card{flex:1 1 120px;text-align:center}
+  .ends .card .big{font-size:1.6rem}
+  footer{margin-top:60px;color:var(--muted);font-size:.8rem;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HERO -->
+<section class="hero">
+  <div class="kicker">10+10 WORKSHOP · 키워드 추첨 결과</div>
+  <h1>〈통제하다〉 단편영화 기획 맵</h1>
+  <p class="muted">역사적 배경: 1946 대구 10월사건 — <b>국가폭력과 통제</b> → 오늘의 <b>자기통제·내면화</b>로 확장</p>
+  <div>
+    <span class="tag red">자기통제</span><span class="tag red">내면화</span><span class="tag">환상과 현실</span>
+    <span class="tag">해방의 역설</span><span class="tag yel">현실적인 미장센</span><span class="tag yel">CG 최소화</span>
+  </div>
+  <div class="bigq">“우리는 어떤 사람이 되기 위해 얼마나 많은 자기 자신을 포기하는가?”</div>
+  <div class="status">
+    <span class="ok">✔ 키워드 확정: 통제하다</span>
+    <span class="ok">✔ 표현 방식: 비현실적 규칙 × 현실적 화면</span>
+    <span class="ok">✔ 주제 조합: 자기 자신 = 통제자</span>
+    <span class="no">✘ 제목·시놉시스·결말·배우 수 미확정</span>
+  </div>
+</section>
+
+<!-- 1. 아이디어가 발전한 과정 -->
+<h2>① 아이디어가 발전한 과정<small>출발점 → 현재 방향</small></h2>
+<div class="flow">
+  <div class="step"><div class="n">STEP 1</div><b>출발 소재</b><p class="muted">조조 래빗 · 가스라이팅 · 연애 · MBTI</p></div>
+  <div class="step"><div class="n">STEP 2</div><b>키워드 확장</b><p class="muted">외부 / 관계 / 자기 / 사회적 통제</p></div>
+  <div class="step"><div class="n">STEP 3</div><b>24개 발상</b><p class="muted">권력·기록·영화 형식·자유의 역설까지</p></div>
+  <div class="step"><div class="n">STEP 4</div><b>SF 5안</b><p class="muted">자기 자신 × SF·판타지 × 해방의 역설</p></div>
+  <div class="step final"><div class="n">STEP 5 · 현재</div><b>현실 미장센 5안</b><p class="muted">“CG가 너무 많다” → 현실 공간에 낯선 규칙 하나</p></div>
+</div>
+
+<!-- 2. 워크숍 조건 -->
+<h2>② 워크숍 제작 조건<small>오늘이 바로 그날 (10/31)</small></h2>
+<div class="grid g2">
+  <div class="card">
+    <h3>🗓 일정</h3>
+    <div class="tl">
+      <div><b>10/31(토) 10:00</b> 대화가옥 집결 · 키워드 추첨</div>
+      <div><b>추첨 이후</b> 팀별 기획 · 촬영 · 편집</div>
+      <div><b>11/1(일) 오후</b> 이메일 최종 출품 <span class="tag red">6시 이전 제출 권장</span></div>
+      <div><b>11/1(일) 20~22시</b> 오오극장 상영 · 투표 · 시상</div>
+    </div>
+    <p class="muted" style="font-size:.82rem">📍 대화가옥: 대구 중구 북성로 104-15 · 오오극장: 국채보상로 537</p>
+  </div>
+  <div class="card">
+    <h3>🎬 필수 규칙</h3>
+    <div class="grid" style="gap:10px">
+      <div class="rule"><span class="ic">⏱</span><div><b>10초 ~ 10분</b></div></div>
+      <div class="rule"><span class="ic">🖥</span><div><b>1920×1080 · MP4</b></div></div>
+      <div class="rule"><span class="ic">📍</span><div><b>북성로 실사 최소 1컷</b><br><span class="muted">AI 생성 이미지·영상으로 대체 불가</span></div></div>
+      <div class="rule"><span class="ic">📱</span><div><b>장르·촬영 자유</b> <span class="muted">(휴대폰 OK, AI 영상 허용)</span></div></div>
+      <div class="rule"><span class="ic">©</span><div><b>음악·폰트·이미지 상영 권리 확보</b></div></div>
+    </div>
+    <div class="warn">⚠ 공지상 마감이 18:00 / 18:30으로 혼재 → 운영진 확인 필요</div>
+  </div>
+</div>
+
+<!-- 3. 심사 -->
+<h2>③ 심사 기준 → 어디에 힘을 줄까</h2>
+<div class="grid g2">
+  <div class="card">
+    <div class="bar"><span class="lab">키워드 해석</span><div class="trk"><div class="fill" style="width:100%">18</div></div></div>
+    <div class="bar"><span class="lab">창의성과 시도</span><div class="trk"><div class="fill" style="width:100%">18</div></div></div>
+    <div class="bar"><span class="lab">이야기·감정</span><div class="trk"><div class="fill dim" style="width:83%">15</div></div></div>
+    <div class="bar"><span class="lab">구성·완성도</span><div class="trk"><div class="fill dim" style="width:50%">9</div></div></div>
+    <p class="muted" style="font-size:.82rem;margin-top:10px">심사위원 60점 + 참여팀 투표(1표당 5점, 팀당 2표)</p>
+  </div>
+  <div class="card hl">
+    <h3>🎯 전략 결론</h3>
+    <p><b style="color:var(--accent);font-size:1.6rem">36 / 60</b> = 키워드 해석 + 창의성 <b>(60%)</b></p>
+    <p style="margin-top:10px">장비·규모보다 아래 네 가지에 투자</p>
+    <div style="margin-top:6px">
+      <span class="tag red">선명한 설정</span><span class="tag red">독특한 해석</span>
+      <span class="tag red">설득력 있는 감정</span><span class="tag red">기억에 남는 결말</span>
+    </div>
+    <p class="muted" style="font-size:.82rem;margin-top:10px">지원금(잠정) 팀당 30만 원 · 보증금 5만 원 환불 · 미출품 시 반환 조건 있음</p>
+  </div>
+</div>
+
+<!-- 4. 역사 -->
+<h2>④ 역사적 배경과의 연결</h2>
+<div class="grid g2">
+  <div class="card">
+    <h3>📜 1946 대구 10월사건 (진실화해위 2010 보고서)</h3>
+    <p class="muted">식량난·양곡 공출 · 노동자 총파업 · 토지 문제 · 경찰 불신 · 미군정과 정치세력 대립</p>
+    <p style="margin-top:8px">조사 범위 내 희생자 <b>60명</b>(확인·추정) <span class="muted">— 사건 전체 사망자 수 아님</span></p>
+    <p style="margin-top:8px">‘통제’의 역사적 출발점:</p>
+    <span class="tag">계엄</span><span class="tag">포고령</span><span class="tag">강제연행</span><span class="tag">낙인</span><span class="tag">기록 누락</span><span class="tag">유족의 침묵</span>
+  </div>
+  <div class="card">
+    <h3>🔗 연결 방식 (미결정)</h3>
+    <p><b>A. 직접 연결</b> — 이미지·대사로 역사를 호출</p>
+    <p><b>B. 구조적 연결</b> — 권위·복종·내면화라는 <i>질문의 구조</i>로 연결</p>
+    <div class="warn">⚠ 개인의 연애·심리적 자기통제를 국가폭력 피해와 동일시하지 않기. 공통 질문을 찾되 <b>역사적 사실과 창작적 비유를 구분</b>.</div>
+  </div>
+</div>
+
+<!-- 5. 조조 래빗 장치 -->
+<h2>⑤ 〈조조 래빗〉에서 가져온 핵심 장치</h2>
+<div class="arc">
+  <div class="b"><strong>1</strong>주인공에게만 보이는 인물</div>
+  <div class="b"><strong>2</strong>처음엔 조언·보호·응원</div>
+  <div class="b"><strong>3</strong>반복 → 지시가 습관이 됨</div>
+  <div class="b"><strong>4</strong>현실과 지시가 어긋나며 갈등</div>
+  <div class="b twist"><strong>5 · 반전</strong>거부한 뒤에도 스스로 같은 명령</div>
+</div>
+<div class="card" style="margin-top:12px">
+  <b>차별화 포인트 →</b> 통제자를 악당이 아닌 <b style="color:var(--accent2)">친절하고 유능하며 진심으로 걱정하는 존재</b>로.
+  관객이 “이 통제가 완전히 나쁜가?”를 고민하게 됨. <span class="muted">CG 없이 배우 2명을 같은 프레임에 두는 것만으로 충분.</span>
+</div>
+
+<!-- 6. 24 아이디어 맵 -->
+<h2>⑥ 24개 아이디어 맵<small>확산적 발상 기록 — 자유롭게 섞어도 됨</small></h2>
+<div class="grid g3">
+  <div class="card group"><h3><span class="dot" style="background:var(--accent)"></span>A. 사람 사이의 통제</h3><ul>
+    <li><b>01 다 널 위해서야</b><span>이별 뒤에도 남는 연인의 목소리</span></li>
+    <li><b>02 완벽한 부모</b><span>세대를 건너 반복되는 설계</span></li>
+    <li><b>03 좋은 친구</b><span>첫 독립이 “너 변했다”가 됨</span></li>
+    <li><b>04 동의합니다</b><span>계약으로 관리하다 사라진 관계</span></li></ul></div>
+  <div class="card group hl"><h3><span class="dot" style="background:var(--accent2)"></span>B. 자기 자신을 통제 ★</h3><ul>
+    <li><b>05 머릿속의 독재자</b><span>나를 보호해 온 신념이 성장을 막음</span></li>
+    <li><b>06 너는 I니까</b><span>검사 결과가 바뀌자 성격도 바뀜</span></li>
+    <li><b>07 오늘도 성공적인 하루</b><span>계획이 삶을 빼앗음</span></li>
+    <li><b>08 웃으세요</b><span>슬플 때도 웃을 수밖에 없음</span></li></ul></div>
+  <div class="card group"><h3><span class="dot" style="background:var(--blue)"></span>C. 시스템·기술</h3><ul>
+    <li><b>09 추천해 드립니다</b><span>“그 선택도 예측 범위입니다”</span></li>
+    <li><b>10 별점 4.9</b><span>평판을 위해 침묵</span></li>
+    <li><b>11 자유로운 직원</b><span>자유지만 인사평가에 반영</span></li>
+    <li><b>12 읽음</b><span>명령 없이 불안이 통제</span></li></ul></div>
+  <div class="card group"><h3><span class="dot" style="background:#c0584a"></span>D. 권력과 역사</h3><ul>
+    <li><b>13 허가</b><span>“아무것도 안 하기”에도 허가 필요</span></li>
+    <li><b>14 그날의 명령</b><span>전달되며 변형되는 명령</span></li>
+    <li><b>15 이름을 지우다</b><span>기록 통제 = 기억 통제</span></li>
+    <li><b>16 통행금지</b><span>북성로, “원래 그래요”</span></li></ul></div>
+  <div class="card group"><h3><span class="dot" style="background:var(--purple)"></span>E. 영화가 관객을 통제</h3><ul>
+    <li><b>17 보지 마세요</b><span>금지가 시선을 유도</span></li>
+    <li><b>18 자막</b><span>“싫어요”가 “좋아요”로</span></li>
+    <li><b>19 컷!</b><span>“내가 하고 싶은 건 언제 해요?”</span></li>
+    <li><b>20 정답입니다</b><span>보이기만 하는 선택지</span></li></ul></div>
+  <div class="card group"><h3><span class="dot" style="background:var(--green)"></span>F. 통제의 의미 뒤집기</h3><ul>
+    <li><b>21 통제되지 않는 사람</b><span>순응하지 않으면 비정상?</span></li>
+    <li><b>22 제발 시켜주세요</b><span>선택의 책임이 두려워 명령을 찾음</span></li>
+    <li><b>23 우리 모두 관리자</b><span>최상위도 알림의 지시를 따름</span></li>
+    <li><b>24 안전한 세상</b><span>사고도 시도도 없는 세상</span></li></ul></div>
+</div>
+
+<!-- 7. SF -> 현실 -->
+<h2>⑦ 방향 전환: SF 5안 → 현실 미장센 5안</h2>
+<div class="vs">
+  <div class="card">
+    <h3>🚀 SF·판타지 5안 <span class="muted" style="font-size:.8rem">(CG 부담)</span></h3>
+    <table>
+      <tr><th>아이디어</th><th>제작 부담</th></tr>
+      <tr><td>미래의 나를 차단했습니다</td><td><span class="lv"><i class="on"></i><i></i><i></i></span></td></tr>
+      <tr><td>수정 가능한 인생</td><td><span class="lv"><i class="on"></i><i class="on"></i><i></i></span></td></tr>
+      <tr><td>내 그림자가 먼저 움직인다</td><td><span class="lv"><i class="on"></i><i class="on"></i><i class="on"></i></span></td></tr>
+      <tr><td>감정 보관함</td><td><span class="lv"><i class="on"></i><i class="on"></i><i></i></span></td></tr>
+      <tr><td>자유로운 나를 선택하세요</td><td><span class="lv"><i class="on"></i><i class="on"></i><i></i></span></td></tr>
+    </table>
+  </div>
+  <div class="mid">➜</div>
+  <div class="card hl">
+    <h3>🏙 현실 미장센 원칙</h3>
+    <p class="quote">“비현실을 보여주지만 현실을 보여주는 미장센”</p>
+    <p>초능력·세계관 ✘ → <b>현실 안에 낯선 규칙 하나</b> ✔</p>
+    <p class="muted" style="margin-top:6px;font-size:.88rem">참고: 조조 래빗(내면의 의인화) · 더 랍스터(부조리 규칙의 일상 수용) · 비둘기, 가지에 앉아…(고정 화면의 기묘함)</p>
+  </div>
+</div>
+
+<div class="grid g3" style="margin-top:14px">
+  <div class="card"><h3>🏠 공간</h3><p class="muted">실제 거리·골목·방·카페</p></div>
+  <div class="card"><h3>🎭 연기</h3><p class="muted">이상한 규칙에 지극히 평범하게 반응</p></div>
+  <div class="card"><h3>🎥 촬영</h3><p class="muted">대칭 · 정적 롱숏 · 반복 동선</p></div>
+  <div class="card"><h3>✂ 편집</h3><p class="muted">반복 · 되감기 · 말과 자막 불일치</p></div>
+  <div class="card"><h3>🔊 사운드</h3><p class="muted">보이지 않는 명령 · 과하게 친절한 톤</p></div>
+  <div class="card"><h3>🔚 결말</h3><p class="muted">통제자가 사라져도 행동은 자동 반복</p></div>
+</div>
+
+<!-- 8. 현실 5안 -->
+<h2>⑧ CG 최소화 5가지 안<small>상황 → 해방 → 반전</small></h2>
+<table class="card" style="padding:0">
+  <tr><th>안</th><th>상황</th><th>해방</th><th>반전</th><th>핵심 소품/연출</th></tr>
+  <tr><td><b>01 내 안의 상사</b><br><span class="tag">배우 2</span></td><td>따라다니며 걸음·표정·말투 지적</td><td>상사를 쫓아냄</td><td style="color:var(--accent2)">혼자 “똑바로 앉아” 하며 몸을 교정</td><td>정장 · 같은 프레임 두 배우</td></tr>
+  <tr><td><b>02 선을 넘지 마세요</b><br><span class="tag">배우 1~2</span></td><td>스스로 그은 바닥 선, 공간이 좁아짐</td><td>테이프를 다 뜯음</td><td style="color:var(--accent2)">선 없던 자리도 피해 다님</td><td>마스킹 테이프 · 고정 카메라</td></tr>
+  <tr><td><b>03 리허설</b><br><span class="tag">배우 2</span></td><td>하루 모든 행동을 “다시”로 연습</td><td>지시자가 떠남</td><td style="color:var(--accent2)">스스로 “다시”라고 말함</td><td>리테이크 · 동일 컷 반복</td></tr>
+  <tr><td><b>04 괜찮습니다</b><br><span class="tag">배우 1+</span></td><td>무엇이든 “괜찮습니다”</td><td>“안 괜찮습니다”</td><td style="color:var(--accent2)">그 말 때문에 계속 사과</td><td>동일 대사 반복 · 거리 변화</td></tr>
+  <tr><td><b>05 자유롭게 선택하세요</b><br><span class="tag">배우 2</span></td><td>카페 메뉴를 스스로 하나씩 지움</td><td>남은 하나를 만족하며 주문</td><td style="color:var(--accent2)">“원래 메뉴는 하나뿐인데요?”</td><td>메뉴판 · 지운 흔적 인서트</td></tr>
+</table>
+
+<!-- 9. 유력 결합안 -->
+<h2>⑨ 현재 유력 결합안 ★ 〈내 안의 상사〉 × 〈리허설〉</h2>
+<div class="arc">
+  <div class="b"><strong>도입</strong>주인공 곁의 다정하고 유능한 관리자/코치</div>
+  <div class="b"><strong>반복</strong>인사·표정·대화를 매일 검수, “다시”</div>
+  <div class="b"><strong>성공</strong>덕분에 인정받는 성실한 사람이 됨</div>
+  <div class="b"><strong>균열·해방</strong>내면의 의인화임이 드러나고, 쫓아냄</div>
+  <div class="b twist"><strong>반전</strong>스스로 같은 지시, 같은 행동 반복</div>
+</div>
+<div class="bigq" style="font-size:1.05rem;margin-top:14px">중심 역설: “이 통제가 나를 성공시켰다면, 정말 버려야 하는 것일까?”</div>
+<p class="muted" style="font-size:.82rem">※ 확정 시놉시스가 아닌 유망한 조합</p>
+
+<!-- 10. 미결정 -->
+<h2>⑩ 아직 결정하지 않은 것</h2>
+<div class="grid g2">
+  <div class="card">
+    <h3>👤 통제자의 성격은?</h3>
+    <span class="tag">권위적</span><span class="tag">과하게 친절</span><span class="tag">우스꽝스러움</span><span class="tag">보호자 같음</span>
+    <h3 style="margin-top:14px">💎 주인공이 통제를 받아들인 이유는?</h3>
+    <span class="tag">사회적 인정</span><span class="tag">사랑</span><span class="tag">실패 회피</span><span class="tag">편안함</span><span class="tag">안전</span>
+    <h3 style="margin-top:14px">💡 기타</h3>
+    <p class="muted">· 가상 인물임이 <b>언제</b> 드러나는가?<br>· 모순을 깨닫게 할 <b>작은 사건</b>은?<br>· 관객에게 남을 감정: 공감 / 웃음 / 불편함?<br>· 북성로를 1컷 이상의 <b>극적 공간</b>으로 쓸 수 있나?</p>
+  </div>
+  <div class="card">
+    <h3>🔚 해방 이후 — 어떤 결말이 가장 강할까?</h3>
+    <div class="ends" style="margin-top:10px">
+      <div class="card"><div class="big">🔁</div><b>동일 행동 반복</b><p class="muted" style="font-size:.8rem">통제자는 이제 나 자신</p></div>
+      <div class="card"><div class="big">👉</div><b>타인을 통제</b><p class="muted" style="font-size:.8rem">피해자이자 전달자</p></div>
+      <div class="card"><div class="big">📏</div><b>새 규칙 발명</b><p class="muted" style="font-size:.8rem">“자유로워야 해”도 규칙</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- 11. 메시지 -->
+<h2>⑪ 메시지 업그레이드</h2>
+<div class="vs">
+  <div class="card" style="text-align:center"><p class="muted">단순한 메시지</p><p style="font-size:1.1rem;text-decoration:line-through;color:var(--muted)">“통제는 나쁘다. 벗어나야 한다.”</p></div>
+  <div class="mid">➜</div>
+  <div class="card hl">
+    <p>1. 통제는 우리를 불행하게만 만들지 않는다</p>
+    <p>2. 자신을 지키려는 행동이 자신을 가둔다</p>
+    <p>3. 통제자가 사라져도 언어와 습관으로 남는다</p>
+    <p>4. 우리는 통제의 피해자이자 전달자다</p>
+    <p>5. “자유롭게 살아라”도 하나의 규칙이다</p>
+    <p>6. 완벽한 통제가 좋은 결과를 보장하지 않는다</p>
+  </div>
+</div>
+<div class="grid g3" style="margin-top:14px">
+  <div class="card">🎬 메시지는 대사 대신 <b>한 행동의 변화</b>로</div>
+  <div class="card">🔄 반전은 <b>앞부분을 다시 해석</b>하게</div>
+  <div class="card">🎯 짧은 길이 → <b>하나의 중심 질문</b>에 집중</div>
+</div>
+
+<!-- 12. 연출 장치 -->
+<h2>⑫ ‘통제’를 화면으로 — 연출 도구함</h2>
+<div class="grid g4">
+  <div class="card"><h3>📐 카메라</h3><p class="muted">정중앙 고정 · 대칭 · 출구 차단 · 프레임 탈출 · 마지막 컷에서 대칭으로 복귀(거짓 해방)</p></div>
+  <div class="card"><h3>🚶 동작</h3><p class="muted">같은 보폭·동작 반복 · 몸의 자동 교정 · 떠난 자리를 계속 의식</p></div>
+  <div class="card"><h3>🗣 소리</h3><p class="muted">“다시” “괜찮습니다” “똑바로 앉아” — 타인 목소리 → <b>주인공 목소리</b>로</p></div>
+  <div class="card"><h3>🧰 소품</h3><p class="muted">마스킹 테이프 · 넥타이/명찰 · 메뉴판 · 체크리스트 · 휴대폰 · 거울 · 빈 의자 · 대본</p></div>
+</div>
+
+<!-- 13. 체크리스트 -->
+<h2>⑬ 최종안 선택 체크리스트</h2>
+<div class="grid g2">
+  <div class="card">
+    <ul class="check">
+      <li>배우 1~2명으로 가능한가?</li>
+      <li>북성로 실사 1컷이 서사에 자연스러운가?</li>
+      <li>CG 없이 연기·카메라·소품으로 규칙이 보이는가?</li>
+      <li>2~4분 안에 갈등과 선택이 선명한가?</li>
+      <li>‘통제하다’가 대사 설명 없이 읽히는가?</li>
+      <li>마지막 행동이 초반을 새롭게 해석하게 하는가?</li>
+      <li>끝난 뒤 관객에게 질문이 남는가?</li>
+      <li>역사적 출발점이 지나치게 단순화되지 않았는가?</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>🧪 다음 회의 미장센 실험</h3>
+    <p>1. 두 배우 + 의자 하나로 통제 관계 표현</p>
+    <p>2. 한 컷 안에서 통제자 퇴장 후 자동으로 움직이기</p>
+    <p>3. “다시” — 처음엔 타인이, 마지막엔 주인공이</p>
+    <p>4. 북성로 창틀·가로선·골목·표지판을 프레임으로</p>
+    <p>5. 카메라 고정, 주인공 위치만 바꿔 자유/속박 표현</p>
+  </div>
+</div>
+
+<!-- 14. 핵심 문장 -->
+<h2>⑭ 회의용 핵심 문장</h2>
+<div class="grid g2">
+  <div>
+    <p class="quote">상황은 비현실적이지만, 감정과 갈등은 현실적이어야 한다.</p>
+    <p class="quote">가장 무서운 통제는 통제자가 없어져도 계속되는 통제다.</p>
+    <p class="quote">주인공이 벗어난 순간에도 카메라는 이전의 규칙으로 돌아갈 수 있다.</p>
+    <p class="quote">자유를 원하지만 선택의 책임을 두려워할 수 있다.</p>
+  </div>
+  <div>
+    <p class="quote">좋은 단편은 메시지를 설명하기보다 관객이 스스로 질문하게 한다.</p>
+    <p class="quote">자신이 통제당하고 있다는 사실조차 모르는 인물.</p>
+    <p class="quote">가장 위험한 통제는 그것을 통제라고 느끼지 못하는 순간 시작된다.</p>
+    <p class="quote" style="color:var(--accent2)">해방된 줄 알았지만, 통제자는 이제 자기 자신이다.</p>
+  </div>
+</div>
+
+<footer>원본: control_shortfilm_ideas.md · 결정된 기획서가 아닌 아이디어 작업 노트의 시각화</footer>
+</div>
+</body>
+</html>
